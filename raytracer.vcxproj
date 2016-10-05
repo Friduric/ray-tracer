@@ -151,7 +151,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\raytracer.cpp" />
+    <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Geometry\Ray.cpp" />
     <ClCompile Include="src\Geometry\Scene.cpp" />
     <ClCompile Include="src\Geometry\Sphere.cpp" />
