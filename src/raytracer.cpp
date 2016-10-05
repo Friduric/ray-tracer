@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "src\Graphics\Camera.h"
+#include "Graphics\Camera.h"
 
 ///<summary> The main start for pengine. </summary>
 int main()
