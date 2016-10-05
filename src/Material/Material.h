@@ -4,7 +4,6 @@
 
 class Material {
 public:
-
 	/// <summary> Calculates the BRDF value of this material. In other words the outgoing radiance. </summary>
 	/// <param name='inDirection'> the direction of the incoming light.</param>
     	/// <param name='outDirection'> the outgoing direction towards the eye / another surface.</param>
