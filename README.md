@@ -1,5 +1,5 @@
 ﻿## Introduction
-This is a Monte-Carlo ray tracer implementation that models intransparent objects using Lambertian reflections.
+This is a Monte Carlo ray tracer implementation that models intransparent objects using Lambertian reflections.
 
 ## A few troubleshooting tips
 1. IMPORTANT: Use the 32-bit binaries (build using x86!).
