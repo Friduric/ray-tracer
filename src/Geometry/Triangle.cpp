@@ -28,7 +28,7 @@ bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
 	vec3 P = cross(D, E2);
 	vec3 Q = cross(T, E1);
 	float den = dot(P, E1);
-	if (abs(den) < FLT_EPSILON) {
+	if (den < FLT_EPSILON) {
 		return false;
 	}
 	float t = dot(Q, E2) / den;
