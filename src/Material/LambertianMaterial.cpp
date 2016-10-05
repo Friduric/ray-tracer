@@ -4,9 +4,9 @@ glm::vec3 LambertianMaterial::CalculateBRDF(glm::vec3 & inDirection, glm::vec3 &
 											glm::vec3 & normal, glm::vec3 & incomingIntensity,
 											glm::vec3 & surfaceColor) {
 	float d = glm::max(0.0f, glm::dot(inDirection, normal));
-	float r = incomingIntensity.x * surfaceColor.x;
-	float g = incomingIntensity.y * surfaceColor.y;
-	float b = incomingIntensity.z * surfaceColor.z;
+	float r = incomingIntensity.r * surfaceColor.r;
+	float g = incomingIntensity.g * surfaceColor.g;
+	float b = incomingIntensity.b * surfaceColor.b;
 	return d * glm::vec3(r, g, b);
 }
 
