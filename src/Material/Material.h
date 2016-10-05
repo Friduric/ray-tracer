@@ -4,6 +4,9 @@
 
 class Material {
 public:
+	//The intensity of the light of this material (should generally be 0 if not a lightsource).
+	glm::vec3 lightIntensity;
+
 	/// <summary> Calculates the BRDF value of this material. In other words the outgoing radiance. </summary>
 	/// <param name='inDirection'> the direction of the incoming light.</param>
 	/// <param name='outDirection'> the outgoing direction towards the eye / another surface.</param>
