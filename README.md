@@ -1,4 +1,4 @@
-﻿#A Monte Carlo ray tracer implementation.
+﻿# A Monte Carlo ray tracer implementation.
 
 ## A few troubleshooting tips
 1. IMPORTANT: Use the 32-bit binaries (build using x86!).
