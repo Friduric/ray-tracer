@@ -12,5 +12,5 @@ public:
 	/// <param name='surfaceColor'> the color of the surface.</param>
 	/// <returns> The BRDF value of this material. </returns>
 	virtual glm::vec3 CalculateBRDF(glm::vec3& inDirection, glm::vec3& outDirection, glm::vec3& normal, 
-					glm::vec3 incomingIntensity, glm::vec3 surfaceColor) = 0;
+					glm::vec3 & incomingIntensity, glm::vec3 & surfaceColor) = 0;
 };
