@@ -1,6 +1,4 @@
 #pragma once
-#include <vector>
-#include <glm.hpp>
 #include "Material.h"
 
 class LambertianMaterial : public Material {
