@@ -34,6 +34,6 @@ bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
 	const float t = dot(Q, E2) / den;
 
 	// Calculate answer.
-	intersectionPoint = ray.from + t * (ray.from - ray.to);
+	intersectionPoint = ray.from + t * D;
 	return true;
 }
