@@ -18,34 +18,22 @@ bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
 		return false; // The ray direction and normal are in the same direction. 
 	}
 
-	const auto& v0 = vertices[0];
-	const auto& v1 = vertices[1];
-	const auto& v2 = vertices[2];
-
-	vec3 v0v1 = v1 - v0;
-	vec3 v0v2 = v2 - v0;
-	vec3 pvec = cross(ray.dir, pvec);
-	float det = dot(v0v1, pvec);
-	if (det < FLT_EPSILON) {
+	// Calculate intersection using barycentric coordinates. This gives a equation system
+	// which we can solve using Cramer's rule.
+	// See http://staffwww.itn.liu.se/~mardi/WebPages/Courses/TNCG15/TheCode.pdf for more information.
+	vec3 T = ray.from - vertices[0];
+	vec3 E1 = vertices[1] - vertices[0];
+	vec3 E2 = vertices[2] - vertices[0];
+	vec3 D = ray.to - ray.from;
+	vec3 P = cross(D, E2);
+	vec3 Q = cross(T, E1);
+	float den = dot(P, E1);
+	if (abs(den) < FLT_EPSILON) {
 		return false;
 	}
-	float inv = 1.0 / det;
+	float t = dot(Q, E2) / den;
 
-	// u
-	vec3 tvec = vec3(ray.from) - v0;
-	float u = dot(tvec, pvec) * inv;
-	if (u < -FLT_EPSILON || u > 1 + FLT_EPSILON) { return false; }
-
-	// v
-	vec3 qvec = cross(tvec, v0v1);
-	float v = dot(ray.dir, qvec) * inv;
-	if (v < -FLT_EPSILON || u + v > 1 + FLT_EPSILON) { return false; }
-
-	// t
-	double t = 1 - u - v;
-
-	intersectionPoint.x = t;
-	intersectionPoint.y = u;
-	intersectionPoint.z = v;
+	// Calculate answer.
+	intersectionPoint = ray.from + t * (ray.from - ray.to);
 	return true;
 }
