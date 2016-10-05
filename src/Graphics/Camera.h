@@ -6,16 +6,19 @@
 
 class Camera {
 public:
-	// Constructor.
 	Camera(int width = PIXELS_WIDTH, int height = PIXELS_HEIGHT);
 	size_t width, height;
 
+	/// <summary>
 	/// Renders the image by setting the color of each pixel according to Monte Carlo 
 	/// ray tracing techniques.
+	/// </summary>
 	void Render();
 
+	/// <summary> 
 	/// Writes the discretized pixels to a TGA image.
-	/// Returns true if successful.
+	/// Returns true if successful. 
+	/// </summary>
 	bool WriteImageToTGA(std::string path = "output/output_image.tga");
 private:
 	// Constants.
@@ -31,6 +34,6 @@ private:
 	std::vector<std::vector<Pixel>> pixels;
 	std::vector<std::vector<glm::u8vec3>> discretizedPixels;
 
-	/// Discretizes the color of each pixel.
+	/// <summary> Discretizes the color of each pixel. </summary>
 	void CreateImage();
 };
