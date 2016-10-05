@@ -1,6 +1,5 @@
 #include "Camera.h"
 
-#include <algorithm>
 #include <iostream>
 #include <fstream>
 
@@ -18,12 +17,12 @@ void Camera::CreateImage() {
 	std::cout << "Creating raw pixel image..." << std::endl;
 
 	// Find max color intensity. Could try using r + g + b instead.
-	double maxIntensity = 0;
+	float maxIntensity = 0;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
-			maxIntensity = std::max<double>(maxIntensity, pixels[i][j].color.r);
-			maxIntensity = std::max<double>(maxIntensity, pixels[i][j].color.g);
-			maxIntensity = std::max<double>(maxIntensity, pixels[i][j].color.b);
+			maxIntensity = glm::max(maxIntensity, pixels[i][j].color.r);
+			maxIntensity = glm::max(maxIntensity, pixels[i][j].color.g);
+			maxIntensity = glm::max(maxIntensity, pixels[i][j].color.b);
 		}
 	}
 
@@ -39,15 +38,15 @@ void Camera::CreateImage() {
 	}
 
 	// Discretize pixels using the max intensity. Every value must be between 0 and 255.
-	double f = maxIntensity < 0.00001 ? 0 : 254.99 / maxIntensity;
+	float f = maxIntensity < 0.00001 ? 0 : 254.99 / maxIntensity;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
-			double r = pixels[i][j].color.r * f;
-			assert(r >= -DBL_EPSILON && r <= 256 - DBL_EPSILON);
-			double g = pixels[i][j].color.g * f;
-			assert(g >= -DBL_EPSILON && g <= 256 - DBL_EPSILON);
-			double b = pixels[i][j].color.b * f;
-			assert(b >= -DBL_EPSILON && b <= 256 - DBL_EPSILON);
+			float r = pixels[i][j].color.r * f;
+			assert(r >= -FLT_EPSILON && r <= 256 - FLT_EPSILON);
+			float g = pixels[i][j].color.g * f;
+			assert(g >= -FLT_EPSILON && g <= 256 - FLT_EPSILON);
+			float b = pixels[i][j].color.b * f;
+			assert(b >= -FLT_EPSILON && b <= 256 - FLT_EPSILON);
 			discretizedPixels[i][j].r = (glm::u8)round(r);
 			discretizedPixels[i][j].g = (glm::u8)round(g);
 			discretizedPixels[i][j].b = (glm::u8)round(b);
