@@ -10,9 +10,11 @@ public:
 	float radius;
 	Sphere(glm::vec3 center = glm::vec3(), glm::vec3 color = glm::vec3(), float r = 1.0);
 
-	/// <summary>
-	/// Returns the number of intersection points given by a ray.
-	/// Overwrites the two intersection point vertices with the intersection (if there was an intersection).
+	/// <summary> 
+	/// Computes the ray intersection point.
+	/// Returns true if there was an intersection.
 	/// </summary>
-	int RayIntersection(const Ray& ray, glm::vec3& intersectionPoint1, glm::vec3& intersectionPoint2);
+	/// <param name='ray'> The ray. </param>
+	/// <param name='intersectionPoint'> The overwritten output intersection point. </param>
+	bool RayIntersection(const Ray& ray, glm::vec3& intersectionPoint);
 };
