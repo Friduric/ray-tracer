@@ -2,7 +2,7 @@
 This is a Monte Carlo ray tracer implementation that models intransparent objects using Lambertian reflections.
 
 ## A few troubleshooting tips
-- IMPORTANT: Use the 32-bit binaries (build using x86!).
+- IMPORTANT: Use the 32-bit binaries (build using x86!). Otherwise GLM might bug out.
 
 - OPTIONAL: Linker -> Command Line -> Add "/NODEFAULTLIB:MSVCRT /NODEFAULTLIB:LIBCMT"
 
