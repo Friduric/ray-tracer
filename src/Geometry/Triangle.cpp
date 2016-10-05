@@ -21,17 +21,17 @@ bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
 	// Calculate intersection using barycentric coordinates. This gives a equation system
 	// which we can solve using Cramer's rule.
 	// See http://staffwww.itn.liu.se/~mardi/WebPages/Courses/TNCG15/TheCode.pdf for more information.
-	vec3 T = ray.from - vertices[0];
-	vec3 E1 = vertices[1] - vertices[0];
-	vec3 E2 = vertices[2] - vertices[0];
-	vec3 D = ray.to - ray.from;
-	vec3 P = cross(D, E2);
-	vec3 Q = cross(T, E1);
-	float den = dot(P, E1);
+	const vec3 T = ray.from - vertices[0];
+	const vec3 E1 = vertices[1] - vertices[0];
+	const vec3 E2 = vertices[2] - vertices[0];
+	const vec3 D = ray.to - ray.from;
+	const vec3 P = cross(D, E2);
+	const vec3 Q = cross(T, E1);
+	const float den = dot(P, E1);
 	if (den < FLT_EPSILON) {
-		return false;
+		return false; // Didn't hit.
 	}
-	float t = dot(Q, E2) / den;
+	const float t = dot(Q, E2) / den;
 
 	// Calculate answer.
 	intersectionPoint = ray.from + t * (ray.from - ray.to);
