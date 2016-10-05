@@ -3,12 +3,14 @@
 #include <iostream>
 #include <fstream>
 
-Camera::Camera(int _width, int _height) : width(_width), height(_height) {
+Camera::Camera(const int _width, const int _height) : width(_width), height(_height) {
 	pixels.assign(width, std::vector<Pixel>(height));
 	discretizedPixels.assign(width, std::vector<glm::u8vec3>(height));
 }
 
-void Camera::Render() {
+
+void Camera::Render(const glm::vec3 eye1, const glm::vec3 c1, const glm::vec3 c2,
+					const glm::vec3 c3, const glm::vec3 c4) {
 	std::cout << "Rendering the scene..." << std::endl;
 	CreateImage(); // Should always be done immediately after the rendering step.
 }
@@ -54,7 +56,7 @@ void Camera::CreateImage() {
 	}
 }
 
-bool Camera::WriteImageToTGA(std::string path) {
+bool Camera::WriteImageToTGA(const std::string path) {
 	std::cout << "Writing image to TGA..." << std::endl;
 
 	assert(width > 0 && height > 0);
