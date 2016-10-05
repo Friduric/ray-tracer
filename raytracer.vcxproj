@@ -160,6 +160,7 @@
     <ClCompile Include="src\Geometry\Triangle.cpp" />
     <ClCompile Include="src\Graphics\Camera.cpp" />
     <ClCompile Include="src\Graphics\Pixel.cpp" />
+    <ClCompile Include="src\Material\LambertianMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Geometry\Ray.h" />
@@ -168,6 +169,8 @@
     <ClInclude Include="src\Geometry\Triangle.h" />
     <ClInclude Include="src\Graphics\Camera.h" />
     <ClInclude Include="src\Graphics\Pixel.h" />
+    <ClInclude Include="src\Material\LambertianMaterial.h" />
+    <ClInclude Include="src\Material\Material.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
