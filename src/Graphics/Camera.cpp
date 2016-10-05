@@ -42,19 +42,23 @@ void Camera::CreateImage() {
 	double f = maxIntensity < 0.00001 ? 0 : 254.99 / maxIntensity;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
-			discretizedPixels[i][j].r = (glm::u8)round(pixels[i][j].color.r * f);
-			discretizedPixels[i][j].g = (glm::u8)round(pixels[i][j].color.g * f);
-			discretizedPixels[i][j].b = (glm::u8)round(pixels[i][j].color.b * f);
+			double r = pixels[i][j].color.r * f;
+			assert(r >= -DBL_EPSILON && r <= 256 - DBL_EPSILON);
+			double g = pixels[i][j].color.g * f;
+			assert(g >= -DBL_EPSILON && g <= 256 - DBL_EPSILON);
+			double b = pixels[i][j].color.b * f;
+			assert(b >= -DBL_EPSILON && b <= 256 - DBL_EPSILON);
+			discretizedPixels[i][j].r = (glm::u8)round(r);
+			discretizedPixels[i][j].g = (glm::u8)round(g);
+			discretizedPixels[i][j].b = (glm::u8)round(b);
 		}
 	}
 }
 
 bool Camera::WriteImageToTGA(std::string path) {
 	std::cout << "Writing image to TGA..." << std::endl;
-	if (width <= 0 || height <= 0) {
-		std::cerr << "Image size is not set properly" << std::endl;
-		return false;
-	}
+
+	assert(width > 0 && height > 0);
 
 	std::ofstream o(path.c_str(), std::ios::out | std::ios::binary);
 
