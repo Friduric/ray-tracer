@@ -19,5 +19,5 @@ public:
 	/// </summary>
 	/// <param name='ray'> The ray. </param>
 	/// <param name='intersectionPoint'> The overwritten output intersection point. </param>
-	bool RayIntersection(const Ray& ray, glm::vec3& intersectionPoint);
+	bool RayIntersection(const Ray& ray, glm::vec3& intersectionPoint) const;
 };

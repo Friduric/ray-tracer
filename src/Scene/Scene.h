@@ -16,7 +16,7 @@ public:
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color.
 	/// </summary>
-	glm::vec3 TraceRay(const Ray & ray);
+	glm::vec3 TraceRay(const Ray & ray) const;
 
 	/// <summary> 
 	/// Creates all walls, floors and ceilings of a room (according to the description given

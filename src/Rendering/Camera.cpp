@@ -130,7 +130,7 @@ void Camera::CreateImage() {
 	}
 }
 
-bool Camera::WriteImageToTGA(const std::string path) {
+bool Camera::WriteImageToTGA(const std::string path) const {
 	std::cout << "Writing image to TGA..." << std::endl;
 
 	assert(width > 0 && height > 0);

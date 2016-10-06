@@ -33,7 +33,7 @@ public:
 	/// Writes the discretized pixels to a TGA image.
 	/// Returns true if successful. 
 	/// </summary>
-	bool WriteImageToTGA(const std::string path = "output/output_image.tga");
+	bool WriteImageToTGA(const std::string path = "output/output_image.tga") const;
 private:
 	// Constants.
 	constexpr static double BRIGHTNESS_DISCRETIZATION_THRESHOLD = 1.25;

@@ -5,7 +5,7 @@ using namespace glm;
 Sphere::Sphere(vec3 _center, vec3 _color, float _radius) :
 	center(_center), color(_color), radius(_radius) {}
 
-bool Sphere::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
+bool Sphere::RayIntersection(const Ray & ray, vec3 & intersectionPoint) const {
 	// We assume that the ray does not start inside the sphere.
 	const float bcheck = dot(ray.dir, center - ray.from);
 	if (bcheck < -FLT_EPSILON) {

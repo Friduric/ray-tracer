@@ -2,7 +2,7 @@
 
 Scene::Scene() {}
 
-glm::vec3 Scene::TraceRay(const Ray & ray)
+glm::vec3 Scene::TraceRay(const Ray & ray) const
 {
 	return glm::vec3();
 }

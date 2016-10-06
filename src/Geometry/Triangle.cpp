@@ -13,7 +13,7 @@ Triangle::Triangle(vec3 _vertices[3], vec3 _normal, vec3 _color) :
 }
 
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
-bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
+bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) const {
 	if (dot(ray.dir, normal) > -FLT_EPSILON) {
 		return false; // The ray direction and normal are in the same direction. 
 	}
