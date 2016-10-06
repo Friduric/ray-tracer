@@ -5,8 +5,7 @@
 Scene::Scene() {}
 
 glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
-						  const unsigned int MAX_DEPTH) const
-{
+						  const unsigned int MAX_DEPTH) const {
 	if (MAX_DEPTH == 0) { return glm::vec3(0, 0, 0); }
 
 	unsigned int intersectionPrimitiveIndex;
@@ -19,17 +18,28 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	const auto& intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
-	if (intersectionRenderGroup.material) {
 
+	/* Simplification: emissive materials only return their emission. I.e. no indirect lighting
+	 * from other lights. */
+	if (glm::length(intersectionRenderGroup.material->emission) > FLT_EPSILON) {
+		return intersectionRenderGroup.material->emission;
 	}
 
 	const auto& intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
-
-
-	/* We intersected with something. Now shoot rays all over the place. */
+	/* We intersected with something non-emissive. Now shoot rays all over the place. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
+	glm::vec3 hitNormal = intersectionPrimitive.GetNormal(intersectionPoint);
+
+	// Testing.
+	return intersectionPrimitive.color;
+
+	/*
+	for (unsigned int b = 0; b < BOUNCES_PER_HIT; ++b) {
+
+	}
 
 	return colorAccumulator;
+	*/
 }
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
