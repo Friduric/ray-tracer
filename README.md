@@ -1,4 +1,4 @@
-﻿## Introduction
+﻿## Description
 This is a Monte Carlo ray tracer implementation that models intransparent objects using Lambertian reflections.
 
 ## A few troubleshooting tips
