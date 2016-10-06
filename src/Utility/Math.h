@@ -14,7 +14,7 @@ namespace Math {
 	/// <param name='x2'> The value of the "lower left" point. </param>
 	/// <param name='x3'> The value of the "upper left" point. </param>
 	/// <param name='x4'> The value of the "upper right" point. </param>
-	float InterpolationQuad4f(const float dy, const float dz,
-							  const float x1, const float x2,
-							  const float x3, const float x4);
+	float BilinearInterpolation(const float dy, const float dz,
+								const float x1, const float x2,
+								const float x3, const float x4);
 }
