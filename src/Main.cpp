@@ -10,7 +10,8 @@ int main()
 
 	// --- body ---
 	Camera c(1, 1);
-	// c.Render();
+	Scene scene;
+	c.Render(scene);
 	// c.WriteImageToTGA();
 	// ------------
 
