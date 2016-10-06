@@ -1,12 +1,11 @@
 #pragma once
 
 #include "glm.hpp"
-
+#include "Primitive.h"
 #include "Ray.h"
 
-class Triangle {
+class Triangle : public Primitive {
 public:
-	glm::vec3 color;
 	glm::vec3 vertices[3];
 	glm::vec3 normal;
 	Triangle(glm::vec3 v1 = glm::vec3(), glm::vec3 v2 = glm::vec3(), glm::vec3 v3 = glm::vec3(),

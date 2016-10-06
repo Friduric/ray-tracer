@@ -1,12 +1,11 @@
 #pragma once
 
 #include "glm.hpp"
-
+#include "Primitive.h"
 #include "Ray.h"
 
-class Sphere {
+class Sphere : public Primitive {
 public:
-	glm::vec3 color;
 	glm::vec3 center;
 	float radius;
 	Sphere(glm::vec3 center = glm::vec3(), glm::vec3 color = glm::vec3(), float r = 1.0);
