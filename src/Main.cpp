@@ -18,7 +18,11 @@ int main()
 	cout << t << endl;*/
 	// --- body ---
 	Camera c(100, 100);
-	Scene scene;					//			c1					c2					c3					c4
+	Scene scene;	
+	//scene.CreateRoom();
+	//scene.CreateSphere();
+	//scene.CreateTetrahedron();
+					//			c1					c2					c3					c4
 	c.Render(scene, glm::vec3(-2, 0, 0), glm::vec3(0, -1, 0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1));
 	c.WriteImageToTGA();
 	// ------------

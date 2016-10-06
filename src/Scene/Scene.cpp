@@ -1,7 +1,7 @@
 #include "Scene.h"
 #include <memory>
 #include "../../includes/glm/gtx/norm.hpp"
-#include "../Rendering/Material/LambertianMaterial.h";
+#include "../Rendering/Material/LambertianMaterial.h"
 #include "../Geometry/Sphere.h"
 
 Scene::Scene() {}
@@ -74,8 +74,30 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 }*/
 
 void Scene::CreateRoom() {
+	// Colors
 	glm::vec3 whiteColor(1.0, 1.0, 1.0);
-	auto whiteMaterial = std::make_shared<Material>(LambertianMaterial(whiteColor));
+	glm::vec3 redColor(1.0, 0.0, 0.0);
+	glm::vec3 greenColor(0.0, 1.0, 1.0);
+	glm::vec3 blueColor(0.0, 0.0, 1.0);
+	glm::vec3 yellowColor(0.0, 1.0, 0.0);
+	glm::vec3 orangeColor(1.0, 1.0, 0.0);
+	glm::vec3 purpleColor(1.0, 0.0, 1.0);
+
+	// Materials
+	std::shared_ptr<Material> whiteMaterial;
+	whiteMaterial.reset(new LambertianMaterial(whiteColor));
+	std::shared_ptr<Material> redMaterial;
+	redMaterial.reset(new LambertianMaterial(redColor));
+	std::shared_ptr<Material> greenMaterial;
+	greenMaterial.reset(new LambertianMaterial(greenColor));
+	std::shared_ptr<Material> blueMaterial;
+	blueMaterial.reset(new LambertianMaterial(blueColor));
+	std::shared_ptr<Material> yellowMaterial;
+	yellowMaterial.reset(new LambertianMaterial(yellowColor));
+	std::shared_ptr<Material> orangeMaterial;
+	orangeMaterial.reset(new LambertianMaterial(orangeColor));
+	std::shared_ptr<Material> purpleMaterial;
+	purpleMaterial.reset(new LambertianMaterial(purpleColor));
 
 	// Ceiling.
 	glm::vec3 cv1(-3.0, 0.0, 5.0);
@@ -85,7 +107,7 @@ void Scene::CreateRoom() {
 	glm::vec3 cv5(10.0, -6.0, 5.0);
 	glm::vec3 cv6(0.0, -6.0, 5.0);
 	glm::vec3 ceilingNormal(0.0, 0.0, -1.0);
-	RenderGroup ceiling(whiteMaterial);
+	RenderGroup ceiling(whiteMaterial);	
 	Triangle ct1(cv1, cv2, cv6, ceilingNormal);
 	Triangle ct2(cv2, cv3, cv5, ceilingNormal);
 	Triangle ct3(cv2, cv5, cv6, ceilingNormal);
@@ -116,9 +138,7 @@ void Scene::CreateRoom() {
 	renderGroups.push_back(floor);
 
 	// Wall 1.
-	glm::vec3 redColor(1.0, 0.0, 0.0);
 	glm::vec3 w1Normal(2.0, -1.0, 0.0);
-	auto redMaterial = std::make_shared<Material>(LambertianMaterial(redColor));
 	RenderGroup wall1(redMaterial);
 	Triangle w1t1(fv1, cv1, cv2, w1Normal);
 	Triangle w1t2(fv2, fv1, cv2, w1Normal);
@@ -127,9 +147,7 @@ void Scene::CreateRoom() {
 	renderGroups.push_back(wall1);
 
 	// Wall 2.
-	glm::vec3 greenColor(0.0, 1.0, 1.0);
 	glm::vec3 w2Normal(0.0, -1.0, 0.0);
-	auto greenMaterial = std::make_shared<Material>(LambertianMaterial(greenColor));
 	RenderGroup wall2(greenMaterial);
 	Triangle w2t1(fv2, cv2, cv3, w2Normal);
 	Triangle w2t2(fv3, fv2, cv3, w2Normal);
@@ -138,10 +156,8 @@ void Scene::CreateRoom() {
 	renderGroups.push_back(wall2);
 
 	// Wall 3.
-	glm::vec3 blueColor(0.0, 0.0, 1.0);
 	glm::vec3 w3Normal(-2.0, -1.0, 0.0);
-	auto greenMaterial = std::make_shared<Material>(LambertianMaterial(greenColor));
-	RenderGroup wall3(greenMaterial);
+	RenderGroup wall3(blueMaterial);
 	Triangle w3t1(fv3, cv3, cv4, w3Normal);
 	Triangle w3t2(fv4, fv3, cv4, w3Normal);
 	wall3.primitives.push_back(w3t1);
@@ -149,9 +165,7 @@ void Scene::CreateRoom() {
 	renderGroups.push_back(wall3);
 
 	// Wall 4.
-	glm::vec3 yellowColor(0.0, 1.0, 0.0);
 	glm::vec3 w4Normal(-2.0, 1.0, 0.0);
-	auto yellowMaterial = std::make_shared<Material>(LambertianMaterial(yellowColor));
 	RenderGroup wall4(yellowMaterial);
 	Triangle w4t1(fv4, cv4, cv5, w4Normal);
 	Triangle w4t2(fv5, fv4, cv5, w4Normal);
@@ -160,9 +174,7 @@ void Scene::CreateRoom() {
 	renderGroups.push_back(wall4);
 
 	// Wall 5.
-	glm::vec3 orangeColor(1.0, 1.0, 0.0);
 	glm::vec3 w5Normal(0.0, 1.0, 0.0);
-	auto orangeMaterial = std::make_shared<Material>(LambertianMaterial(orangeColor));
 	RenderGroup wall5(orangeMaterial);
 	Triangle w5t1(fv5, cv5, cv6, w5Normal);
 	Triangle w5t2(fv6, fv5, cv6, w5Normal);
@@ -171,9 +183,7 @@ void Scene::CreateRoom() {
 	renderGroups.push_back(wall5);
 
 	// Wall 6.
-	glm::vec3 purpleColor(1.0, 0.0, 1.0);
 	glm::vec3 w6Normal(2.0, 1.0, 0.0);
-	auto purpleMaterial = std::make_shared<Material>(LambertianMaterial(purpleColor));
 	RenderGroup wall6(purpleMaterial);
 	Triangle w6t1(fv6, cv6, cv1, w6Normal);
 	Triangle w6t2(fv1, fv6, cv1, w6Normal);
@@ -184,7 +194,8 @@ void Scene::CreateRoom() {
 
 void Scene::CreateTetrahedron(float x, float y, float z) {
 	glm::vec3 c(0.0, 0.5, 0.5);
-	auto tetraMat = std::make_shared<Material>(LambertianMaterial(c));
+	std::shared_ptr<Material> tetraMat;
+	tetraMat.reset(new LambertianMaterial(c));
 	RenderGroup tetrahedron(tetraMat);
 
 	// Vertices.
@@ -216,7 +227,8 @@ void Scene::CreateTetrahedron(float x, float y, float z) {
 
 void Scene::CreateSphere(float x, float y, float z, float radius) {
 	glm::vec3 c(0.5, 0.5, 0.0);
-	auto sphereMat = std::make_shared<Material>(LambertianMaterial(c));
+	std::shared_ptr<Material> sphereMat;
+	sphereMat.reset(new LambertianMaterial(c));
 	RenderGroup sphereGroup(sphereMat);
 	Sphere sphere(glm::vec3(x,y,z), radius);
 

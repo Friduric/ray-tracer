@@ -6,7 +6,7 @@
 
 #include "../Geometry/Ray.h"
 #include "../Rendering/RenderGroup.h"
-#include "../Geometry/Triangle.h";
+#include "../Geometry/Triangle.h"
 
 class Scene {
 public:
@@ -46,8 +46,8 @@ public:
 	void CreateRoom();
 
 	/// <summary> Creates a tetrahedron at position x, y, z and adds it to the scene. </summary>
-	void CreateTetrahedron(float x = 0, float y = 0, float z = 0);
+	void CreateTetrahedron(float x = -3, float y = 0, float z = 0);
 
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
-	void CreateSphere(float x = 2, float y = 0, float z = 0, float radius = 1.0f);
+	void CreateSphere(float x = 3, float y = 0, float z = 0, float radius = 1.0f);
 };
