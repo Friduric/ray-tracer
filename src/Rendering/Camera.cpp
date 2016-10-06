@@ -27,14 +27,18 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 	float invWidth = 1.0f / (float)width;
 	float invHeight = 1.0f / (float)height;
 
+	long long ctr = 0;
 	/* For each pixel, shoot a bunch of rays through it. */
 	for (unsigned int y = 0; y < width; ++y) {
 		for (unsigned int z = 0; z < height; ++z) {
 
 			/* Shoot a bunch of rays through the pixel (y, z). */
 			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
-			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
-
+			for (unsigned int i = 0; i < 4; ++i) {
+				++ctr;
+				if (ctr % 100000 == 0) {
+					std::cout << ctr << "/" << 4000000 << std::endl;
+				}
 				/* Calculate new randomized point in the camera plane. */
 				float ylerp = (y + rand(gen)) * invWidth;
 				float zlerp = (z + rand(gen)) * invHeight;
@@ -91,14 +95,14 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
 			float r = pixels[i][j].color.r * f;
-			assert(r >= -FLT_EPSILON && r <= 255.5f - FLT_EPSILON);
+			// assert(r >= -FLT_EPSILON && r <= 255.5f - FLT_EPSILON);
 			float g = pixels[i][j].color.g * f;
-			assert(g >= -FLT_EPSILON && g <= 255.5f - FLT_EPSILON);
+			// assert(g >= -FLT_EPSILON && g <= 255.5f - FLT_EPSILON);
 			float b = pixels[i][j].color.b * f;
-			assert(b >= -FLT_EPSILON && b <= 255.5f - FLT_EPSILON);
-			discretizedPixels[i][j].r = (glm::u8)round(r);
-			discretizedPixels[i][j].g = (glm::u8)round(g);
-			discretizedPixels[i][j].b = (glm::u8)round(b);
+			// assert(b >= -FLT_EPSILON && b <= 255.5f - FLT_EPSILON);
+			discretizedPixels[i][j].r = (glm::u8)round(abs(r));
+			discretizedPixels[i][j].g = (glm::u8)round(abs(g));
+			discretizedPixels[i][j].b = (glm::u8)round(abs(b));
 		}
 	}
 }
