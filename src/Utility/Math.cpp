@@ -17,5 +17,6 @@ float Math::InterpolationQuad4f(const float dy, const float dz,
 	float a2 = dy * dz; // lower left area.
 	float a3 = dy * idz; // upper left area.
 	float a4 = idy * idz; // upper right area.
+	assert(abs(a1 + a2 + a3 + a4 - 1.0f) < FLT_EPSILON * 10.0f);
 	return a3 * x1 + a4 * x2 + a1 * x3 + a2 * x4;
 }
