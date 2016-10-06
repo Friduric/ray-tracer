@@ -1,5 +1,5 @@
 #include "Scene.h"
-
+#include <memory>
 #include "../../includes/glm/gtx/norm.hpp"
 #include "../Rendering/Material/LambertianMaterial.h";
 
@@ -74,7 +74,6 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 
 void Scene::CreateRoom() {
 	glm::vec3 whiteColor(1.0, 1.0, 1.0);
-
 	// Ceiling.
 	glm::vec3 cv1(-3.0, 0.0, 5.0);
 	glm::vec3 cv2(0.0, 6.0, 5.0);
@@ -84,15 +83,16 @@ void Scene::CreateRoom() {
 	glm::vec3 cv6(0.0, -6.0, 5.0);
 	glm::vec3 ceilingNormal(0.0, 0.0, -1.0);
 	LambertianMaterial whiteLambMat(whiteColor);
-	RenderGroup ceiling(&mat);
-	Triangle ct1(cv1, cv2, cv6, whiteColor, ceilingNormal);
-	Triangle ct2(cv2, cv3, cv5, whiteColor, ceilingNormal);
-	Triangle ct3(cv2, cv5, cv6, whiteColor, ceilingNormal);
-	Triangle ct4(cv3, cv4, cv5, whiteColor, ceilingNormal);
-	renderGroups.push_back(ct1);
-	triangles.push_back(ct2);
-	triangles.push_back(ct3);
-	triangles.push_back(ct4);
+	RenderGroup cel(std::shared_ptr<LambertianMaterial>(whiteLambMat));
+	Triangle ct1(cv1, cv2, cv6, ceilingNormal);
+	Triangle ct2(cv2, cv3, cv5, ceilingNormal);
+	Triangle ct3(cv2, cv5, cv6, ceilingNormal);
+	Triangle ct4(cv3, cv4, cv5, ceilingNormal);
+	cel.primitives.push_back(ct1);
+	cel.primitives.push_back(ct2);
+	cel.primitives.push_back(ct3);
+	cel.primitives.push_back(ct4);
+	renderGroups.push_back(cel);
 
 	// Floor.
 	glm::vec3 fv1(-3.0, 0.0, -5.0);
