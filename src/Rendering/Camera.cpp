@@ -38,9 +38,9 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 				/* Calculate new randomized point in the camera plane. */
 				float ylerp = (y + rand(gen)) * invWidth;
 				float zlerp = (z + rand(gen)) * invHeight;
-				float nx = Math::InterpolationQuad4f(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
-				float ny = Math::InterpolationQuad4f(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
-				float nz = Math::InterpolationQuad4f(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
+				float nx = Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
+				float ny = Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
+				float nz = Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
 
 				/* Create ray. */
 				const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.

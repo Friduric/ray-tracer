@@ -6,9 +6,9 @@
 
 using namespace std;
 
-float Math::InterpolationQuad4f(const float dy, const float dz,
-								const float x1, const float x2,
-								const float x3, const float x4) {
+float Math::BilinearInterpolation(const float dy, const float dz,
+								  const float x1, const float x2,
+								  const float x3, const float x4) {
 	assert(dy >= 0 && dy <= 1 + FLT_EPSILON);
 	assert(dz >= 0 && dz <= 1 + FLT_EPSILON);
 	const float idy = 1 - dy;
