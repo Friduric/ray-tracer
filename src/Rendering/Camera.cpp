@@ -91,11 +91,11 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
 			float r = pixels[i][j].color.r * f;
-			assert(r >= -FLT_EPSILON && r <= 256 - FLT_EPSILON);
+			assert(r >= -FLT_EPSILON && r <= 255.5f - FLT_EPSILON);
 			float g = pixels[i][j].color.g * f;
-			assert(g >= -FLT_EPSILON && g <= 256 - FLT_EPSILON);
+			assert(g >= -FLT_EPSILON && g <= 255.5f - FLT_EPSILON);
 			float b = pixels[i][j].color.b * f;
-			assert(b >= -FLT_EPSILON && b <= 256 - FLT_EPSILON);
+			assert(b >= -FLT_EPSILON && b <= 255.5f - FLT_EPSILON);
 			discretizedPixels[i][j].r = (glm::u8)round(r);
 			discretizedPixels[i][j].g = (glm::u8)round(g);
 			discretizedPixels[i][j].b = (glm::u8)round(b);
