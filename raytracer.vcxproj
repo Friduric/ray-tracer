@@ -153,6 +153,7 @@
     <Text Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Geometry\Rectangle.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Geometry\Ray.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
@@ -161,9 +162,11 @@
     <ClCompile Include="src\Rendering\Camera.cpp" />
     <ClCompile Include="src\Rendering\Pixel.cpp" />
     <ClCompile Include="src\Rendering\Material\LambertianMaterial.cpp" />
+    <ClCompile Include="src\Utility\Math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Geometry\Ray.h" />
+    <ClInclude Include="src\Geometry\Rectangle.h" />
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Geometry\Sphere.h" />
     <ClInclude Include="src\Geometry\Triangle.h" />
@@ -171,6 +174,7 @@
     <ClInclude Include="src\Rendering\Pixel.h" />
     <ClInclude Include="src\Rendering\Material\LambertianMaterial.h" />
     <ClInclude Include="src\Rendering\Material\Material.h" />
+    <ClInclude Include="src\Utility\Math.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

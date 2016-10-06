@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <random>
+#include <algorithm>
 
 #include "../Geometry/Ray.h"
 #include "../Utility/Math.h"
@@ -20,14 +21,13 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 	std::cout << "Rendering the scene ..." << std::endl;
 
 	std::random_device rd;
+	std::default_random_engine gen(rd());
 	std::uniform_real_distribution<float> rand(0, 1.0f);
-	std::default_random_engine r(rd());
 
 	float invWidth = 1.0f / (float)width;
 	float invHeight = 1.0f / (float)height;
 
 	/* For each pixel, shoot a bunch of rays through it. */
-	unsigned int y, z;
 	for (unsigned int y = 0; y < width; ++y) {
 		for (unsigned int z = 0; z < height; ++z) {
 
@@ -36,11 +36,11 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
 
 				/* Calculate new randomized point in the camera plane. */
-				float ylerp = (y + rand(r)) * invWidth;
-				float zlerp = (z + rand(r)) * invHeight;
-				float nx = Math::InterpolateQuad4f(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
-				float ny = Math::InterpolateQuad4f(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
-				float nz = Math::InterpolateQuad4f(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
+				float ylerp = (y + rand(gen)) * invWidth;
+				float zlerp = (z + rand(gen)) * invHeight;
+				float nx = Math::InterpolationQuad4f(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
+				float ny = Math::InterpolationQuad4f(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
+				float nz = Math::InterpolationQuad4f(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
 
 				/* Create ray. */
 				const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
@@ -83,6 +83,7 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 				pixels[i][j].color.b = sqrt(pixels[i][j].color.b);
 			}
 		}
+		maxIntensity = sqrt(maxIntensity);
 	}
 
 	// Discretize pixels using the max intensity. Every value must be between 0 and 255.
