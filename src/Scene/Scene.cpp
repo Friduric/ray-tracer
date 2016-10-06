@@ -2,9 +2,29 @@
 
 Scene::Scene() {}
 
-glm::vec3 Scene::TraceRay(const Ray & ray) const
+glm::vec3 Scene::TraceRay(const Ray & ray, int depth) const
 {
-	return glm::vec3();
+	depth--;
+	
+	if (bounces <= 0) {
+		return;
+	}
+	glm::vec3 colorAcc = { 0,0,0 };
+	for (unsigned i = 0; i < RAY_CASTS_PER_BOUNCE; i++) {
+		// Create new ray to cast
+		Ray newRay();
+		colorAcc += TraceRay();
+	}
+
+	return colorAcc;
+}
+
+glm::vec3 Scene::RayCast(const Ray & ray) const
+{
+	// Check hit and get closest hit of all triangles in scene
+	for (unsigned int i = 0; i < triangles.size(); ++i) {
+
+	}
 }
 
 void Scene::CreateRoom() {
