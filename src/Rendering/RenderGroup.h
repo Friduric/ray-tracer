@@ -5,6 +5,7 @@
 #include "..\Geometry\Primitive.h"
 
 class RenderGroup {
+public:
 	Material* material;
 	std::vector<Primitive> primitives;
 	RenderGroup(Material* material);
