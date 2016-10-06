@@ -2,6 +2,7 @@
 
 #include "Material\Material.h"
 #include <vector>
+#include "..\Geometry\Primitive.h"
 
 class RenderGroup {
 	Material* material;
