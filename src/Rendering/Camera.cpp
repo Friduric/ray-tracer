@@ -22,7 +22,7 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 
 	std::random_device rd;
 	std::default_random_engine gen(rd());
-	std::uniform_real_distribution<float> rand(0, 1.0f);
+	std::uniform_real_distribution<float> rand(0, 1.0f - FLT_EPSILON);
 
 	float invWidth = 1.0f / (float)width;
 	float invHeight = 1.0f / (float)height;
