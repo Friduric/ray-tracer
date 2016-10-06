@@ -32,6 +32,10 @@ bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
 		return false; // Didn't hit.
 	}
 	const float t = dot(Q, E2) / den;
+	float rayLength = glm::distance(ray.from, ray.to);
+	if (t > rayLength + FLT_EPSILON) {
+		return false; // Outside of ray length.
+	}
 
 	// Calculate answer.
 	intersectionPoint = ray.from + t * D;

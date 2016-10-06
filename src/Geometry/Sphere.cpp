@@ -26,8 +26,13 @@ bool Sphere::RayIntersection(const Ray & ray, vec3 & intersectionPoint) {
 	if (d1 < 0) { d1 = d2; }
 	if (d1 < 0) { return false; }
 
-	// Store closest intersection point.
+	// Get intersection point distance from ray origin point.
 	float t = min(d1, d2); // Second intersection point would be max(d1, d2) if d1 != d2.
+	float rayLength = glm::distance(ray.from, ray.to);
+	if (t > rayLength + FLT_EPSILON) {
+		return false;
+	}
+	// Store closest intersection point.
 	intersectionPoint = ray.from + ray.dir * t;
 	return true;
 }
