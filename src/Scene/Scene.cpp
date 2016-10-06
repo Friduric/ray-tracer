@@ -258,7 +258,7 @@ void Scene::CreateSphere(float x, float y, float z, float radius) {
 	materials.push_back(sphereMaterial);
 	RenderGroup sphereGroup(sphereMaterial);
 
-	Sphere sphere(glm::vec3(x, y, z), radius);
+	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
 
 	renderGroups.push_back(sphereGroup);
 }
