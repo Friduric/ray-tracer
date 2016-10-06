@@ -4,11 +4,9 @@
 
 class Material {
 public:
-	
 	virtual bool IsEmissive() const = 0;
 	virtual glm::vec3 GetSurfaceColor() const = 0;
 	virtual glm::vec3 GetEmissionColor() const = 0;
-
 
 	/// <summary> 
 	/// Calculates the BRDF value of this material. 
