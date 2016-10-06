@@ -16,5 +16,5 @@ float Math::InterpolationQuad4f(float dy, float dz, float x1, float x2, float x3
 	assert(dist2 >= 0 && dist2 <= 1);
 	assert(dist3 >= 0 && dist3 <= 1);
 	assert(dist4 >= 0 && dist4 <= 1);
-	return dist1 * x1 + dist2 * x2 + dist3 * x3 + dist4 * x4;
+	return (1.0 - dist1) * x1 + (1.0 - dist2) * x2 + (1.0 - dist3) * x3 + (1.0 - dist4) * x4;
 }
