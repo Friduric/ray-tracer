@@ -21,7 +21,7 @@ public:
 	void Render(const glm::vec3 eye = glm::vec3(-2, 0, 0),
 				const glm::vec3 c1 = glm::vec3(0, -1, -1), const glm::vec3 c2 = glm::vec3(0, 1, -1),
 				const glm::vec3 c3 = glm::vec3(0, 1, 1), const glm::vec3 c4 = glm::vec3(0, -1, 1),
-				const float rayLength = 1000.0f);
+				const float RAY_LENGTH = 1000.0f, const float RAYS_PER_PIXEL = 5);
 
 	/// <summary> 
 	/// Writes the discretized pixels to a TGA image.

@@ -17,7 +17,8 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 /// <param name='c3'> Upper left corner of the camera plane. </param>
 /// <param name='c4'> Upper right corner of the camera plane. </param>
 void Camera::Render(const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
-					const glm::vec3 c3, const glm::vec3 c4, const float rayLength) {
+					const glm::vec3 c3, const glm::vec3 c4,
+					const float RAY_LENGTH, const float RAYS_PER_PIXEL) {
 
 	std::cout << "Rendering the scene..." << std::endl;
 
@@ -39,39 +40,41 @@ void Camera::Render(const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 
 	for (unsigned int y = 0, float cy = -0.5f * planeWidth; y < width; ++y, cy += dy) {
 		for (unsigned int z = 0, float cz = -0.5f * planeHeight; z < height; ++z, cz += dz) {
-			/* Randomized offset in y and z. */
-			float ry = rand(rengine) * dy;
-			float rz = rand(rengine) * dz;
+			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
+				/* Randomized offset in y and z. */
+				float ry = rand(rengine) * dy;
+				float rz = rand(rengine) * dz;
 
-			/* Calculate infinitesimal dy and dz offset based on ry and rz. */
-			float ddy = ry * invPlaneWidth;
-			float ddz = rz * invPlaneHeight;
+				/* Calculate infinitesimal dy and dz offset based on ry and rz. */
+				float ddy = ry * invPlaneWidth;
+				float ddz = rz * invPlaneHeight;
 
-			/* Calculate x contribution from y. */
-			float interpy = (y + ddy) * invWidth;
-			float invy = 1.0f - interpy;
-			float interpyplus = (y + ddy + 1) * invWidth;
-			float invyplus = 1.0f - interpyplus;
-			float nxy = invy * (c2.x + c3.x) + interpy * (c1.x + c4.x);
-			float nxyplus = invyplus * (c2.x + c3.x) + interpyplus * (c1.x + c4.x);
+				/* Calculate x contribution from y. */
+				float interpy = (y + ddy) * invWidth;
+				float invy = 1.0f - interpy;
+				float interpyplus = (y + ddy + 1) * invWidth;
+				float invyplus = 1.0f - interpyplus;
+				float nxy = invy * (c2.x + c3.x) + interpy * (c1.x + c4.x);
+				float nxyplus = invyplus * (c2.x + c3.x) + interpyplus * (c1.x + c4.x);
 
-			/* Calculate x contribution from z. */
-			float interpz = (z + ddz) * invHeight;
-			float invz = 1.0f - interpz;
-			float interpzplus = (z + 1 + ddz) * invWidth;
-			float invzplus = 1.0f - interpzplus;
-			float nxz = invz * (c1.x + c2.x) + interpz * (c3.x + c4.x);
-			float nxzplus = invzplus * (c1.x + c2.x) + interpzplus * (c3.x + c4.x);
+				/* Calculate x contribution from z. */
+				float interpz = (z + ddz) * invHeight;
+				float invz = 1.0f - interpz;
+				float interpzplus = (z + 1 + ddz) * invWidth;
+				float invzplus = 1.0f - interpzplus;
+				float nxz = invz * (c1.x + c2.x) + interpz * (c3.x + c4.x);
+				float nxzplus = invzplus * (c1.x + c2.x) + interpzplus * (c3.x + c4.x);
 
-			/* Calculate ray origin in plane. */
-			float nx = 0.25f * (nxy + nxz);
-			float ny = cy + ry;
-			float nz = cz + rz;
+				/* Calculate ray origin in plane. */
+				float nx = 0.25f * (nxy + nxz);
+				float ny = cy + ry;
+				float nz = cz + rz;
 
-			/* Create ray. */
-			glm::vec3 from(nx, ny, nz);
-			glm::vec3 direction = glm::normalize(from - eye);
-			Ray ray(eye, from, from + rayLength * direction);
+				/* Create ray. */
+				glm::vec3 from(nx, ny, nz);
+				glm::vec3 direction = glm::normalize(from - eye);
+				Ray ray(eye, from, from + RAY_LENGTH * direction);
+			}
 		}
 	}
 
