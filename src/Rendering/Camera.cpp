@@ -70,9 +70,9 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 				float nz = cz + rz;
 
 				/* Create ray. */
-				glm::vec3 from(nx, ny, nz);
-				glm::vec3 direction = glm::normalize(from - eye);
-				Ray ray(eye, from, from + RAY_LENGTH * direction);
+				glm::vec3 planePosition(nx, ny, nz);
+				glm::vec3 rayDirection = glm::normalize(planePosition - eye);
+				Ray ray(eye, planePosition, planePosition + RAY_LENGTH * rayDirection);
 
 				/* Trace ray through scene. */
 				colorAccumulator += scene.TraceRay(ray);
@@ -80,8 +80,7 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 
 			/* Set pixel color dependent on ray trace. */
 			float f = 1.0f / static_cast<float>(RAYS_PER_PIXEL);
-			colorAccumulator *= f;
-			pixels[y][z].color = colorAccumulator;
+			pixels[y][z].color = f * colorAccumulator;
 		}
 	}
 
