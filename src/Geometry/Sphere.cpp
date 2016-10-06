@@ -3,7 +3,9 @@
 using namespace glm;
 
 Sphere::Sphere(vec3 _center, vec3 _color, float _radius) :
-	center(_center), color(_color), radius(_radius) {}
+	Primitive(_color), center(_center), radius(_radius) {}
+
+glm::vec3 Sphere::GetNormal(const glm::vec3 & position) const { return glm::normalize(position - center); }
 
 bool Sphere::RayIntersection(const Ray & ray, vec3 & intersectionPoint) const {
 	// We assume that the ray does not start inside the sphere.
