@@ -24,16 +24,17 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 	if (glm::length(intersectionRenderGroup.material->emission) > FLT_EPSILON) {
 		return intersectionRenderGroup.material->emission;
 	}
+	else {
+		return intersectionRenderGroup.material->surfaceColor; // Only for testing. Remove this.
+	}
+
+	/*
 
 	const auto& intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
-	/* We intersected with something non-emissive. Now shoot rays all over the place. */
+	// We intersected with something non-emissive. Now shoot rays all over the place.
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	glm::vec3 hitNormal = intersectionPrimitive.GetNormal(intersectionPoint);
 
-	// Testing.
-	return intersectionPrimitive.color;
-
-	/*
 	for (unsigned int b = 0; b < BOUNCES_PER_HIT; ++b) {
 
 	}

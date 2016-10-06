@@ -9,8 +9,8 @@ public:
 	glm::vec3 vertices[3];
 	glm::vec3 normal;
 	Triangle(glm::vec3 v1 = glm::vec3(), glm::vec3 v2 = glm::vec3(), glm::vec3 v3 = glm::vec3(),
-			 glm::vec3 normal = glm::vec3(), glm::vec3 color = glm::vec3());
-	Triangle(glm::vec3 vertices[3], glm::vec3 normal = glm::vec3(), glm::vec3 color = glm::vec3());
+			 glm::vec3 normal = glm::vec3());
+	Triangle(glm::vec3 vertices[3], glm::vec3 normal = glm::vec3());
 
 	glm::vec3 GetNormal(const glm::vec3 & position) const override;
 

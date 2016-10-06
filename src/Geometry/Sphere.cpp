@@ -2,8 +2,8 @@
 
 using namespace glm;
 
-Sphere::Sphere(vec3 _center, vec3 _color, float _radius) :
-	Primitive(_color), center(_center), radius(_radius) {}
+Sphere::Sphere(vec3 _center, float _radius) :
+	Primitive(), center(_center), radius(_radius) {}
 
 glm::vec3 Sphere::GetNormal(const glm::vec3 & position) const { return glm::normalize(position - center); }
 

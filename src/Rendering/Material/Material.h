@@ -6,6 +6,7 @@ class Material {
 public:
 	//The intensity of the light of this material (should generally be 0 if not a lightsource).
 	glm::vec3 emission;
+	glm::vec3 surfaceColor;
 
 	/// <summary> 
 	/// Calculates the BRDF value of this material. 
@@ -17,7 +18,6 @@ public:
 	/// <param name='incomingIntensity'> The intensity of the incoming light.</param>
 	/// <param name='surfaceColor'> The color of the surface.</param>
 	/// <returns> The BRDF value of this material. </returns>
-	virtual glm::vec3 CalculateBRDF(const glm::vec3& inDirection, const glm::vec3& outDirection,
-									const glm::vec3& normal, const glm::vec3 & incomingIntensity,
-									const glm::vec3 & surfaceColor) const = 0;
+	virtual glm::vec3 CalculateBRDF(const glm::vec3 & inDirection, const glm::vec3 & outDirection,
+									const glm::vec3 & normal, const glm::vec3 & incomingIntensity) const = 0;
 };

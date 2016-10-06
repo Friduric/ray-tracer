@@ -45,7 +45,7 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 				/* Create ray. */
 				const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
 				const glm::vec3 rayDirection = glm::normalize(planePosition - eye);
-				const Ray ray(eye, planePosition, planePosition + RAY_LENGTH * rayDirection);
+				const Ray ray(planePosition, planePosition + RAY_LENGTH * rayDirection);
 
 				/* Trace ray through the scene. */
 				colorAccumulator += scene.TraceRay(ray);
