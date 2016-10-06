@@ -74,6 +74,8 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 
 void Scene::CreateRoom() {
 	glm::vec3 whiteColor(1.0, 1.0, 1.0);
+	auto whiteMaterial = std::make_shared<Material>(LambertianMaterial(whiteColor));
+
 	// Ceiling.
 	glm::vec3 cv1(-3.0, 0.0, 5.0);
 	glm::vec3 cv2(0.0, 6.0, 5.0);
@@ -82,17 +84,16 @@ void Scene::CreateRoom() {
 	glm::vec3 cv5(10.0, -6.0, 5.0);
 	glm::vec3 cv6(0.0, -6.0, 5.0);
 	glm::vec3 ceilingNormal(0.0, 0.0, -1.0);
-	LambertianMaterial whiteLambMat(whiteColor);
-	RenderGroup cel(std::shared_ptr<LambertianMaterial>(whiteLambMat));
+	RenderGroup ceiling(whiteMaterial);
 	Triangle ct1(cv1, cv2, cv6, ceilingNormal);
 	Triangle ct2(cv2, cv3, cv5, ceilingNormal);
 	Triangle ct3(cv2, cv5, cv6, ceilingNormal);
 	Triangle ct4(cv3, cv4, cv5, ceilingNormal);
-	cel.primitives.push_back(ct1);
-	cel.primitives.push_back(ct2);
-	cel.primitives.push_back(ct3);
-	cel.primitives.push_back(ct4);
-	renderGroups.push_back(cel);
+	ceiling.primitives.push_back(ct1);
+	ceiling.primitives.push_back(ct2);
+	ceiling.primitives.push_back(ct3);
+	ceiling.primitives.push_back(ct4);
+	renderGroups.push_back(ceiling);
 
 	// Floor.
 	glm::vec3 fv1(-3.0, 0.0, -5.0);
