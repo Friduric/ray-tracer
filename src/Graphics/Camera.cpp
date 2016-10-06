@@ -2,16 +2,80 @@
 
 #include <iostream>
 #include <fstream>
+#include <random>
+
+#include "../Geometry/Ray.h"
 
 Camera::Camera(const int _width, const int _height) : width(_width), height(_height) {
 	pixels.assign(width, std::vector<Pixel>(height));
 	discretizedPixels.assign(width, std::vector<glm::u8vec3>(height));
 }
 
+/// <param name='eye'> The eye of the viewer. </param>
+/// <param name='c1'> Lower right corner of the camera plane. </param>
+/// <param name='c2'> Lower left corner of the camera plane. </param>
+/// <param name='c3'> Upper left corner of the camera plane. </param>
+/// <param name='c4'> Upper right corner of the camera plane. </param>
+void Camera::Render(const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
+					const glm::vec3 c3, const glm::vec3 c4, const float rayLength) {
 
-void Camera::Render(const glm::vec3 eye1, const glm::vec3 c1, const glm::vec3 c2,
-					const glm::vec3 c3, const glm::vec3 c4) {
 	std::cout << "Rendering the scene..." << std::endl;
+
+	std::random_device rd;
+	std::uniform_real_distribution<float> rand(0, 1.0f);
+	std::default_random_engine rengine(rd());
+
+	/* Shoot a bunch of rays through the pixels. */
+	float planeWidth = c4.y - c2.y;
+	float planeHeight = c4.z - c2.z;
+
+	float invWidth = 1.0f / (float)width;
+	float invHeight = 1.0f / (float)height;
+	float invPlaneWidth = 1.0f / (float)planeWidth;
+	float invPlaneHeight = 1.0f / (float)planeHeight;
+
+	float dy = planeWidth * invWidth;
+	float dz = planeHeight * invHeight;
+
+	for (unsigned int y = 0, float cy = -0.5f * planeWidth; y < width; ++y, cy += dy) {
+		for (unsigned int z = 0, float cz = -0.5f * planeHeight; z < height; ++z, cz += dz) {
+			/* Randomized offset in y and z. */
+			float ry = rand(rengine) * dy;
+			float rz = rand(rengine) * dz;
+
+			/* Calculate infinitesimal dy and dz offset based on ry and rz. */
+			float ddy = ry * invPlaneWidth;
+			float ddz = rz * invPlaneHeight;
+
+			/* Calculate x contribution from y. */
+			float interpy = (y + ddy) * invWidth;
+			float invy = 1.0f - interpy;
+			float interpyplus = (y + ddy + 1) * invWidth;
+			float invyplus = 1.0f - interpyplus;
+			float nxy = invy * (c2.x + c3.x) + interpy * (c1.x + c4.x);
+			float nxyplus = invyplus * (c2.x + c3.x) + interpyplus * (c1.x + c4.x);
+
+			/* Calculate x contribution from z. */
+			float interpz = (z + ddz) * invHeight;
+			float invz = 1.0f - interpz;
+			float interpzplus = (z + 1 + ddz) * invWidth;
+			float invzplus = 1.0f - interpzplus;
+			float nxz = invz * (c1.x + c2.x) + interpz * (c3.x + c4.x);
+			float nxzplus = invzplus * (c1.x + c2.x) + interpzplus * (c3.x + c4.x);
+
+			/* Calculate ray origin in plane. */
+			float nx = 0.25f * (nxy + nxz);
+			float ny = cy + ry;
+			float nz = cz + rz;
+
+			/* Create ray. */
+			glm::vec3 from(nx, ny, nz);
+			glm::vec3 direction = glm::normalize(from - eye);
+			Ray ray(eye, from, from + rayLength * direction);
+		}
+	}
+
+	/* Create the final discretized image from float values. */
 	CreateImage(); // Should always be done immediately after the rendering step.
 }
 
