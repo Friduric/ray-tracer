@@ -4,9 +4,11 @@
 
 class Material {
 public:
-	//The intensity of the light of this material (should generally be 0 if not a lightsource).
-	glm::vec3 emission;
-	glm::vec3 surfaceColor;
+	
+	virtual bool IsEmissive() const = 0;
+	virtual glm::vec3 GetSurfaceColor() const = 0;
+	virtual glm::vec3 GetEmissionColor() const = 0;
+
 
 	/// <summary> 
 	/// Calculates the BRDF value of this material. 

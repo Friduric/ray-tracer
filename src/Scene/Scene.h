@@ -6,6 +6,7 @@
 
 #include "../Geometry/Ray.h"
 #include "../Rendering/RenderGroup.h"
+#include "../Geometry/Triangle.h";
 
 class Scene {
 public:

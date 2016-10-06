@@ -1,6 +1,7 @@
 #include "Scene.h"
 
 #include "../../includes/glm/gtx/norm.hpp"
+#include "../Rendering/Material/LambertianMaterial.h";
 
 Scene::Scene() {}
 
@@ -21,11 +22,11 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 
 	/* Simplification: emissive materials only return their emission. I.e. no indirect lighting
 	 * from other lights. */
-	if (glm::length(intersectionRenderGroup.material->emission) > FLT_EPSILON) {
-		return intersectionRenderGroup.material->emission;
+	if (glm::length(intersectionRenderGroup.material->GetEmissionColor()) > FLT_EPSILON) {
+		return intersectionRenderGroup.material->GetEmissionColor();
 	}
 	else {
-		return intersectionRenderGroup.material->surfaceColor; // Only for testing. Remove this.
+		return intersectionRenderGroup.material->GetSurfaceColor(); // Only for testing. Remove this.
 	}
 
 	/*
@@ -65,6 +66,12 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
 }
 
+/*void Scene::CreatePhotonMap() {
+	// Get all light sources
+	std::vector<RenderGroup> lightSources;
+
+}*/
+
 void Scene::CreateRoom() {
 	glm::vec3 whiteColor(1.0, 1.0, 1.0);
 
@@ -76,11 +83,13 @@ void Scene::CreateRoom() {
 	glm::vec3 cv5(10.0, -6.0, 5.0);
 	glm::vec3 cv6(0.0, -6.0, 5.0);
 	glm::vec3 ceilingNormal(0.0, 0.0, -1.0);
+	LambertianMaterial whiteLambMat(whiteColor);
+	RenderGroup ceiling(&mat);
 	Triangle ct1(cv1, cv2, cv6, whiteColor, ceilingNormal);
 	Triangle ct2(cv2, cv3, cv5, whiteColor, ceilingNormal);
 	Triangle ct3(cv2, cv5, cv6, whiteColor, ceilingNormal);
 	Triangle ct4(cv3, cv4, cv5, whiteColor, ceilingNormal);
-	triangles.push_back(ct1);
+	renderGroups.push_back(ct1);
 	triangles.push_back(ct2);
 	triangles.push_back(ct3);
 	triangles.push_back(ct4);
