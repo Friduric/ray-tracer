@@ -153,6 +153,7 @@
     <Text Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Geometry\Primitive.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Geometry\Ray.cpp" />
     <ClCompile Include="src\Rendering\RenderGroup.cpp" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="src\Geometry\Primitive.h" />
     <ClInclude Include="src\Geometry\Ray.h" />
+    <ClInclude Include="src\Rendering\Photon.h" />
     <ClInclude Include="src\Rendering\RenderGroup.h" />
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Geometry\Sphere.h" />

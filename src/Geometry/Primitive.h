@@ -1,7 +1,6 @@
 #pragma once
 
 #include "glm.hpp"
-
 #include "Ray.h"
 
 class Primitive {
