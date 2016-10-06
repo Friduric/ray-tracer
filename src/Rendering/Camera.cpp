@@ -11,12 +11,7 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 	discretizedPixels.assign(width, std::vector<glm::u8vec3>(height));
 }
 
-/// <param name='eye'> The eye of the viewer. </param>
-/// <param name='c1'> Lower right corner of the camera plane. </param>
-/// <param name='c2'> Lower left corner of the camera plane. </param>
-/// <param name='c3'> Upper left corner of the camera plane. </param>
-/// <param name='c4'> Upper right corner of the camera plane. </param>
-void Camera::Render(const Scene& scene, const const glm::vec3 eye,
+void Camera::Render(const Scene & scene, const glm::vec3 eye,
 					const glm::vec3 c1, const glm::vec3 c2,
 					const glm::vec3 c3, const glm::vec3 c4,
 					const float RAY_LENGTH, const unsigned int RAYS_PER_PIXEL) {
@@ -119,7 +114,7 @@ void Camera::CreateImage() {
 	}
 
 	// Discretize pixels using the max intensity. Every value must be between 0 and 255.
-	float f = maxIntensity < 0.00001 ? 0 : 254.99 / maxIntensity;
+	float f = maxIntensity < 0.00001f ? 0.0f : 254.99f / maxIntensity;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
 			float r = pixels[i][j].color.r * f;
