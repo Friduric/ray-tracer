@@ -12,8 +12,10 @@ class Scene {
 public:
 	/// <summary> The groups in this scene which are renderable. </summary>
 	std::vector<RenderGroup> renderGroups;
+	std::vector<Material*> materials;
 
 	Scene();
+	~Scene();
 
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color.
@@ -46,7 +48,7 @@ public:
 	void CreateRoom();
 
 	/// <summary> Creates a tetrahedron at position x, y, z and adds it to the scene. </summary>
-	void CreateTetrahedron(float x = -3, float y = 0, float z = 0);
+	void CreateTetrahedron(float x = -35, float y = 0, float z = 0);
 
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
 	void CreateSphere(float x = 3, float y = 0, float z = 0, float radius = 1.0f);

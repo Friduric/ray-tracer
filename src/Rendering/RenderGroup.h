@@ -9,8 +9,8 @@
 
 class RenderGroup {
 public:
-	std::shared_ptr<Material> material;
-	std::vector<Primitive> primitives;
+	Material* material;
+	std::vector<Primitive*> primitives;
 	std::vector<std::vector<Photon>> photons;
-	RenderGroup(std::shared_ptr<Material>);
+	RenderGroup(Material*);
 };
