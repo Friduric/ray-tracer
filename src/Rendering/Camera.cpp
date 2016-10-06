@@ -26,19 +26,21 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 
 	float invWidth = 1.0f / (float)width;
 	float invHeight = 1.0f / (float)height;
+	float F = 1.0f / static_cast<float>(RAYS_PER_PIXEL);
 
 	long long ctr = 0;
+
 	/* For each pixel, shoot a bunch of rays through it. */
 	for (unsigned int y = 0; y < width; ++y) {
 		for (unsigned int z = 0; z < height; ++z) {
 
 			/* Shoot a bunch of rays through the pixel (y, z). */
 			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
-			for (unsigned int i = 0; i < 4; ++i) {
-				++ctr;
-				if (ctr % 100000 == 0) {
-					std::cout << ctr << "/" << 4000000 << std::endl;
+			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
+				if (++ctr % 100000 == 0) {
+					std::cout << ctr << "/" << width * height * RAYS_PER_PIXEL << std::endl;
 				}
+
 				/* Calculate new randomized point in the camera plane. */
 				float ylerp = (y + rand(gen)) * invWidth;
 				float zlerp = (z + rand(gen)) * invHeight;
@@ -56,8 +58,7 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 			}
 
 			/* Set pixel color dependent on ray trace. */
-			float f = 1.0f / static_cast<float>(RAYS_PER_PIXEL);
-			pixels[y][z].color = f * colorAccumulator;
+			pixels[y][z].color = F * colorAccumulator;
 		}
 	}
 
