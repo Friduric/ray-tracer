@@ -5,6 +5,7 @@
 #include <random>
 
 #include "../Geometry/Ray.h"
+#include "../Utility/Math.h"
 
 Camera::Camera(const int _width, const int _height) : width(_width), height(_height) {
 	pixels.assign(width, std::vector<Pixel>(height));
@@ -16,65 +17,37 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 					const glm::vec3 c3, const glm::vec3 c4,
 					const float RAY_LENGTH, const unsigned int RAYS_PER_PIXEL) {
 
-	std::cout << "Rendering the scene..." << std::endl;
+	std::cout << "Rendering the scene ..." << std::endl;
 
 	std::random_device rd;
 	std::uniform_real_distribution<float> rand(0, 1.0f);
-	std::default_random_engine rengine(rd());
-
-	/* Shoot a bunch of rays through the pixels. */
-	float planeWidth = c4.y - c2.y;
-	float planeHeight = c4.z - c2.z;
+	std::default_random_engine r(rd());
 
 	float invWidth = 1.0f / (float)width;
 	float invHeight = 1.0f / (float)height;
-	float invPlaneWidth = 1.0f / (float)planeWidth;
-	float invPlaneHeight = 1.0f / (float)planeHeight;
 
-	float dy = planeWidth * invWidth;
-	float dz = planeHeight * invHeight;
-
-	float cy, cz;
+	/* For each pixel, shoot a bunch of rays through it. */
 	unsigned int y, z;
-	for (y = 0, cy = -0.5f * planeWidth; y < width; ++y, cy += dy) {
-		for (z = 0, cz = -0.5f * planeHeight; z < height; ++z, cz += dz) {
+	for (unsigned int y = 0; y < width; ++y) {
+		for (unsigned int z = 0; z < height; ++z) {
+
+			/* Shoot a bunch of rays through the pixel (y, z). */
 			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
 			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
-				/* Randomized offset in y and z. */
-				float ry = rand(rengine) * dy;
-				float rz = rand(rengine) * dz;
 
-				/* Calculate infinitesimal dy and dz offset based on ry and rz. */
-				float ddy = ry * invPlaneWidth;
-				float ddz = rz * invPlaneHeight;
-
-				/* Calculate x contribution from y. */
-				float interpy = (y + ddy) * invWidth;
-				float invy = 1.0f - interpy;
-				float interpyplus = (y + ddy + 1) * invWidth;
-				float invyplus = 1.0f - interpyplus;
-				float nxy = invy * (c2.x + c3.x) + interpy * (c1.x + c4.x);
-				float nxyplus = invyplus * (c2.x + c3.x) + interpyplus * (c1.x + c4.x);
-
-				/* Calculate x contribution from z. */
-				float interpz = (z + ddz) * invHeight;
-				float invz = 1.0f - interpz;
-				float interpzplus = (z + 1 + ddz) * invWidth;
-				float invzplus = 1.0f - interpzplus;
-				float nxz = invz * (c1.x + c2.x) + interpz * (c3.x + c4.x);
-				float nxzplus = invzplus * (c1.x + c2.x) + interpzplus * (c3.x + c4.x);
-
-				/* Calculate ray origin in plane. */
-				float nx = 0.25f * (nxy + nxz);
-				float ny = cy + ry;
-				float nz = cz + rz;
+				/* Calculate new randomized point the camera plane. */
+				float ylerp = (y + rand(r)) * invWidth;
+				float zlerp = (z + rand(r)) * invHeight;
+				float nx = Math::InterpolateQuad4f(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
+				float ny = Math::InterpolateQuad4f(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
+				float nz = Math::InterpolateQuad4f(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
 
 				/* Create ray. */
-				glm::vec3 planePosition(nx, ny, nz);
-				glm::vec3 rayDirection = glm::normalize(planePosition - eye);
-				Ray ray(eye, planePosition, planePosition + RAY_LENGTH * rayDirection);
+				const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
+				const glm::vec3 rayDirection = glm::normalize(planePosition - eye);
+				const Ray ray(eye, planePosition, planePosition + RAY_LENGTH * rayDirection);
 
-				/* Trace ray through scene. */
+				/* Trace ray through the scene. */
 				colorAccumulator += scene.TraceRay(ray);
 			}
 
@@ -84,12 +57,12 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 		}
 	}
 
-	/* Create the final discretized image from float values. */
+	/* Create the final discretized image from float the values. */
 	CreateImage(); // Should always be done immediately after the rendering step.
 }
 
 void Camera::CreateImage() {
-	std::cout << "Creating raw pixel image..." << std::endl;
+	std::cout << "Creating a discretized image from the rendered image ..." << std::endl;
 
 	/* Find max color intensity. Could try using r + g + b instead. */
 	float maxIntensity = 0;
@@ -130,7 +103,7 @@ void Camera::CreateImage() {
 }
 
 bool Camera::WriteImageToTGA(const std::string path) const {
-	std::cout << "Writing image to TGA..." << std::endl;
+	std::cout << "Writing image to TGA ..." << std::endl;
 
 	assert(width > 0 && height > 0);
 
