@@ -2,9 +2,9 @@
 
 #include "Material.h"
 
-class LambertianMaterial : public Material {
+class OrenNayarMaterial : public Material {
 public:
-	LambertianMaterial(glm::vec3 surfaceColor, glm::vec3 emissionColor = glm::vec3(0, 0, 0));
+	OrenNayarMaterial(glm::vec3 surfaceColor, glm::vec3 emissionColor = glm::vec3(0, 0, 0));
 
 	bool IsEmissive() const override;
 	glm::vec3 GetSurfaceColor() const override;

@@ -45,7 +45,7 @@
     <ClCompile Include="src\Rendering\RenderGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Geometry\Primitive.cpp">
+    <ClCompile Include="src\Rendering\Material\OrenNayarMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -84,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Rendering\Photon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Material\OrenNayarMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
