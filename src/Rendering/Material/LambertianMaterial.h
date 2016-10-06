@@ -4,7 +4,7 @@
 
 class LambertianMaterial : public Material {
 public:
-	glm::vec3 CalculateBRDF(glm::vec3& inDirection, glm::vec3& outDirection,
-							glm::vec3& normal, glm::vec3 & incomingIntensity,
-							glm::vec3 & surfaceColor) const;
+	glm::vec3 CalculateBRDF(const glm::vec3 & inDirection, const glm::vec3& outDirection,
+							const glm::vec3 & normal, const glm::vec3 & incomingIntensity,
+							const glm::vec3 & surfaceColor) const;
 };

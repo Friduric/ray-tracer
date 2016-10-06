@@ -17,7 +17,7 @@ public:
 	/// <param name='incomingIntensity'> The intensity of the incoming light.</param>
 	/// <param name='surfaceColor'> The color of the surface.</param>
 	/// <returns> The BRDF value of this material. </returns>
-	virtual glm::vec3 CalculateBRDF(glm::vec3& inDirection, glm::vec3& outDirection,
-									glm::vec3& normal, glm::vec3 & incomingIntensity,
-									glm::vec3 & surfaceColor) const = 0;
+	virtual glm::vec3 CalculateBRDF(const glm::vec3& inDirection, const glm::vec3& outDirection,
+									const glm::vec3& normal, const glm::vec3 & incomingIntensity,
+									const glm::vec3 & surfaceColor) const = 0;
 };

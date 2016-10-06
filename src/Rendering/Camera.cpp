@@ -92,7 +92,7 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 void Camera::CreateImage() {
 	std::cout << "Creating raw pixel image..." << std::endl;
 
-	// Find max color intensity. Could try using r + g + b instead.
+	/* Find max color intensity. Could try using r + g + b instead. */
 	float maxIntensity = 0;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
