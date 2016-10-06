@@ -10,9 +10,9 @@ namespace Math {
 	/// The amount interpolated in the z-direction (on the "height axis"). 
 	/// Must be normalized to [0,1]. 
 	/// </param>
-	/// <param name='x1'> The value of the "lower left" point. </param>
-	/// <param name='x2'> The value of the "upper left" point. </param>
-	/// <param name='x3'> The value of the "upper right" point. </param>
-	/// <param name='x4'> The value of the "lower right" point. </param>
+	/// <param name='x1'> The value of the "lower right" point. </param>
+	/// <param name='x2'> The value of the "lower left" point. </param>
+	/// <param name='x3'> The value of the "upper left" point. </param>
+	/// <param name='x4'> The value of the "upper right" point. </param>
 	float InterpolationQuad4f(float dy, float dz, float x1, float x2, float x3, float x4);
 }
