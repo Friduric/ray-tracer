@@ -16,9 +16,10 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 /// <param name='c2'> Lower left corner of the camera plane. </param>
 /// <param name='c3'> Upper left corner of the camera plane. </param>
 /// <param name='c4'> Upper right corner of the camera plane. </param>
-void Camera::Render(const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
+void Camera::Render(const Scene& scene, const const glm::vec3 eye,
+					const glm::vec3 c1, const glm::vec3 c2,
 					const glm::vec3 c3, const glm::vec3 c4,
-					const float RAY_LENGTH, const float RAYS_PER_PIXEL) {
+					const float RAY_LENGTH, const unsigned int RAYS_PER_PIXEL) {
 
 	std::cout << "Rendering the scene..." << std::endl;
 
@@ -38,8 +39,11 @@ void Camera::Render(const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 	float dy = planeWidth * invWidth;
 	float dz = planeHeight * invHeight;
 
-	for (unsigned int y = 0, float cy = -0.5f * planeWidth; y < width; ++y, cy += dy) {
-		for (unsigned int z = 0, float cz = -0.5f * planeHeight; z < height; ++z, cz += dz) {
+	float cy, cz;
+	unsigned int y, z;
+	for (y = 0, cy = -0.5f * planeWidth; y < width; ++y, cy += dy) {
+		for (z = 0, cz = -0.5f * planeHeight; z < height; ++z, cz += dz) {
+			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
 			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
 				/* Randomized offset in y and z. */
 				float ry = rand(rengine) * dy;
@@ -74,7 +78,15 @@ void Camera::Render(const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 				glm::vec3 from(nx, ny, nz);
 				glm::vec3 direction = glm::normalize(from - eye);
 				Ray ray(eye, from, from + RAY_LENGTH * direction);
+
+				/* Trace ray through scene. */
+				colorAccumulator += scene.TraceRay(ray);
 			}
+
+			/* Set pixel color dependent on ray trace. */
+			float f = 1.0f / static_cast<float>(RAYS_PER_PIXEL);
+			colorAccumulator *= f;
+			pixels[y][z].color = colorAccumulator;
 		}
 	}
 

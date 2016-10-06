@@ -1,13 +1,22 @@
 #pragma once
 
 #include <vector>
-#include "Triangle.h"
+
+#include <glm.hpp>
+
+#include "../Geometry/Triangle.h"
+#include "../Geometry/Ray.h"
 
 class Scene {
 public:
 	std::vector<Triangle> triangles;
 
 	Scene();
+
+	/// <summary> 
+	/// Traces a ray through the scene and returns a color.
+	/// </summary>
+	glm::vec3 TraceRay(const Ray & ray);
 
 	/// <summary> 
 	/// Creates all walls, floors and ceilings of a room (according to the description given

@@ -1,7 +1,10 @@
 #pragma once
-#include "../Geometry/Ray.h"
+
 #include <vector>
+
 #include <glm.hpp>
+
+#include "../Geometry/Ray.h"
 
 class Pixel {
 public:

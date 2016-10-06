@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include "Graphics\Camera.h"
+#include "Rendering\Camera.h"
 
 ///<summary> The main start for pengine. </summary>
 int main()
@@ -10,8 +10,8 @@ int main()
 
 	// --- body ---
 	Camera c(1, 1);
-	c.Render();
-	c.WriteImageToTGA();
+	// c.Render();
+	// c.WriteImageToTGA();
 	// ------------
 
 	std::cout << "Exiting... press any key to exit." << std::endl;

@@ -155,22 +155,22 @@
   <ItemGroup>
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Geometry\Ray.cpp" />
-    <ClCompile Include="src\Geometry\Scene.cpp" />
+    <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Geometry\Sphere.cpp" />
     <ClCompile Include="src\Geometry\Triangle.cpp" />
-    <ClCompile Include="src\Graphics\Camera.cpp" />
-    <ClCompile Include="src\Graphics\Pixel.cpp" />
-    <ClCompile Include="src\Material\LambertianMaterial.cpp" />
+    <ClCompile Include="src\Rendering\Camera.cpp" />
+    <ClCompile Include="src\Rendering\Pixel.cpp" />
+    <ClCompile Include="src\Rendering\Material\LambertianMaterial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Geometry\Ray.h" />
-    <ClInclude Include="src\Geometry\Scene.h" />
+    <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Geometry\Sphere.h" />
     <ClInclude Include="src\Geometry\Triangle.h" />
-    <ClInclude Include="src\Graphics\Camera.h" />
-    <ClInclude Include="src\Graphics\Pixel.h" />
-    <ClInclude Include="src\Material\LambertianMaterial.h" />
-    <ClInclude Include="src\Material\Material.h" />
+    <ClInclude Include="src\Rendering\Camera.h" />
+    <ClInclude Include="src\Rendering\Pixel.h" />
+    <ClInclude Include="src\Rendering\Material\LambertianMaterial.h" />
+    <ClInclude Include="src\Rendering\Material\Material.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

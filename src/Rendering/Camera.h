@@ -1,8 +1,11 @@
 #pragma once
 
-#include "Pixel.h"
-#include <glm.hpp>
 #include <vector>
+
+#include <glm.hpp>
+
+#include "../Scene/Scene.h"
+#include "Pixel.h"
 
 class Camera {
 public:
@@ -18,10 +21,10 @@ public:
 	/// <param name='c2'> Lower left corner of the camera plane. </param>
 	/// <param name='c3'> Upper left corner of the camera plane. </param>
 	/// <param name='c4'> Upper right corner of the camera plane. </param>
-	void Render(const glm::vec3 eye = glm::vec3(-2, 0, 0),
+	void Render(const Scene& scene, const glm::vec3 eye = glm::vec3(-2, 0, 0),
 				const glm::vec3 c1 = glm::vec3(0, -1, -1), const glm::vec3 c2 = glm::vec3(0, 1, -1),
 				const glm::vec3 c3 = glm::vec3(0, 1, 1), const glm::vec3 c4 = glm::vec3(0, -1, 1),
-				const float RAY_LENGTH = 1000.0f, const float RAYS_PER_PIXEL = 5);
+				const float RAY_LENGTH = 1000.0f, const unsigned int RAYS_PER_PIXEL = 5);
 
 	/// <summary> 
 	/// Writes the discretized pixels to a TGA image.

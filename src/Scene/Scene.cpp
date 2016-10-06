@@ -2,6 +2,11 @@
 
 Scene::Scene() {}
 
+glm::vec3 Scene::TraceRay(const Ray & ray)
+{
+	return glm::vec3();
+}
+
 void Scene::CreateRoom() {
 	glm::vec3 whiteColor(1.0, 1.0, 1.0);
 
