@@ -1,30 +1,57 @@
 #include "Scene.h"
 
+#include "../../includes/glm/gtx/norm.hpp"
+
 Scene::Scene() {}
 
-glm::vec3 Scene::TraceRay(const Ray & ray, int depth) const
+glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
+						  const unsigned int MAX_DEPTH) const
 {
-	depth--;
-	
-	if (bounces <= 0) {
-		return;
-	}
-	glm::vec3 colorAcc = { 0,0,0 };
-	for (unsigned i = 0; i < RAY_CASTS_PER_BOUNCE; i++) {
-		// Create new ray to cast
-		Ray newRay();
-		colorAcc += TraceRay();
+	if (MAX_DEPTH == 0) { return glm::vec3(0, 0, 0); }
+
+	unsigned int intersectionPrimitiveIndex;
+	unsigned int intersectionRenderGroupIndex;
+	glm::vec3 intersectionPoint;
+	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex,
+									 intersectionPrimitiveIndex, intersectionPoint);
+
+	/* If the ray doesn't intersect, simply return (0, 0, 0). */
+	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
+
+	const auto& intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
+	if (intersectionRenderGroup.material) {
+
 	}
 
-	return colorAcc;
+	const auto& intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
+
+
+	/* We intersected with something. Now shoot rays all over the place. */
+	glm::vec3 colorAccumulator = { 0,0,0 };
+
+	return colorAccumulator;
 }
 
-glm::vec3 Scene::RayCast(const Ray & ray) const
-{
-	// Check hit and get closest hit of all triangles in scene
-	for (unsigned int i = 0; i < triangles.size(); ++i) {
-
+bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
+					unsigned int & intersectionPrimitiveIndex, glm::vec3 & intersectionPoint) const {
+	float closestInterectionDistance = FLT_MAX;
+	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
+		const auto& rg = renderGroups[i];
+		for (unsigned int j = 0; j < rg.primitives.size(); ++j) {
+			const auto& pr = rg.primitives[j];
+			/* Check if the ray intersects with anything. */
+			bool intersects = pr.RayIntersection(ray, intersectionPoint);
+			if (intersects) {
+				float distance = glm::distance2(ray.from, intersectionPoint);
+				if (distance < closestInterectionDistance) {
+					intersectionRenderGroupIndex = i;
+					intersectionPrimitiveIndex = j;
+					closestInterectionDistance = distance;
+				}
+			}
+		}
 	}
+	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
 }
 
 void Scene::CreateRoom() {
