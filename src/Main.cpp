@@ -2,16 +2,24 @@
 
 #include <iostream>
 #include "Rendering\Camera.h"
+#include "Utility\Math.h"
+
+using namespace std;
 
 ///<summary> The main start for pengine. </summary>
 int main()
 {
 	std::cout << "Starting..." << std::endl;
 
+	// --- Interp test ---
+	float t = Math::InterpolationQuad4f(0, 0, 0, 0, 1, 1);
+	cout << t << endl;
+	t = Math::InterpolationQuad4f(1, 1, 0, 0, 1, 1);
+	cout << t << endl;
 	// --- body ---
-	Camera c(1, 1);
-	Scene scene;
-	c.Render(scene);
+	// Camera c(1, 1);
+	// Scene scene;
+	// c.Render(scene);
 	// c.WriteImageToTGA();
 	// ------------
 
