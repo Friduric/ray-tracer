@@ -5,7 +5,7 @@
 class Material {
 public:
 	//The intensity of the light of this material (should generally be 0 if not a lightsource).
-	glm::vec3 lightIntensity;
+	glm::vec3 emission;
 
 	/// <summary> 
 	/// Calculates the BRDF value of this material. 
