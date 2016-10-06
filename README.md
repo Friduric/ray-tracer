@@ -1,5 +1,5 @@
-﻿## Description
-This is a Monte Carlo ray tracer implementation that models intransparent objects using Lambertian reflections.
+## Description
+This is a Monte Carlo ray tracer implementation.
 
 ## A few troubleshooting tips
 - IMPORTANT: Use the 32-bit binaries (build using x86!). Otherwise GLM might bug out.
