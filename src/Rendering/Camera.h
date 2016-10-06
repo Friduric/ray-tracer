@@ -9,8 +9,12 @@
 
 class Camera {
 public:
-	Camera(const int width = PIXELS_WIDTH, const int height = PIXELS_HEIGHT);
 	size_t width, height;
+
+	/// <summary> Constructs an image. </summary>
+	/// <param name="width"> The width of the image in pixels. </param>
+	/// <param name="height"> The height of the image in pixels. </param>
+	Camera(const int width = 1000, const int height = 1000);
 
 	/// <summary>
 	/// Renders the image by setting the color of each pixel according to Monte Carlo 
@@ -35,15 +39,10 @@ public:
 	/// </summary>
 	bool WriteImageToTGA(const std::string path = "output/output_image.tga") const;
 private:
-	// Constants.
-	constexpr static double BRIGHTNESS_DISCRETIZATION_THRESHOLD = 1.25;
-	const static unsigned int PIXELS_WIDTH = 1;
-	const static unsigned int PIXELS_HEIGHT = 1;
-
 	// Pixel containers.
 	std::vector<std::vector<Pixel>> pixels;
 	std::vector<std::vector<glm::u8vec3>> discretizedPixels;
 
 	/// <summary> Discretizes the color of each pixel. </summary>
-	void CreateImage();
+	void CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD = 1.25f);
 };

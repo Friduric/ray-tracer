@@ -35,7 +35,7 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
 			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
 
-				/* Calculate new randomized point the camera plane. */
+				/* Calculate new randomized point in the camera plane. */
 				float ylerp = (y + rand(r)) * invWidth;
 				float zlerp = (z + rand(r)) * invHeight;
 				float nx = Math::InterpolateQuad4f(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
@@ -61,7 +61,7 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 	CreateImage(); // Should always be done immediately after the rendering step.
 }
 
-void Camera::CreateImage() {
+void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	std::cout << "Creating a discretized image from the rendered image ..." << std::endl;
 
 	/* Find max color intensity. Could try using r + g + b instead. */
