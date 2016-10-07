@@ -8,6 +8,8 @@
 #include "../Geometry/Ray.h"
 #include "../Utility/Math.h"
 
+#define __LOG_ITERATIONS
+
 Camera::Camera(const int _width, const int _height) : width(_width), height(_height) {
 	pixels.assign(width, std::vector<Pixel>(height));
 	discretizedPixels.assign(width, std::vector<glm::u8vec3>(height));
@@ -24,29 +26,34 @@ void Camera::Render(const Scene & scene, const glm::vec3 eye,
 	std::default_random_engine gen(rd());
 	std::uniform_real_distribution<float> rand(0, 1.0f - FLT_EPSILON);
 
-	float invWidth = 1.0f / (float)width;
-	float invHeight = 1.0f / (float)height;
-	float F = 1.0f / static_cast<float>(RAYS_PER_PIXEL);
+	const float invWidth = 1.0f / (float)width;
+	const float invHeight = 1.0f / (float)height;
+	const float F = 1.0f / static_cast<float>(RAYS_PER_PIXEL);
 
+#ifdef __LOG_ITERATIONS
 	long long ctr = 0;
+#endif // __LOG_ITERATIONS
 
 	/* For each pixel, shoot a bunch of rays through it. */
 	for (unsigned int y = 0; y < width; ++y) {
 		for (unsigned int z = 0; z < height; ++z) {
 
-			/* Shoot a bunch of rays through the pixel (y, z). */
+			/* Shoot a bunch of rays through the pixel (y, z), and accumulate color. */
 			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
 			for (unsigned int i = 0; i < RAYS_PER_PIXEL; ++i) {
+
+#ifdef __LOG_ITERATIONS
 				if (++ctr % 100000 == 0) {
 					std::cout << ctr << "/" << width * height * RAYS_PER_PIXEL << std::endl;
 				}
+#endif // __LOG_ITERATIONS
 
 				/* Calculate new randomized point in the camera plane. */
-				float ylerp = (y + rand(gen)) * invWidth;
-				float zlerp = (z + rand(gen)) * invHeight;
-				float nx = Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
-				float ny = Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
-				float nz = Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
+				const float ylerp = (y + rand(gen)) * invWidth;
+				const float zlerp = (z + rand(gen)) * invHeight;
+				const float nx = Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
+				const float ny = Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
+				const float nz = Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
 
 				/* Create ray. */
 				const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
@@ -96,11 +103,11 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
 			float r = pixels[i][j].color.r * f;
-			// assert(r >= -FLT_EPSILON && r <= 255.5f - FLT_EPSILON);
+			assert(r >= -FLT_EPSILON && r <= 255.5f - FLT_EPSILON);
 			float g = pixels[i][j].color.g * f;
-			// assert(g >= -FLT_EPSILON && g <= 255.5f - FLT_EPSILON);
+			assert(g >= -FLT_EPSILON && g <= 255.5f - FLT_EPSILON);
 			float b = pixels[i][j].color.b * f;
-			// assert(b >= -FLT_EPSILON && b <= 255.5f - FLT_EPSILON);
+			assert(b >= -FLT_EPSILON && b <= 255.5f - FLT_EPSILON);
 			discretizedPixels[i][j].r = (glm::u8)round(abs(r));
 			discretizedPixels[i][j].g = (glm::u8)round(abs(g));
 			discretizedPixels[i][j].b = (glm::u8)round(abs(b));
