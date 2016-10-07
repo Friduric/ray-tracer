@@ -24,9 +24,9 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 
 	unsigned int intersectionPrimitiveIndex;
 	unsigned int intersectionRenderGroupIndex;
-	glm::vec3 intersectionPoint;
+	float intersectionDistance;
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex,
-									 intersectionPrimitiveIndex, intersectionPoint);
+									 intersectionPrimitiveIndex, intersectionDistance);
 
 	/* If the ray doesn't intersect, simply return (0, 0, 0). */
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
@@ -58,32 +58,25 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 }
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
-					unsigned int & intersectionPrimitiveIndex, glm::vec3 & intersectionPoint) const {
+					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
 	float closestInterectionDistance = FLT_MAX;
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		const auto& rg = renderGroups[i];
 		for (unsigned int j = 0; j < rg.primitives.size(); ++j) {
 			const auto& pr = rg.primitives[j];
 			/* Check if the ray intersects with anything. */
-			bool intersects = pr->RayIntersection(ray, intersectionPoint);
+			bool intersects = pr->RayIntersection(ray, intersectionDistance);
 			if (intersects) {
-				float distance = glm::distance2(ray.from, intersectionPoint);
-				if (distance < closestInterectionDistance) {
+				if (intersectionDistance < closestInterectionDistance) {
 					intersectionRenderGroupIndex = i;
 					intersectionPrimitiveIndex = j;
-					closestInterectionDistance = distance;
+					closestInterectionDistance = intersectionDistance;
 				}
 			}
 		}
 	}
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
 }
-
-/*void Scene::CreatePhotonMap() {
-	// Get all light sources
-	std::vector<RenderGroup> lightSources;
-
-}*/
 
 void Scene::CreateRoom() {
 
@@ -226,10 +219,11 @@ void Scene::CreateRoom() {
 }
 
 void Scene::CreateTetrahedron(float x, float y, float z) {
+
+	// Material.
 	glm::vec3 c(0.2, 0.5, 0.5);
 	const auto tetraMaterial = new LambertianMaterial(c);
 	materials.push_back(tetraMaterial);
-	RenderGroup tetrahedronGroup(tetraMaterial);
 
 	// Vertices.
 	glm::vec3 v1(0.0 + x, 1.09 + y, 0.0 + z);
@@ -243,6 +237,9 @@ void Scene::CreateTetrahedron(float x, float y, float z) {
 	glm::vec3 n3(2.8036, 1.15, 1.63);
 	glm::vec3 n4(0.0, -3.44, 0.0);
 
+	// Render group + primitives.
+	RenderGroup tetrahedronGroup(tetraMaterial);
+
 	// Add triangles.
 	tetrahedronGroup.primitives.push_back(new Triangle(v1, v3, v2, n1));
 	tetrahedronGroup.primitives.push_back(new Triangle(v1, v4, v3, n2));
@@ -253,12 +250,14 @@ void Scene::CreateTetrahedron(float x, float y, float z) {
 }
 
 void Scene::CreateSphere(float x, float y, float z, float radius) {
+
+	// Material.
 	glm::vec3 c(0.5, 0.5, 0.0);
 	const auto sphereMaterial = new LambertianMaterial(c);
 	materials.push_back(sphereMaterial);
+
+	// Render group + primitive.
 	RenderGroup sphereGroup(sphereMaterial);
-
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
-
 	renderGroups.push_back(sphereGroup);
 }

@@ -37,8 +37,10 @@ public:
 	/// <param name='intersectionPoint'> 
 	/// Contains the intersection point if there was an intersection.
 	/// </param>
-	bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
-						unsigned int & intersectionPrimitiveIndex, glm::vec3 & intersectionPoint) const;
+	bool Scene::RayCast(const Ray & ray,
+						unsigned int & intersectionRenderGroupIndex,
+						unsigned int & intersectionPrimitiveIndex,
+						float & intersectionDistance) const;
 
 	/// <summary> 
 	/// Creates all walls, floors and ceilings of a room (according to the description given
