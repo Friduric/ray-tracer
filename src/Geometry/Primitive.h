@@ -11,7 +11,9 @@ public:
 	/// Computes the ray intersection point.
 	/// Returns true if there is an intersection.
 	/// </summary>
-	/// <param name='ray'> The ray. </param>
-	/// <param name='intersectionPoint'> The overwritten output intersection point. </param>
-	virtual bool RayIntersection(const Ray& ray, glm::vec3& intersectionPoint) const = 0;
+	/// <param name='ray'> The ray for which we compute intersection. </param>
+	/// <param name='intersectionPoint'> 
+	/// The distance to the intersection point (if there is an intersection). 
+	/// </param>
+	virtual bool RayIntersection(const Ray& ray, float & intersectionDistance) const = 0;
 };

@@ -1,5 +1,6 @@
 #include "Triangle.h"
 #include "../../includes/glm/gtx/norm.hpp"
+#include <iostream>
 
 using namespace glm;
 
@@ -12,14 +13,13 @@ Triangle::Triangle(vec3 _vertices[3], vec3 _normal) : normal(_normal) {
 vec3 Triangle::GetNormal(const vec3 & position) const { return normal; }
 
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
-bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) const {
+bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	if (dot(ray.dir, normal) > -FLT_EPSILON) {
-		return false; // The ray direction and normal are in the same direction (back facing).
+		return false; // The ray direction and normal are in the same direction (behind).
 	}
 
 	// Calculate intersection using barycentric coordinates. This gives a equation system
 	// which we can solve using Cramer's rule.
-	// See http://staffwww.itn.liu.se/~mardi/WebPages/Courses/TNCG15/TheCode.pdf for more information.
 	const vec3 E1 = vertices[1] - vertices[0];
 	const vec3 E2 = vertices[2] - vertices[0];
 	const vec3 P = cross(ray.dir, E2);
@@ -37,12 +37,6 @@ bool Triangle::RayIntersection(const Ray & ray, vec3 & intersectionPoint) const 
 		return false; // Didn't hit.
 	}
 
-	const float t = inv_den * dot(E2, Q);
-	float rayLength = distance2(ray.from, ray.to);
-	if (t * t > rayLength + FLT_EPSILON) {
-		return false; // Outside of ray length.
-	}
-
-	intersectionPoint = ray.from + t * ray.dir;
+	intersectionDistance = inv_den * dot(E2, Q);
 	return true;
 }

@@ -15,8 +15,11 @@ public:
 	/// <summary> 
 	/// Computes the ray intersection point.
 	/// Returns true if there was an intersection.
+	/// The ray is assumed to start outside of the sphere.
 	/// </summary>
-	/// <param name='ray'> The ray. </param>
-	/// <param name='intersectionPoint'> The overwritten output intersection point. </param>
-	bool RayIntersection(const Ray& ray, glm::vec3& intersectionPoint) const override;
+	/// <param name='ray'> The ray for which we compute sphere intersection. </param>
+	/// <param name='intersectionPoint'> 
+	/// The distance to the intersection point (if there is an intersection). 
+	/// </param>
+	bool RayIntersection(const Ray& ray, float & intersectionDistance) const override;
 };
