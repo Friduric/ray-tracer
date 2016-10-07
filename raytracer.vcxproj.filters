@@ -33,9 +33,6 @@
     <ClCompile Include="src\Rendering\Pixel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\Material\LambertianMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,7 +42,10 @@
     <ClCompile Include="src\Rendering\RenderGroup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\Material\OrenNayarMaterial.cpp">
+    <ClCompile Include="src\Rendering\Materials\LambertianMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Materials\OrenNayarMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,12 +65,6 @@
     <ClInclude Include="src\Rendering\Pixel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Material\LambertianMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Rendering\Material\Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Scene\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -86,7 +80,13 @@
     <ClInclude Include="src\Rendering\Photon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rendering\Material\OrenNayarMaterial.h">
+    <ClInclude Include="src\Rendering\Materials\LambertianMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Materials\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rendering\Materials\OrenNayarMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
