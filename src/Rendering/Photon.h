@@ -4,11 +4,12 @@
 
 class Photon {
 public:
-	// The direction the photon came from.
+	/// <summary> The direction the photon came from. </summary>
 	glm::vec3 direction;
-	// The world position of the photon.
-	glm::vec3 position;
-	// The color of the photon.
-	glm::vec3 color;
 
+	/// <summary> The world position of the photon. </summary>
+	glm::vec3 position;
+
+	/// <summary> The color of the photon. </summary>
+	glm::vec3 color;
 };
