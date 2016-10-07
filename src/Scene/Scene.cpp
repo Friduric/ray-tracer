@@ -45,12 +45,13 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
 
 	/* If the ray doesn't intersect, simply return (0, 0, 0). */
-	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
+	if (!intersectionFound) { return glm::vec3(1, 1, 1); }
 
 	/* Retrieve primitive and material information for the intersected object. */
 	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
 	Material* hitMaterial = intersectionRenderGroup.material;
 	if (hitMaterial->IsEmissive()) {
+		// We could also add emission color to the end result. Returning it here speeds up rendering.
 		return intersectionRenderGroup.material->GetEmissionColor();
 	}
 	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
@@ -103,50 +104,4 @@ std::vector<Ray> Scene::GenerateBouncingRays(const glm::vec3 & incomingDirection
 		result.push_back(Ray(intersectionPoint, intersectionPoint + reflectionDirection * rayLength));
 	}
 	return result;
-
-	// const glm::vec3 orthogonalToReflection = normalize(glm::cross(reflection, Math::NonParallellVector(reflection)));
-
-	// Always shoot towards the light => less rays needed for a neat image.
-	/*
-	for (unsigned int i = 0; i < emissiveRenderGroups.size(); ++i) {
-		const auto & grp = renderGroups[emissiveRenderGroups[i]];
-		for (unsigned int j = 0; j < grp.primitives.size(); ++j) {
-			const auto & prim = grp.primitives[j];
-			glm::vec3 newRayDirection = glm::normalize(prim->GetCenter() - intersectionPoint);
-			if (dot(newRayDirection, hitNormal) > 0) {
-				result.push_back(Ray(intersectionPoint, intersectionPoint + newRayDirection * rayLength));
-			}
-		}
-	}*/
-
-	// The technique we use is that we rotate the reflection using an inclination angle
-	// and then an azimuth angle. The azimuth and inclination angles are given by the 
-	// material and it's distribution function. Thus we can have different light bounce
-	// behaviour for different materials.
-	// for (unsigned int i = 0; i < numberOfRays; ++i) {
-
-		// glm::vec3 newRayDirection = Math::CosineWeightedHemisphereSampleDirection(hitNormal);
-		// result.push_back(Ray(intersectionPoint, intersectionPoint + newRayDirection * rayLength));
-
-		/*
-		// Fetch angles from the material (using it's distribution functions).
-		const float azimuthAngle = material->AzimuthDistributionFunction();
-		const float inclinationAngle = material->InclinationDistributionFunction();
-
-		// Calculate a new ray direction using the azimuth and inclination angles.
-		glm::vec3 newRayDirection = glm::rotate(reflection,
-												inclinationAngle,
-												orthogonalToReflection);
-		newRayDirection = glm::rotate(newRayDirection, azimuthAngle, reflection);
-
-		// Check if the new ray is going through the material.
-		// (if it is, then we could check the refraction index of the material).
-		if (glm::dot(newRayDirection, hitNormal) > 0) {
-
-			break;
-		}
-		*/
-		// }
-
-
 }

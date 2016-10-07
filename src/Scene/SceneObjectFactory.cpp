@@ -3,7 +3,7 @@
 #include "../Rendering/Materials/LambertianMaterial.h"
 #include "../Geometry/Sphere.h"
 
-void SceneObjectFactory::AddRoom(Scene & scene) {
+void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
@@ -31,11 +31,13 @@ void SceneObjectFactory::AddRoom(Scene & scene) {
 	materials.push_back(orangeMaterial);
 	const auto purpleMaterial = new LambertianMaterial(purpleColor);
 	materials.push_back(purpleMaterial);
+	const auto emissiveMaterial = new LambertianMaterial(whiteColor, whiteColor);
+	materials.push_back(emissiveMaterial);
 
 	// -------------------
 	// Ceiling.
 	// -------------------
-	RenderGroup ceiling(whiteMaterial);
+	RenderGroup ceiling(emissiveCeiling ? emissiveMaterial : whiteMaterial);
 
 	glm::vec3 cv1(-3.0, 0.0, 5.0);
 	glm::vec3 cv2(0.0, 6.0, 5.0);

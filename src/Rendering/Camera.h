@@ -27,8 +27,11 @@ public:
 	/// <param name='c3'> Upper left corner of the camera plane. </param>
 	/// <param name='c4'> Upper right corner of the camera plane. </param>
 	/// <param name='RAY_LENGTH'> The length of all the rays used to render the scene. </param>
-	/// <param name='RAYS_PER_PIXEL'> The number of rays which we trace through each pixel. </param> 
-	void Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL = 4, const glm::vec3 eye = glm::vec3(-7, 0, 0),
+	/// <param name='RAYS_PER_PIXEL'> 
+	/// The number of rays which we trace through each pixel. 
+	/// Best results are given if RAYS_PER_PIXEL = N^2 for some integer N. 
+	/// </param> 
+	void Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL = 1024, const glm::vec3 eye = glm::vec3(-7, 0, 0),
 				const glm::vec3 c1 = glm::vec3(-5, -1, -1), const glm::vec3 c2 = glm::vec3(-5, 1, -1),
 				const glm::vec3 c3 = glm::vec3(-5, 1, 1), const glm::vec3 c4 = glm::vec3(-5, -1, 1),
 				const float RAY_LENGTH = 100000.0f);
