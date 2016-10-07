@@ -3,6 +3,7 @@
 #include <iostream>
 #include "Rendering\Camera.h"
 #include "Utility\Math.h"
+#include "Scene\SceneObjectFactory.h"
 
 using namespace std;
 
@@ -12,19 +13,22 @@ int main()
 	std::cout << "Starting..." << std::endl;
 
 	/* Initialize camera. */
-	Camera c(90, 90);
+	Camera c(200, 200);
 
 	/* Create scene. */
 	Scene scene;
-	scene.CreateRoom();
-	scene.CreateSphere(10, 0, 2, 1.0f);
-	scene.CreateTetrahedron(3, 0, 0);
+	SceneObjectFactory::AddRoom(scene);
+	SceneObjectFactory::AddSphere(scene, 10, 0, 2, 1.0f, glm::vec3(1.0f, 0.15f, 0.5f));
+	SceneObjectFactory::AddTetrahedron(scene, 3, 0, 0, glm::vec3(0, 1.0f, 1.0f));
+	SceneObjectFactory::AddEmissiveSphere(scene, 7, -2, -2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1, 1, 1));
+	// SceneObjectFactory::AddEmissiveSphere(scene, -4.5f, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(0.0f, 0.0f, 0.5f));
+	scene.Initialize();
 
 	/* Render. */
-	c.Render(scene);
+	c.Render(scene, 256); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
 	c.WriteImageToTGA();
 
-	std::cout << "Exiting... press any key to exit." << std::endl;
+	std::cout << "Rendering finished... press any key to exit." << std::endl;
 	std::cin.get();
 
 	return 0;

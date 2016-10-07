@@ -17,6 +17,6 @@ float OrenNayarMaterial::InclinationDistributionFunction() { return 0.0f; }
 glm::vec3 OrenNayarMaterial::CalculateBRDF(const glm::vec3 & inDirection,
 										   const glm::vec3 & outDirection,
 										   const glm::vec3 & normal,
-										   const glm::vec3 & incomingIntensity) const {
+										   const glm::vec3 & incomingRadiance) const {
 	return glm::vec3();
 }
