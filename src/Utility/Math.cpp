@@ -37,6 +37,43 @@ glm::vec3 Math::NonParallellVector(const glm::vec3 & v) {
 	}
 }
 
+glm::vec3 Math::SampleHemisphereUsingDiskCoordinates(const float u, const float v) {
+	const float r = sqrt(u);
+	const float theta = 2 * glm::pi<float>() * v;
+	const float x = r * cos(theta);
+	const float y = r * sin(theta);
+	return glm::vec3(x, y, sqrt(std::max<float>(0, 1 - u)));
+}
+
+glm::vec3 Math::CosineWeightedHemisphereSampleDirection(const glm::vec3 & n) {
+	float r1 = rand() / static_cast<float>(RAND_MAX);
+	float r2 = rand() / static_cast<float>(RAND_MAX);
+
+	float phi = 2.0f * glm::pi<float>() * r1;
+	float theta = acos(sqrt(1.0f - r2));
+
+	float xs = sinf(theta) * cosf(phi);
+	float ys = cosf(theta);
+	float zs = sinf(theta) * sinf(phi);
+
+	glm::vec3 y(n.x, n.y, n.z);
+	glm::vec3 h = y;
+	if (abs(h.x) <= abs(h.y) && abs(h.x) <= abs(h.z)) {
+		h.x = 1.0;
+	}
+	else if (abs(h.y) <= abs(h.x) && abs(h.y) <= abs(h.z)) {
+		h.y = 1.0;
+	}
+	else {
+		h.z = 1.0;
+	}
+
+	glm::vec3 x = glm::normalize(glm::cross(h, y));
+	glm::vec3 z = glm::normalize(glm::cross(x, y));
+	glm::vec3 res = xs * x + ys * y + zs * z;
+	return glm::normalize(res);
+}
+
 Math::NormalDistributionGenerator::NormalDistributionGenerator(float _min, float _max) :
 	min(_min), max(_max), distribution(0.5f * (_min + _max), (1.0f / 6.0f) * (_max - _min)) { }
 

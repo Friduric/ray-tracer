@@ -41,4 +41,15 @@ namespace Math {
 	/// Returns a vector that is non-parallell to a given vector.
 	/// </summary>
 	glm::vec3 NonParallellVector(const glm::vec3 & v);
+
+	/// <summary> 
+	/// Returns a hemisphere coordinate given two coordinates on a disk.
+	/// </summary>
+	glm::vec3 SampleHemisphereUsingDiskCoordinates(const float u, const float v);
+
+	/// <summary>
+	/// Returns a random direction given a normal.
+	/// Uses cosine-weighted hemisphere sampling.
+	/// </summary>
+	glm::vec3 CosineWeightedHemisphereSampleDirection(const glm::vec3 & n);
 }
