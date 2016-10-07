@@ -21,7 +21,7 @@ public:
 private:
 	glm::vec3 emissionColor;
 	glm::vec3 surfaceColor;
-	float reflectance = 0.4f; // Should not exceed 0.64!
+	float reflectance = 0.62f; // Should not exceed 0.64!
 	Math::NormalDistributionGenerator azimuthGenerator;
 	Math::NormalDistributionGenerator inclinationGenerator;
 	glm::vec3 GetRandomSampleDirection(const glm::vec3 & normal) const;
