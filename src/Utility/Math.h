@@ -1,5 +1,9 @@
 #pragma once
 
+#include <random>
+#include <glm.hpp>
+#include "../../includes/glm/gtc/constants.hpp"
+
 namespace Math {
 	/// <summary> Returns an interpolated value between 4 corner values. </summary>
 	/// <param name='dy'> 
@@ -17,4 +21,24 @@ namespace Math {
 	float BilinearInterpolation(const float dy, const float dz,
 								const float x1, const float x2,
 								const float x3, const float x4);
+
+	/// <summary> 
+	/// A normal distribution generator that generates numbers between two given numbers.
+	/// There will be a small peak at min and max (since normal distributions are not really 
+	/// supposed to be limited to a range).
+	/// </summary>
+	class NormalDistributionGenerator {
+	public:
+		NormalDistributionGenerator(float min = 0.0f, float max = glm::half_pi<float>());
+		float GetRandomFloat();
+	private:
+		std::normal_distribution<float> distribution;
+		std::default_random_engine generator;
+		float min, max;
+	};
+
+	/// <summary>
+	/// Returns a vector that is non-parallell to a given vector.
+	/// </summary>
+	glm::vec3 NonParallellVector(const glm::vec3 & v);
 }
