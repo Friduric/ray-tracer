@@ -163,6 +163,7 @@
     <ClCompile Include="src\Rendering\Camera.cpp" />
     <ClCompile Include="src\Rendering\Pixel.cpp" />
     <ClCompile Include="src\Rendering\Materials\LambertianMaterial.cpp" />
+    <ClCompile Include="src\Scene\SceneObjectFactory.cpp" />
     <ClCompile Include="src\Utility\Math.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="src\Rendering\Pixel.h" />
     <ClInclude Include="src\Rendering\Materials\LambertianMaterial.h" />
     <ClInclude Include="src\Rendering\Materials\Material.h" />
+    <ClInclude Include="src\Scene\SceneObjectFactory.h" />
     <ClInclude Include="src\Utility\Math.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
