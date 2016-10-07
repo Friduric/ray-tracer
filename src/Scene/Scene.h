@@ -20,21 +20,23 @@ public:
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color.
 	/// </summary>
-	glm::vec3 TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT = 20,
-					   const unsigned int MAX_DEPTH = 5) const;
+	glm::vec3 TraceRay(const Ray & ray,
+					   const unsigned int BOUNCES_PER_HIT = 20,
+					   const unsigned int MAX_DEPTH = 5,
+					   const float DEPRECATION_FACTOR = 1.0f) const;
 
 	/// <summary> 
 	/// Casts a ray through the scene. Returns true if the was an intersection.
 	/// </summary>
 	/// <param name='ray'> The ray which we cast. </param>
 	/// <param name='intersectionRenderGroupIndex'> 
-	/// The intersection render group index if there was an intersection.
+	/// OUT: The intersection render group index if there was an intersection.
 	/// </param>
 	/// <param name='intersectionPrimitiveIndex'> 
-	/// The intersection primitive index if there was an intersection.
+	/// OUT: The intersection primitive index if there was an intersection.
 	/// </param>
 	/// <param name='intersectionPoint'> 
-	/// The intersection point distance if there was an intersection.
+	/// OUT: The intersection point distance if there was an intersection.
 	/// </param>
 	bool Scene::RayCast(const Ray & ray,
 						unsigned int & intersectionRenderGroupIndex,
@@ -49,8 +51,17 @@ public:
 	void CreateRoom();
 
 	/// <summary> Creates a tetrahedron at position x, y, z and adds it to the scene. </summary>
-	void CreateTetrahedron(float x = -35, float y = 0, float z = 0);
+	void CreateTetrahedron(float x = 0, float y = 0, float z = 0);
 
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
-	void CreateSphere(float x = 3, float y = 0, float z = 0, float radius = 1.0f);
+	void CreateSphere(float x = 0, float y = 0, float z = 0, float radius = 1.0f);
+
+	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
+	void CreateEmissiveSphere(float x = 0, float y = 0, float z = 0,
+							  float radius = 1.0f, glm::vec3 emissionColor = glm::vec3(1, 1, 1));
+
+	std::vector<Ray> GenerateBouncingRays(const glm::vec3 & hitNormal,
+										  const glm::vec3 & intersectionPoint,
+										  const Material* material,
+										  const unsigned int numberOfRays) const;
 };

@@ -1,7 +1,11 @@
 #include "Scene.h"
+
 #include <memory>
+#include <algorithm>
+#include <cassert>
+
 #include "../../includes/glm/gtx/norm.hpp"
-#include "../Rendering/Material/LambertianMaterial.h"
+#include "../Rendering/Materials/LambertianMaterial.h"
 #include "../Geometry/Sphere.h"
 
 Scene::Scene() {}
@@ -19,8 +23,10 @@ Scene::~Scene()
 }
 
 glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
-						  const unsigned int MAX_DEPTH) const {
+						  const unsigned int MAX_DEPTH, const float DEPRECATION_FACTOR) const {
 	if (MAX_DEPTH == 0) { return glm::vec3(0, 0, 0); }
+
+	assert(BOUNCES_PER_HIT > 0);
 
 	unsigned int intersectionPrimitiveIndex;
 	unsigned int intersectionRenderGroupIndex;
@@ -38,24 +44,26 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 	if (glm::length(intersectionRenderGroup.material->GetEmissionColor()) > FLT_EPSILON) {
 		return intersectionRenderGroup.material->GetEmissionColor();
 	}
-	else {
-		return intersectionRenderGroup.material->GetSurfaceColor(); // Only for testing. Remove this.
-	}
-
-	/*
 
 	const auto& intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
-	// We intersected with something non-emissive. Now shoot rays all over the place.
+	glm::vec3 intersectionPoint = ray.from + ray.dir * intersectionDistance;
+	glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
+	Material* hitMaterial = intersectionRenderGroup.material;
+
+	/* We intersected with something non-emissive. Now shoot rays all over the place. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
-	glm::vec3 hitNormal = intersectionPrimitive.GetNormal(intersectionPoint);
-
-	for (unsigned int b = 0; b < BOUNCES_PER_HIT; ++b) {
-
+	std::vector<Ray> bouncingRays = GenerateBouncingRays(hitNormal,
+														 intersectionPoint,
+														 hitMaterial,
+														 BOUNCES_PER_HIT);
+	int nextBouncesPerHit = BOUNCES_PER_HIT;
+	nextBouncesPerHit -= (float)(BOUNCES_PER_HIT / MAX_DEPTH) * DEPRECATION_FACTOR;
+	for (const auto & bouncedRay : bouncingRays) {
+		colorAccumulator += TraceRay(ray, std::min(nextBouncesPerHit, 0), MAX_DEPTH - 1, DEPRECATION_FACTOR);
 	}
-
-	return colorAccumulator;
-	*/
+	return (1.0f / (float)BOUNCES_PER_HIT) * colorAccumulator;
 }
+
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
 					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
@@ -260,4 +268,25 @@ void Scene::CreateSphere(float x, float y, float z, float radius) {
 	RenderGroup sphereGroup(sphereMaterial);
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
 	renderGroups.push_back(sphereGroup);
+}
+
+void Scene::CreateEmissiveSphere(float x, float y, float z, float radius, glm::vec3 emissionColor) {
+
+	// Material.
+	glm::vec3 c(1.0, 1.0, 1.0);
+	const auto sphereMaterial = new LambertianMaterial(c, emissionColor);
+	materials.push_back(sphereMaterial);
+
+	// Render group + primitive.
+	RenderGroup sphereGroup(sphereMaterial);
+	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
+	renderGroups.push_back(sphereGroup);
+}
+
+std::vector<Ray> Scene::GenerateBouncingRays(const glm::vec3 & hitNormal,
+											 const glm::vec3 & intersectionPoint,
+											 const Material * material,
+											 const unsigned int numberOfRays) const
+{
+	return std::vector<Ray>();
 }
