@@ -20,22 +20,21 @@ public:
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color.
 	/// </summary>
-	glm::vec3 TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT = 50,
+	glm::vec3 TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT = 20,
 					   const unsigned int MAX_DEPTH = 5) const;
 
 	/// <summary> 
-	/// Casts a ray in the scene and returns the closest
-	/// triangle or sphere in the scene, null if none was hit.
+	/// Casts a ray through the scene. Returns true if the was an intersection.
 	/// </summary>
-	/// <param name='ray'> The ray which we trace during the ray casting. </param>
+	/// <param name='ray'> The ray which we cast. </param>
 	/// <param name='intersectionRenderGroupIndex'> 
-	/// Contains the intersection render group index if there was an intersection.
+	/// The intersection render group index if there was an intersection.
 	/// </param>
 	/// <param name='intersectionPrimitiveIndex'> 
-	/// Contains the intersection primitive index if there was an intersection.
+	/// The intersection primitive index if there was an intersection.
 	/// </param>
 	/// <param name='intersectionPoint'> 
-	/// Contains the intersection point if there was an intersection.
+	/// The intersection point distance if there was an intersection.
 	/// </param>
 	bool Scene::RayCast(const Ray & ray,
 						unsigned int & intersectionRenderGroupIndex,
