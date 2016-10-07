@@ -1,19 +1,23 @@
 #pragma once
 
 #include <vector>
+#include <functional>
 
 #include <glm.hpp>
 
 #include "../Geometry/Ray.h"
 #include "../Rendering/RenderGroup.h"
 #include "../Geometry/Triangle.h"
-#include <functional>
 
 class Scene {
 public:
 	/// <summary> The groups in this scene which are renderable. </summary>
 	std::vector<RenderGroup> renderGroups;
 	std::vector<Material*> materials;
+	std::vector<unsigned int> emissiveRenderGroups;
+
+	/// <summary> Call this after all primitives has been added to the scene (pre-render). </summary>
+	void Initialize();
 
 	Scene();
 	~Scene();
@@ -22,9 +26,8 @@ public:
 	/// Traces a ray through the scene and returns a color.
 	/// </summary>
 	glm::vec3 TraceRay(const Ray & ray,
-					   const unsigned int BOUNCES_PER_HIT = 20,
-					   const unsigned int MAX_DEPTH = 5,
-					   const float DEPRECATION_FACTOR = 1.0f) const;
+					   const unsigned int BOUNCES_PER_HIT = 2,
+					   const unsigned int MAX_DEPTH = 4) const;
 
 	/// <summary> 
 	/// Casts a ray through the scene. Returns true if the was an intersection.
@@ -63,21 +66,4 @@ public:
 										  Material* material,
 										  const unsigned int numberOfRays,
 										  const float rayLength) const;
-
-	/// <summary> 
-	/// Creates all walls, floors and ceilings of a room (according to the description given
-	/// by Mark Eric Dieckmann in the course TNCG15) and adds them to the scene.
-	/// (http://staffwww.itn.liu.se/~mardi/WebPages/Courses/TNCG15/courseTNCG15-2014)
-	/// </summary>
-	void CreateRoom();
-
-	/// <summary> Creates a tetrahedron at position x, y, z and adds it to the scene. </summary>
-	void CreateTetrahedron(float x = 0, float y = 0, float z = 0);
-
-	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
-	void CreateSphere(float x = 0, float y = 0, float z = 0, float radius = 1.0f);
-
-	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
-	void CreateEmissiveSphere(float x = 0, float y = 0, float z = 0,
-							  float radius = 1.0f, glm::vec3 emissionColor = glm::vec3(1, 1, 1));
 };
