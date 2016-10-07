@@ -7,6 +7,10 @@ Sphere::Sphere(vec3 _center, float _radius) :
 
 glm::vec3 Sphere::GetNormal(const glm::vec3 & position) const { return glm::normalize(position - center); }
 
+glm::vec3 Sphere::GetCenter() const {
+	return center;
+}
+
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	// We assume that the ray does not start inside the sphere.
 	const float bcheck = dot(ray.dir, center - ray.from);

@@ -14,6 +14,7 @@ public:
 	Triangle(glm::vec3 vertices[3], glm::vec3 normal = glm::vec3());
 
 	glm::vec3 GetNormal(const glm::vec3 & position) const override;
+	glm::vec3 GetCenter() const override;
 
 	/// <summary> 
 	/// Computes the ray intersection point between a ray and this triangle.

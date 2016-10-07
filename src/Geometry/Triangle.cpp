@@ -12,6 +12,10 @@ Triangle::Triangle(vec3 _vertices[3], vec3 _normal) : normal(_normal) {
 
 vec3 Triangle::GetNormal(const vec3 & position) const { return normal; }
 
+glm::vec3 Triangle::GetCenter() const {
+	return (vertices[0] + vertices[1] + vertices[2]) / 3.0f;
+}
+
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
 bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	if (dot(ray.dir, normal) > -FLT_EPSILON) {
