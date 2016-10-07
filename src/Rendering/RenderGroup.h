@@ -3,7 +3,7 @@
 #include <vector>
 #include <memory>
 
-#include "Material\Material.h"
+#include "Materials\Material.h"
 #include "..\Geometry\Primitive.h"
 #include "Photon.h"
 

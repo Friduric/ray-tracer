@@ -21,7 +21,7 @@ public:
 	/// </summary>
 	/// <param name='ray'> The ray for which we compute triangle intersection. </param>
 	/// <param name='intersectionPoint'> 
-	/// The distance to the intersection point (if there is an intersection). 
+	/// OUT: The distance to the intersection point (if there is an intersection). 
 	/// </param>
 	bool RayIntersection(const Ray& ray, float & intersectionDistance) const override;
 };
