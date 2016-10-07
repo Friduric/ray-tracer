@@ -7,6 +7,7 @@
 #include "../Geometry/Ray.h"
 #include "../Rendering/RenderGroup.h"
 #include "../Geometry/Triangle.h"
+#include <functional>
 
 class Scene {
 public:
@@ -43,6 +44,26 @@ public:
 						unsigned int & intersectionPrimitiveIndex,
 						float & intersectionDistance) const;
 
+	/// <summary>
+	///	Generates "bouncing" rays given a surface and it's properties.
+	/// </summary>
+	/// <param name='incomingDirection'> The direction of the incoming ray. </param>
+	/// <param name='hitNormal'> The normal of the surface for which we are bouncing on. </param>
+	/// <param name='intersectionPoint'> The origin of the generated rays </param>
+	/// <param name='material'> The material of the surface for which we are bouncing on. </param>
+	/// <param name='numberOfRays'> The number of rays to be generated. </param>
+	/// <param name='rayLength'> The length of the generated rays. </param>
+	/// <remarks> 
+	/// Parameter 'material' cannot be const since we re-use random generators from within the 
+	/// material.
+	/// </remarks>
+	std::vector<Ray> GenerateBouncingRays(const glm::vec3 & incomingDirection,
+										  const glm::vec3 & hitNormal,
+										  const glm::vec3 & intersectionPoint,
+										  Material* material,
+										  const unsigned int numberOfRays,
+										  const float rayLength) const;
+
 	/// <summary> 
 	/// Creates all walls, floors and ceilings of a room (according to the description given
 	/// by Mark Eric Dieckmann in the course TNCG15) and adds them to the scene.
@@ -59,9 +80,4 @@ public:
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
 	void CreateEmissiveSphere(float x = 0, float y = 0, float z = 0,
 							  float radius = 1.0f, glm::vec3 emissionColor = glm::vec3(1, 1, 1));
-
-	std::vector<Ray> GenerateBouncingRays(const glm::vec3 & hitNormal,
-										  const glm::vec3 & intersectionPoint,
-										  const Material* material,
-										  const unsigned int numberOfRays) const;
 };

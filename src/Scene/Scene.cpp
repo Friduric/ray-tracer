@@ -5,6 +5,8 @@
 #include <cassert>
 
 #include "../../includes/glm/gtx/norm.hpp"
+#include "../../includes/glm/gtx/rotate_vector.hpp"
+
 #include "../Rendering/Materials/LambertianMaterial.h"
 #include "../Geometry/Sphere.h"
 
@@ -52,10 +54,12 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 
 	/* We intersected with something non-emissive. Now shoot rays all over the place. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
-	std::vector<Ray> bouncingRays = GenerateBouncingRays(hitNormal,
+	std::vector<Ray> bouncingRays = GenerateBouncingRays(ray.dir,
+														 hitNormal,
 														 intersectionPoint,
 														 hitMaterial,
-														 BOUNCES_PER_HIT);
+														 BOUNCES_PER_HIT,
+														 ray.length);
 	int nextBouncesPerHit = BOUNCES_PER_HIT;
 	nextBouncesPerHit -= (float)(BOUNCES_PER_HIT / MAX_DEPTH) * DEPRECATION_FACTOR;
 	for (const auto & bouncedRay : bouncingRays) {
@@ -63,7 +67,6 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int BOUNCES_PER_HIT,
 	}
 	return (1.0f / (float)BOUNCES_PER_HIT) * colorAccumulator;
 }
-
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
 					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
@@ -84,6 +87,44 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 		}
 	}
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
+}
+
+std::vector<Ray> Scene::GenerateBouncingRays(const glm::vec3 & incomingDirection,
+											 const glm::vec3 & hitNormal,
+											 const glm::vec3 & intersectionPoint,
+											 Material * material,
+											 const unsigned int numberOfRays,
+											 const float rayLength) const {
+	std::vector<Ray> result;
+
+	// The technique we use is that we rotate the reflection using an inclination angle
+	// and then an azimuth angle. The azimuth and inclination angles are given by the 
+	// material and it's distribution function. Thus we can have different light bounce
+	// behaviour for different materials.
+	const glm::vec3 reflection = reflect(incomingDirection, hitNormal);
+	const glm::vec3 orthogonalToReflection = normalize(glm::cross(reflection, Math::NonParallellVector(reflection)));
+	for (int i = 0; i < numberOfRays; ++i) {
+		int attempt = 0;
+		while (attempt++ < 4) {
+			// Fetch angles from the material (using it's distribution functions).
+			const float azimuthAngle = material->AzimuthDistributionFunction();
+			const float inclinationAngle = material->InclinationDistributionFunction();
+
+			// Calculate a new ray direction using the azimuth and inclination angles.
+			glm::vec3 newRayDirection = glm::rotate(reflection,
+													inclinationAngle,
+													orthogonalToReflection);
+			newRayDirection = glm::rotate(newRayDirection, azimuthAngle, reflection);
+
+			// Check if the new ray is going through the material.
+			// (if it is, then we could check the refraction index of the material).
+			if (glm::dot(newRayDirection, hitNormal) > 0) {
+				result.push_back(Ray(intersectionPoint, intersectionPoint + newRayDirection * rayLength));
+				break;
+			}
+		}
+	}
+	return result;
 }
 
 void Scene::CreateRoom() {
@@ -281,12 +322,4 @@ void Scene::CreateEmissiveSphere(float x, float y, float z, float radius, glm::v
 	RenderGroup sphereGroup(sphereMaterial);
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
 	renderGroups.push_back(sphereGroup);
-}
-
-std::vector<Ray> Scene::GenerateBouncingRays(const glm::vec3 & hitNormal,
-											 const glm::vec3 & intersectionPoint,
-											 const Material * material,
-											 const unsigned int numberOfRays) const
-{
-	return std::vector<Ray>();
 }
