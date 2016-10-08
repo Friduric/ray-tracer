@@ -1,5 +1,10 @@
 ## Description
-This is a Monte Carlo ray tracer implementation.
+A Monte Carlo ray tracer implementation.
+
+## Sample images
+This is the first image that was rendered by this ray tracer (using only Lambertian reflections): 
+
+<img src="https://github.com/Friduric/raytracer/blob/master/first_lambertian_test.png" width="500" height="500">
 
 ## A few troubleshooting tips
 - IMPORTANT: Use the 32-bit binaries (build using x86!). Otherwise GLM might bug out.
