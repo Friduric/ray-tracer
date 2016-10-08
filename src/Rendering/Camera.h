@@ -33,8 +33,7 @@ public:
 	/// </param> 
 	void Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL = 1024, const glm::vec3 eye = glm::vec3(-7, 0, 0),
 				const glm::vec3 c1 = glm::vec3(-5, -1, -1), const glm::vec3 c2 = glm::vec3(-5, 1, -1),
-				const glm::vec3 c3 = glm::vec3(-5, 1, 1), const glm::vec3 c4 = glm::vec3(-5, -1, 1),
-				const float RAY_LENGTH = 100000.0f);
+				const glm::vec3 c3 = glm::vec3(-5, 1, 1), const glm::vec3 c4 = glm::vec3(-5, -1, 1));
 
 	/// <summary> 
 	/// Writes the discretized pixels to a TGA image.

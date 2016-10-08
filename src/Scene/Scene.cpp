@@ -52,7 +52,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	Material* hitMaterial = intersectionRenderGroup.material;
 	if (hitMaterial->IsEmissive()) {
 		// We could also add emission color to the end result. Returning it here speeds up rendering.
-		return intersectionRenderGroup.material->GetEmissionColor();
+		// return intersectionRenderGroup.material->GetEmissionColor();
 	}
 	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 
@@ -63,13 +63,13 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 
 	/* Shoot rays and integrate based on BRDF sampling. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
-	std::vector<Ray> bouncingRays = GenerateBouncingRays(ray.dir, hitNormal, intersectionPoint, hitMaterial, bouncesPerHit, ray.length);
+	std::vector<Ray> bouncingRays = GenerateBouncingRays(ray.dir, hitNormal, intersectionPoint, hitMaterial, bouncesPerHit);
 	for (const auto & bouncedRay : bouncingRays) {
 		const auto incomingRadiance = TraceRay(bouncedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateBRDF(bouncedRay.dir, ray.dir, hitNormal, incomingRadiance) * 2.0f / glm::pi<float>();
+		colorAccumulator += hitMaterial->CalculateBRDF(bouncedRay.dir, ray.dir, hitNormal, incomingRadiance);
 	}
 
-	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
+	return (1.0f / (float)(bouncesPerHit + 1)) * (colorAccumulator + intersectionRenderGroup.material->GetEmissionColor());
 }
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
@@ -95,13 +95,12 @@ std::vector<Ray> Scene::GenerateBouncingRays(const glm::vec3 & incomingDirection
 											 const glm::vec3 & hitNormal,
 											 const glm::vec3 & intersectionPoint,
 											 Material * material,
-											 const unsigned int numberOfRays,
-											 const float rayLength) const {
+											 const unsigned int numberOfRays) const {
 	std::vector<Ray> result;
 	const glm::vec3 reflection = reflect(incomingDirection, hitNormal);
 	for (unsigned int i = 0; i < numberOfRays; ++i) {
 		glm::vec3 reflectionDirection = Math::CosineWeightedHemisphereSampleDirection(hitNormal);
-		result.push_back(Ray(intersectionPoint, intersectionPoint + reflectionDirection * rayLength));
+		result.push_back(Ray(intersectionPoint, reflectionDirection));
 	}
 	return result;
 }

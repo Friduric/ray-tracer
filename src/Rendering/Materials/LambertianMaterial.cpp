@@ -20,13 +20,11 @@ glm::vec3 LambertianMaterial::CalculateBRDF(const glm::vec3 & inDirection,
 											const glm::vec3 & outDirection,
 											const glm::vec3 & normal,
 											const glm::vec3 & incomingRadiance) const {
-	const float d = glm::max(0.0f, reflectance * glm::dot(inDirection, normal));
-	const float gamma = 0.00f;
-	const float intensity = length(incomingRadiance);
+	const float d = glm::max(0.0f, glm::dot(inDirection, normal));
 	const float r = incomingRadiance.r * surfaceColor.r;
 	const float g = incomingRadiance.g * surfaceColor.g;
 	const float b = incomingRadiance.b * surfaceColor.b;
-	return d * glm::vec3(r, g, b) + gamma * intensity * surfaceColor;
+	return reflectance * d * glm::vec3(r, g, b);
 }
 
 

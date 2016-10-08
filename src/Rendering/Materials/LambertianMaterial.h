@@ -17,5 +17,5 @@ public:
 private:
 	glm::vec3 emissionColor;
 	glm::vec3 surfaceColor;
-	float reflectance = 0.50f; // Should not exceed 2 * pi.
+	float reflectance = 0.62f; // Should not exceed 0.64f.
 };

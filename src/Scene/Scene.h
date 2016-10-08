@@ -64,6 +64,5 @@ public:
 										  const glm::vec3 & hitNormal,
 										  const glm::vec3 & intersectionPoint,
 										  Material* material,
-										  const unsigned int numberOfRays,
-										  const float rayLength) const;
+										  const unsigned int numberOfRays) const;
 };

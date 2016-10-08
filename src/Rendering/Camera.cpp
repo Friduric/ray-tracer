@@ -18,8 +18,7 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					const glm::vec3 eye,
 					const glm::vec3 c1, const glm::vec3 c2,
-					const glm::vec3 c3, const glm::vec3 c4,
-					const float RAY_LENGTH) {
+					const glm::vec3 c3, const glm::vec3 c4) {
 
 	std::cout << "Rendering the scene ..." << std::endl;
 
@@ -34,6 +33,8 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 	/* Number of quads per pixel. */
 	const unsigned int SQRT_QUADS_PER_PIXEL = (unsigned int)(sqrt(RAYS_PER_PIXEL) + 0.5f); // Round.
 	const float INV_SQRT_QUADS_PER_PIXEL = 1.0f / (float)SQRT_QUADS_PER_PIXEL;
+	const float cstep = invWidth * INV_SQRT_QUADS_PER_PIXEL;
+	const float rstep = invHeight * INV_SQRT_QUADS_PER_PIXEL;
 
 #ifdef __LOG_ITERATIONS
 	long long ctr = 0;
@@ -50,15 +51,12 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 
 			/* Shoot a bunch of rays through the pixel (y, z), and accumulate color. */
 			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
-
-			for (unsigned int c = 0; c < SQRT_QUADS_PER_PIXEL; ++c) {
-				float yy = c * invWidth * INV_SQRT_QUADS_PER_PIXEL;
-				for (unsigned int r = 0; r < SQRT_QUADS_PER_PIXEL; ++r) {
-					float zz = r * invHeight * INV_SQRT_QUADS_PER_PIXEL;
+			for (float c = 0; c < invWidth; c += cstep) {
+				for (float r = 0; r < invHeight; r += rstep) {
 
 					/* Calculate new randomized point in the camera plane. */
-					const float ylerp = (y + yy + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * invWidth;
-					const float zlerp = (z + zz + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * invHeight;
+					const float ylerp = (y + c + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * invWidth;
+					const float zlerp = (z + r + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * invHeight;
 					const float nx = Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
 					const float ny = Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
 					const float nz = Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
@@ -66,7 +64,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					/* Create ray. */
 					const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
 					const glm::vec3 rayDirection = glm::normalize(planePosition - eye);
-					const Ray ray(planePosition, planePosition + RAY_LENGTH * rayDirection);
+					const Ray ray(planePosition, rayDirection);
 
 					/* Trace ray through the scene. */
 					colorAccumulator += scene.TraceRay(ray);
@@ -89,43 +87,50 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	float maxIntensity = 0;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
-			float rgb = pixels[i][j].color.r + pixels[i][j].color.g + pixels[i][j].color.b;
-			maxIntensity = std::max<float>(rgb, maxIntensity);
+			const auto & c = pixels[i][j].color;
+			maxIntensity = std::max<float>(c.r, maxIntensity);
+			maxIntensity = std::max<float>(c.g, maxIntensity);
+			maxIntensity = std::max<float>(c.b, maxIntensity);
 		}
 	}
 
 	// TODO: Change this to some other way of detecting whether the image is dark (with spots).
-	if (maxIntensity > BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
-		std::cout << "Squashing brightness color due to high brightness." << std::endl;
-		for (size_t i = 0; i < width; ++i) {
-			for (size_t j = 0; j < height; ++j) {
-				pixels[i][j].color.r = sqrt(pixels[i][j].color.r);
-				pixels[i][j].color.g = sqrt(pixels[i][j].color.g);
-				pixels[i][j].color.b = sqrt(pixels[i][j].color.b);
-			}
-		}
-		maxIntensity = sqrt(maxIntensity);
-	}
-
-	if (maxIntensity < FLT_EPSILON * 10.0f) {
-		std::cout << "Image max intensity was very low." << std::endl;
-	}
-
-	// Discretize pixels using the max intensity. Every value must be between 0 and 255.
-	float f = maxIntensity < FLT_EPSILON * 10.0f ? 0.0f : (3.0f * 254.99f) / maxIntensity;
+	// if (maxIntensity > BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
+	// std::cout << "Squashing brightness color due to high brightness." << std::endl;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
-			float r = pixels[i][j].color.r * f;
-			assert(r >= -FLT_EPSILON && r <= 255.5f - FLT_EPSILON);
-			float g = pixels[i][j].color.g * f;
-			assert(g >= -FLT_EPSILON && g <= 255.5f - FLT_EPSILON);
-			float b = pixels[i][j].color.b * f;
-			assert(b >= -FLT_EPSILON && b <= 255.5f - FLT_EPSILON);
-			discretizedPixels[i][j].r = (glm::u8)round(abs(r));
-			discretizedPixels[i][j].g = (glm::u8)round(abs(g));
-			discretizedPixels[i][j].b = (glm::u8)round(abs(b));
+			pixels[i][j].color = sqrt(pixels[i][j].color);
 		}
 	}
+	maxIntensity = sqrt(maxIntensity);
+	// }
+
+
+	if (maxIntensity < FLT_EPSILON * 4.0f) {
+		std::cerr << "Rendered image intensity was very low. Impossible to discretize image." << std::endl;
+		return;
+	}
+
+	glm::u8 discretizedMaxIntensity{};
+	// Discretize pixels using the max intensity. Every value must be between 0 and 255.
+	float f = 254.99f / maxIntensity;
+	for (size_t i = 0; i < width; ++i) {
+		for (size_t j = 0; j < height; ++j) {
+			const auto & c = f * pixels[i][j].color;
+			assert(c.r >= -FLT_EPSILON && c.r <= 255.5f - FLT_EPSILON);
+			assert(c.g >= -FLT_EPSILON && c.g <= 255.5f - FLT_EPSILON);
+			assert(c.b >= -FLT_EPSILON && c.b <= 255.5f - FLT_EPSILON);
+			discretizedPixels[i][j].r = (glm::u8)round(c.r);
+			discretizedPixels[i][j].g = (glm::u8)round(c.g);
+			discretizedPixels[i][j].b = (glm::u8)round(c.b);
+			discretizedMaxIntensity = glm::max(discretizedMaxIntensity, discretizedPixels[i][j].r);
+			discretizedMaxIntensity = glm::max(discretizedMaxIntensity, discretizedPixels[i][j].g);
+			discretizedMaxIntensity = glm::max(discretizedMaxIntensity, discretizedPixels[i][j].b);
+		}
+	}
+	assert(discretizedMaxIntensity == 255); // Discretized max intensity failed! Image max intensity is OK.
+	std::cout << "Image max intensity was: " << maxIntensity << std::endl;
+
 }
 
 bool Camera::WriteImageToTGA(const std::string path) const {
