@@ -29,7 +29,7 @@ Scene::~Scene() {
 void Scene::Initialize() {
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		if (renderGroups[i].material->IsEmissive()) {
-			emissiveRenderGroups.push_back(i);
+			emissiveRenderGroups.push_back(&renderGroups[i]);
 		}
 	}
 }

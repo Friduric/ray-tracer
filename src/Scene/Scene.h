@@ -14,7 +14,7 @@ public:
 	/// <summary> The groups in this scene which are renderable. </summary>
 	std::vector<RenderGroup> renderGroups;
 	std::vector<Material*> materials;
-	std::vector<unsigned int> emissiveRenderGroups;
+	std::vector<RenderGroup*> emissiveRenderGroups;
 
 	/// <summary> Call this after all primitives has been added to the scene (pre-render). </summary>
 	void Initialize();
