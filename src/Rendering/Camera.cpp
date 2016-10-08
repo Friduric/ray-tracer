@@ -63,8 +63,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 
 					/* Create ray. */
 					const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
-					const glm::vec3 rayDirection = glm::normalize(planePosition - eye);
-					const Ray ray(planePosition, rayDirection);
+					const Ray ray(planePosition, glm::normalize(planePosition - eye));
 
 					/* Trace ray through the scene. */
 					colorAccumulator += scene.TraceRay(ray);
@@ -95,25 +94,24 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	}
 
 	// TODO: Change this to some other way of detecting whether the image is dark (with spots).
-	// if (maxIntensity > BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
-	// std::cout << "Squashing brightness color due to high brightness." << std::endl;
-	for (size_t i = 0; i < width; ++i) {
-		for (size_t j = 0; j < height; ++j) {
-			pixels[i][j].color = sqrt(pixels[i][j].color);
+	if (maxIntensity > BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
+		// std::cout << "Squashing brightness color due to high brightness." << std::endl;
+		for (size_t i = 0; i < width; ++i) {
+			for (size_t j = 0; j < height; ++j) {
+				pixels[i][j].color = sqrt(pixels[i][j].color);
+			}
 		}
+		maxIntensity = sqrt(maxIntensity);
 	}
-	maxIntensity = sqrt(maxIntensity);
-	// }
-
 
 	if (maxIntensity < FLT_EPSILON * 4.0f) {
 		std::cerr << "Rendered image intensity was very low. Impossible to discretize image." << std::endl;
 		return;
 	}
 
-	glm::u8 discretizedMaxIntensity{};
 	// Discretize pixels using the max intensity. Every value must be between 0 and 255.
-	float f = 254.99f / maxIntensity;
+	glm::u8 discretizedMaxIntensity{};
+	const float f = 254.99f / maxIntensity;
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
 			const auto & c = f * pixels[i][j].color;
@@ -130,7 +128,6 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	}
 	assert(discretizedMaxIntensity == 255); // Discretized max intensity failed! Image max intensity is OK.
 	std::cout << "Image max intensity was: " << maxIntensity << std::endl;
-
 }
 
 bool Camera::WriteImageToTGA(const std::string path) const {

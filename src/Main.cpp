@@ -13,7 +13,7 @@ int main()
 	std::cout << "Starting..." << std::endl;
 
 	/* Initialize camera. */
-	Camera c(400, 400);
+	Camera c(100, 100);
 
 	std::cout << "Creating the scene..." << std::endl;
 
@@ -37,7 +37,7 @@ int main()
 	scene.Initialize();
 
 	/* Render. */
-	c.Render(scene, 1024, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
+	c.Render(scene, 128, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
 	c.WriteImageToTGA();
 
 	std::cout << "Rendering finished... press any key to exit." << std::endl;
