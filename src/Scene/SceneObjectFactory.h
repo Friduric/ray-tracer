@@ -26,4 +26,14 @@ namespace SceneObjectFactory {
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
 	void AddOrenNayarSphere(Scene & scene, float x = 0, float y = 0, float z = 0, float radius = 0,
 							glm::vec3 surfaceColor = glm::vec3(1, 0, 0));
+
+	/// <summary> Creates a triangle and adds it to the scene. </summary>
+	void AddTriangle(Scene & scene, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 normal,
+					 glm::vec3 surfaceColor, glm::vec3 emissionColor);
+
+	/// <summary> Creates a quad and adds it to the scene. </summary>
+	void Add2DQuad(Scene & scene, glm::vec2 corner1, glm::vec2 corner2, float height,
+				   glm::vec3 normal = glm::vec3(0, 0, -1),
+				   glm::vec3 surfaceColor = glm::vec3(1, 1, 1),
+				   glm::vec3 emissionColor = glm::vec3(1, 1, 1));
 };

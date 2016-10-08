@@ -148,7 +148,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	renderGroups.push_back(wall6);
 }
 
-void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, float z, float radius, glm::vec3 surfaceColor) {
+void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, float z,
+											float radius, glm::vec3 surfaceColor) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
@@ -162,7 +163,45 @@ void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, flo
 	renderGroups.push_back(sphereGroup);
 }
 
-void SceneObjectFactory::AddSphere(Scene & scene, float x, float y, float z, float radius, glm::vec3 surfaceColor) {
+void SceneObjectFactory::AddTriangle(Scene & scene, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,
+									 glm::vec3 normal, glm::vec3 surfaceColor, glm::vec3 emissionColor) {
+	auto & materials = scene.materials;
+	auto & renderGroups = scene.renderGroups;
+
+	// Material.
+	const auto sphereMaterial = new LambertianMaterial(surfaceColor, emissionColor);
+	materials.push_back(sphereMaterial);
+
+	// Render group + primitive.
+	RenderGroup triangleGroup(sphereMaterial);
+	triangleGroup.primitives.push_back(new Triangle(p1, p2, p3, normal));
+	renderGroups.push_back(triangleGroup);
+}
+
+void SceneObjectFactory::Add2DQuad(Scene & scene, glm::vec2 corner1, glm::vec2 corner2, float height,
+								   glm::vec3 normal, glm::vec3 surfaceColor, glm::vec3 emissionColor) {
+	auto & materials = scene.materials;
+	auto & renderGroups = scene.renderGroups;
+
+	glm::vec3 c1 = glm::vec3(corner1.x, corner1.y, height);
+	glm::vec3 c2 = glm::vec3(corner1.x, corner2.y, height);
+	glm::vec3 c3 = glm::vec3(corner2.x, corner2.y, height);
+	glm::vec3 c4 = glm::vec3(corner2.x, corner1.y, height);
+
+	// Material.
+	const auto sphereMaterial = new LambertianMaterial(surfaceColor, emissionColor);
+	materials.push_back(sphereMaterial);
+
+	// Render group + primitive.
+	RenderGroup triangleGroup(sphereMaterial);
+
+	triangleGroup.primitives.push_back(new Triangle(c1, c2, c3, normal));
+	triangleGroup.primitives.push_back(new Triangle(c3, c4, c1, normal));
+	renderGroups.push_back(triangleGroup);
+}
+
+void SceneObjectFactory::AddSphere(Scene & scene, float x, float y, float z,
+								   float radius, glm::vec3 surfaceColor) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
