@@ -2,7 +2,7 @@
 A Monte Carlo ray tracer implementation.
 
 ## Sample images
-This is the first render done by this ray tracer (using only Lambertian reflections): 
+This is the first image that was rendered by this ray tracer (using only Lambertian reflections): 
 
 <img src="https://github.com/Friduric/raytracer/blob/master/first_lambertian_test.png" width="500" height="500">
 
