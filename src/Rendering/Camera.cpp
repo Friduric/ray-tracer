@@ -4,6 +4,7 @@
 #include <fstream>
 #include <random>
 #include <algorithm>
+#include <chrono>
 
 #include "../Geometry/Ray.h"
 #include "../Utility/Math.h"
@@ -21,6 +22,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					const glm::vec3 c3, const glm::vec3 c4) {
 
 	std::cout << "Rendering the scene ..." << std::endl;
+	auto startTime = std::chrono::high_resolution_clock::now();
 
 	std::random_device rd;
 	std::default_random_engine gen(rd());
@@ -74,6 +76,11 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 			pixels[y][z].color = INV_RAYS_PER_PIXEL * colorAccumulator;
 		}
 	}
+
+	auto endTime = std::chrono::high_resolution_clock::now();
+
+	auto took = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+	std::cout << "Rendering finished and took: " << (took / 1000.0) << " seconds." << std::endl;
 
 	/* Create the final discretized image from float the values. */
 	CreateImage(); // Should always be done immediately after the rendering step.

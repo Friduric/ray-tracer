@@ -13,7 +13,7 @@ int main()
 	std::cout << "Starting..." << std::endl;
 
 	/* Initialize camera. */
-	Camera c(100, 100);
+	Camera c(1000, 1000);
 
 	std::cout << "Creating the scene..." << std::endl;
 
@@ -22,10 +22,10 @@ int main()
 	SceneObjectFactory::AddRoom(scene, false);
 	// SceneObjectFactory::AddSphere(scene, 10, 0, 2, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	// SceneObjectFactory::AddSphere(scene, 7, -3, 3, 1.5f, glm::vec3(0.0f, 1.0f, 0.0f));
-	// SceneObjectFactory::AddOrenNayarSphere(scene, 6, 3, 0, 1.5f, glm::vec3(1.0f, 0.0f, 0.0f));
+	SceneObjectFactory::AddOrenNayarSphere(scene, 6, 3, 0, 1.5f, glm::vec3(1.0f, 0.35f, 1.0f));
 	SceneObjectFactory::AddSphere(scene, 3, -3, 0, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
-	SceneObjectFactory::AddSphere(scene, 3, 0, 0, 1.25f, glm::vec3(0.0f, 1.0f, 0.0f));
-	SceneObjectFactory::AddSphere(scene, 3, 3, 0, 1.25f, glm::vec3(0.0f, 0.0f, 1.0f));
+	SceneObjectFactory::AddSphere(scene, 3, 0, 2, 1.25f, glm::vec3(0.0f, 1.0f, 0.0f));
+	SceneObjectFactory::AddSphere(scene, 3, 3, -2, 1.25f, glm::vec3(0.0f, 0.0f, 1.0f));
 	// SceneObjectFactory::AddTetrahedron(scene, 3, 0, 0, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	/* Lights. */
@@ -37,7 +37,7 @@ int main()
 	scene.Initialize();
 
 	/* Render. */
-	c.Render(scene, 128, 5, 1, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
+	c.Render(scene, 1, 5, 1, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
 	c.WriteImageToTGA();
 
 	std::cout << "Rendering finished... press any key to exit." << std::endl;
