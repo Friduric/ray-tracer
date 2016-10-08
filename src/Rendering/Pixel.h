@@ -9,6 +9,5 @@
 class Pixel {
 public:
 	glm::vec3 color;
-	std::vector<Ray*> rays;
 	Pixel(glm::vec3 color = glm::vec3());
 };
