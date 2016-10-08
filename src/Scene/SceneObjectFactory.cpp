@@ -1,6 +1,7 @@
 #include "SceneObjectFactory.h"
 
 #include "../Rendering/Materials/LambertianMaterial.h"
+#include "../Rendering/Materials/OrenNayarMaterial.h"
 #include "../Geometry/Sphere.h"
 
 void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
@@ -145,6 +146,20 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	wall6.primitives.push_back(new Triangle(fv1, fv6, cv1, w6Normal));
 
 	renderGroups.push_back(wall6);
+}
+
+void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, float z, float radius, glm::vec3 surfaceColor) {
+	auto & materials = scene.materials;
+	auto & renderGroups = scene.renderGroups;
+
+	// Material.
+	const auto sphereMaterial = new OrenNayarMaterial(surfaceColor);
+	materials.push_back(sphereMaterial);
+
+	// Render group + primitive.
+	RenderGroup sphereGroup(sphereMaterial);
+	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
+	renderGroups.push_back(sphereGroup);
 }
 
 void SceneObjectFactory::AddSphere(Scene & scene, float x, float y, float z, float radius, glm::vec3 surfaceColor) {
