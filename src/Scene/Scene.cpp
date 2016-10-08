@@ -45,7 +45,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
 
 	/* If the ray doesn't intersect, simply return (0, 0, 0). */
-	if (!intersectionFound) { return glm::vec3(1, 1, 1); }
+	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/* Retrieve primitive and material information for the intersected object. */
 	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
@@ -66,7 +66,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	std::vector<Ray> bouncingRays = GenerateBouncingRays(ray.dir, hitNormal, intersectionPoint, hitMaterial, bouncesPerHit, ray.length);
 	for (const auto & bouncedRay : bouncingRays) {
 		const auto incomingRadiance = TraceRay(bouncedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateBRDF(bouncedRay.dir, ray.dir, hitNormal, incomingRadiance);
+		colorAccumulator += hitMaterial->CalculateBRDF(bouncedRay.dir, ray.dir, hitNormal, incomingRadiance) * 2.0f / glm::pi<float>();
 	}
 
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;

@@ -43,7 +43,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 	for (unsigned int y = 0; y < width; ++y) {
 		for (unsigned int z = 0; z < height; ++z) {
 #ifdef __LOG_ITERATIONS
-			if (++ctr % 100 == 0) {
+			if (++ctr % 10000 == 0) {
 				std::cout << ctr << "/" << width * height << " pixels." << std::endl;
 			}
 #endif // __LOG_ITERATIONS

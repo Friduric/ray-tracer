@@ -27,7 +27,7 @@ public:
 	/// </summary>
 	glm::vec3 TraceRay(const Ray & ray,
 					   const unsigned int BOUNCES_PER_HIT = 1,
-					   const unsigned int MAX_DEPTH = 3) const;
+					   const unsigned int MAX_DEPTH = 5) const;
 
 	/// <summary> 
 	/// Casts a ray through the scene. Returns true if the was an intersection.
