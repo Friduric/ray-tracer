@@ -7,11 +7,6 @@ public:
 	virtual bool IsEmissive() const = 0;
 	virtual glm::vec3 GetSurfaceColor() const = 0;
 	virtual glm::vec3 GetEmissionColor() const = 0;
-	virtual glm::vec3 GetRandomSampleDirection(const glm::vec3 & normal) const = 0;
-
-	virtual float AzimuthDistributionFunction() = 0;
-	virtual float InclinationDistributionFunction() = 0;
-
 	/// <summary> 
 	/// Calculates the BRDF value of this material. 
 	/// In other words calculates the outgoing radiance. 

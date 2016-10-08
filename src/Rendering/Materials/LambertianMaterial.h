@@ -6,23 +6,14 @@
 
 class LambertianMaterial : public Material {
 public:
-	LambertianMaterial(glm::vec3 surfaceColor, glm::vec3 emissionColor = glm::vec3(0, 0, 0),
-					   float inclinationMax = glm::half_pi<float>(),
-					   float azimuthMax = glm::pi<float>() * 2.0f);
-
+	LambertianMaterial(glm::vec3 surfaceColor, glm::vec3 emissionColor = glm::vec3(0, 0, 0));
 	bool IsEmissive() const override;
 	glm::vec3 GetSurfaceColor() const override;
 	glm::vec3 GetEmissionColor() const override;
-	float AzimuthDistributionFunction() override;
-	float InclinationDistributionFunction() override;
-
 	glm::vec3 CalculateBRDF(const glm::vec3 & inDirection, const glm::vec3 & outDirection,
 							const glm::vec3 & normal, const glm::vec3 & incomingIntensity) const override;
 private:
 	glm::vec3 emissionColor;
 	glm::vec3 surfaceColor;
-	float reflectance = 0.62f; // Should not exceed 0.64!
-	Math::NormalDistributionGenerator azimuthGenerator;
-	Math::NormalDistributionGenerator inclinationGenerator;
-	glm::vec3 GetRandomSampleDirection(const glm::vec3 & normal) const;
+	float reflectance = 0.50f; // Should not exceed 2 * pi.
 };
