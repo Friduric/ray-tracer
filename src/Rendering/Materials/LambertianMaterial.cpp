@@ -11,15 +11,22 @@ glm::vec3 LambertianMaterial::GetSurfaceColor() const { return surfaceColor; }
 
 glm::vec3 LambertianMaterial::GetEmissionColor() const { return emissionColor; }
 
+glm::vec3 LambertianMaterial::CalculateOutPosition(const glm::vec3 & intersectionPoint, const Ray & incomingRay) const
+{
+	return glm::vec3();
+}
+
 glm::vec3 LambertianMaterial::CalculateBRDF(const glm::vec3 & inDirection,
 											const glm::vec3 & outDirection,
 											const glm::vec3 & normal,
 											const glm::vec3 & incomingRadiance) const {
-	float d = glm::max(0.0f, reflectance * glm::dot(inDirection, normal));
-	float r = incomingRadiance.r * surfaceColor.r;
-	float g = incomingRadiance.g * surfaceColor.g;
-	float b = incomingRadiance.b * surfaceColor.b;
-	return d * glm::vec3(r, g, b);
+	const float d = glm::max(0.0f, reflectance * glm::dot(inDirection, normal));
+	const float gamma = 0.00f;
+	const float intensity = length(incomingRadiance);
+	const float r = incomingRadiance.r * surfaceColor.r;
+	const float g = incomingRadiance.g * surfaceColor.g;
+	const float b = incomingRadiance.b * surfaceColor.b;
+	return d * glm::vec3(r, g, b) + gamma * intensity * surfaceColor;
 }
 
 

@@ -8,10 +8,12 @@ public:
 	bool IsEmissive() const override;
 	glm::vec3 GetSurfaceColor() const override;
 	glm::vec3 GetEmissionColor() const override;
+	virtual glm::vec3 CalculateOutPosition(const glm::vec3 & intersectionPoint,
+										   const Ray & incomingRay) const override;
 	glm::vec3 CalculateBRDF(const glm::vec3 & inDirection, const glm::vec3 & outDirection,
 							const glm::vec3 & normal, const glm::vec3 & incomingIntensity) const override;
 private:
 	glm::vec3 emissionColor;
 	glm::vec3 surfaceColor;
-	float roughness = 55.65f;
+	float roughness = 0.1f;
 };

@@ -13,6 +13,11 @@ glm::vec3 OrenNayarMaterial::GetSurfaceColor() const { return surfaceColor; }
 
 glm::vec3 OrenNayarMaterial::GetEmissionColor() const { return emissionColor; }
 
+glm::vec3 OrenNayarMaterial::CalculateOutPosition(const glm::vec3 & intersectionPoint, const Ray & incomingRay) const
+{
+	return glm::vec3();
+}
+
 glm::vec3 OrenNayarMaterial::CalculateBRDF(const glm::vec3 & inDirection,
 										   const glm::vec3 & outDirection,
 										   const glm::vec3 & normal,

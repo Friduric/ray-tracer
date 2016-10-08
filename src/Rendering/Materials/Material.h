@@ -1,12 +1,15 @@
 #pragma once
 
 #include <glm.hpp>
+#include "../../Geometry/Ray.h"
 
 class Material {
 public:
 	virtual bool IsEmissive() const = 0;
 	virtual glm::vec3 GetSurfaceColor() const = 0;
 	virtual glm::vec3 GetEmissionColor() const = 0;
+	virtual glm::vec3 CalculateOutPosition(const glm::vec3 & intersectionPoint,
+										   const Ray & incomingRay) const = 0;
 	/// <summary> 
 	/// Calculates the BRDF value of this material. 
 	/// In other words calculates the outgoing radiance. 
