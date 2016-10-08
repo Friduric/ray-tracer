@@ -37,7 +37,7 @@ int main()
 	scene.Initialize();
 
 	/* Render. */
-	c.Render(scene, 128, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
+	c.Render(scene, 128, 5, 1, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
 	c.WriteImageToTGA();
 
 	std::cout << "Rendering finished... press any key to exit." << std::endl;

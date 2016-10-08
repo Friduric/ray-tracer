@@ -16,8 +16,8 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 }
 
 void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
-					const glm::vec3 eye,
-					const glm::vec3 c1, const glm::vec3 c2,
+					const unsigned int RAY_MAX_DEPTH, const unsigned int RAY_MAX_BOUNCE,
+					const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 					const glm::vec3 c3, const glm::vec3 c4) {
 
 	std::cout << "Rendering the scene ..." << std::endl;
@@ -66,7 +66,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					const Ray ray(planePosition, glm::normalize(planePosition - eye));
 
 					/* Trace ray through the scene. */
-					colorAccumulator += scene.TraceRay(ray);
+					colorAccumulator += scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 				}
 			}
 
