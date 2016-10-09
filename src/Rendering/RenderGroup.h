@@ -5,7 +5,7 @@
 
 #include "Materials\Material.h"
 #include "..\Geometry\Primitive.h"
-#include "Photon.h"
+#include "..\PhotonMap\Photon.h"
 
 class RenderGroup {
 public:
