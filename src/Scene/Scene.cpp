@@ -34,7 +34,7 @@ void Scene::Initialize() {
 	}
 }
 
-glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
+glm::vec3 Scene::TraceRay(Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
 	if (depth == 0) { return glm::vec3(0, 0, 0); }
 
 	assert(depth > 0);
@@ -47,6 +47,9 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	/* If the ray doesn't intersect, simply return (0, 0, 0). */
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
+	/*  Calculate intersection point. */
+	glm::vec3 intersectionPoint = ray.from + ray.dir * intersectionDistance;
+
 	/* Retrieve primitive and material information for the intersected object. */
 	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
 	Material* hitMaterial = intersectionRenderGroup.material;
@@ -56,17 +59,18 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	}
 	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 
-	/* Calculate intersection point and normal. */
-	glm::vec3 intersectionPoint = ray.from + ray.dir * intersectionDistance;
-	assert(glm::distance(ray.from, intersectionPoint) > FLT_EPSILON);
+	/* Calculate normal. */
 	glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
 
 	/* Shoot rays and integrate based on BRDF sampling. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
-	std::vector<Ray> bouncingRays = GenerateBouncingRays(ray.dir, hitNormal, intersectionPoint, hitMaterial, bouncesPerHit);
-	for (const auto & bouncedRay : bouncingRays) {
-		const auto incomingRadiance = TraceRay(bouncedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateBRDF(bouncedRay.dir, ray.dir, hitNormal, incomingRadiance);
+	const glm::vec3 previousRayDirection = ray.dir;
+	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
+		glm::vec3 reflectionDirection = Math::CosineWeightedHemisphereSampleDirection(hitNormal);
+		ray.dir = reflectionDirection;
+		ray.from = intersectionPoint;
+		const auto incomingRadiance = TraceRay(ray, bouncesPerHit, depth - 1);
+		colorAccumulator += hitMaterial->CalculateBRDF(ray.dir, previousRayDirection, hitNormal, incomingRadiance);
 	}
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }
@@ -79,6 +83,7 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 			/* Check if the ray intersects with anything. */
 			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance);
 			if (intersects) {
+				assert(intersectionDistance > FLT_EPSILON);
 				if (intersectionDistance < closestInterectionDistance) {
 					intersectionRenderGroupIndex = i;
 					intersectionPrimitiveIndex = j;
@@ -87,18 +92,6 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 			}
 		}
 	}
+	intersectionDistance = closestInterectionDistance;
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
-}
-
-std::vector<Ray> Scene::GenerateBouncingRays(const glm::vec3 & incomingDirection,
-											 const glm::vec3 & hitNormal,
-											 const glm::vec3 & intersectionPoint,
-											 Material * material,
-											 const unsigned int numberOfRays) const {
-	std::vector<Ray> result;
-	for (unsigned int i = 0; i < numberOfRays; ++i) {
-		glm::vec3 reflectionDirection = Math::CosineWeightedHemisphereSampleDirection(hitNormal);
-		result.push_back(Ray(intersectionPoint, reflectionDirection));
-	}
-	return result;
 }

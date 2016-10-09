@@ -25,7 +25,7 @@ public:
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color.
 	/// </summary>
-	glm::vec3 TraceRay(const Ray & ray,
+	glm::vec3 TraceRay(Ray & ray,
 					   const unsigned int BOUNCES_PER_HIT = 1,
 					   const unsigned int MAX_DEPTH = 5) const;
 
