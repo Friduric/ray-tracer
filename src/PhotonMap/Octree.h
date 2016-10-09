@@ -2,8 +2,25 @@
 #include <vector>
 #include "Photon.h"
 
-class Octree
-{
+class OctreeNode {
+public:
+	/// <summary> Boundaries of node box. </summary>
+	float xMin;
+	float xMax;
+	float yMin;
+	float yMax;
+
+	/// <summary> Child nodes, null if leaf node. </summary>
+	OctreeNode* children[8];
+
+	/// <summary> Parent node, null if root node. </summary>
+	OctreeNode* parent;
+
+	/// <summary> Pointers to photons in this node, empty if not leaf node. </summary>
+	std::vector<Photon*> photons;
+};
+
+class Octree {
 public:
 	/// <summary> The root node. </summary>
 	OctreeNode root;
@@ -22,26 +39,7 @@ public:
 	/// <param name='pos'> The world position. </param>
 	/// </summary>
 	OctreeNode GetNodeAtPosition(glm::vec3 pos);
-
 };
 
-class OctreeNode
-{
-public:
-	/// <summary> Boundaries of node box. </summary>
-	float xMin;
-	float xMax;
-	float yMin;
-	float yMax;
 
-	/// <summary> Child nodes, null if leaf node. </summary>
-	OctreeNode* children[8];
-
-	/// <summary> Parent node, null if root node. </summary>
-	OctreeNode* parent;
-
-	/// <summary> Pointers to photons in this node, empty if not leaf node. </summary>
-	std::vector<Photon*> photons;
-
-};
 
