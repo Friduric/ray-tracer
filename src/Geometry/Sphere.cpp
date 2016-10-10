@@ -14,6 +14,9 @@ glm::vec3 Sphere::GetCenter() const {
 }
 
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
+	if (dot(ray.dir, GetNormal(ray.from)) > -FLT_EPSILON) {
+		return false; // The ray direction and normal are in the same direction (behind).
+	}
 	const vec3 m = ray.from - center;
 	float b = glm::dot(m, ray.dir);
 	float c = glm::dot(m, m) - radius * radius;
@@ -24,11 +27,10 @@ bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) cons
 	if (d < FLT_EPSILON) {
 		return false;
 	}
-	d = sqrt(d);
-	if (b > d) {
+	intersectionDistance = -b - sqrt(d);
+	if (intersectionDistance < FLT_EPSILON) {
 		return false;
 	}
-	intersectionDistance = -b - d;
 	assert(intersectionDistance > FLT_EPSILON);
 	return true;
 }

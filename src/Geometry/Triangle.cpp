@@ -40,7 +40,9 @@ bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) co
 	if (v < -FLT_EPSILON || u + v > 1.0f + FLT_EPSILON) {
 		return false; // Didn't hit.
 	}
-
 	intersectionDistance = inv_den * dot(E2, Q);
+	if (intersectionDistance < FLT_EPSILON) {
+		return false;
+	}
 	return true;
 }
