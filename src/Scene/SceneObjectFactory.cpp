@@ -15,6 +15,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	const glm::vec3 blueColor(0.0, 0.0, 1.0);
 	const glm::vec3 greenColor(0.0, 1.0, 0.0);
 	const glm::vec3 yellowColor(1.0, 1.0, 0.0);
+	const glm::vec3 orangeColor(1.0, 0.25, 0.0);
 	const glm::vec3 purpleColor(1.0, 0.0, 1.0);
 
 	// Materials.
@@ -22,13 +23,13 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	materials.push_back(whiteMaterial);
 	const auto redMaterial = new LambertianMaterial(redColor);
 	materials.push_back(redMaterial);
-	const auto greenMaterial = new LambertianMaterial(cyanColor);
+	const auto greenMaterial = new LambertianMaterial(greenColor);
 	materials.push_back(greenMaterial);
 	const auto blueMaterial = new LambertianMaterial(blueColor);
 	materials.push_back(blueMaterial);
-	const auto yellowMaterial = new LambertianMaterial(greenColor);
+	const auto yellowMaterial = new LambertianMaterial(yellowColor);
 	materials.push_back(yellowMaterial);
-	const auto orangeMaterial = new LambertianMaterial(yellowColor);
+	const auto orangeMaterial = new LambertianMaterial(orangeColor);
 	materials.push_back(orangeMaterial);
 	const auto purpleMaterial = new LambertianMaterial(purpleColor);
 	materials.push_back(purpleMaterial);
