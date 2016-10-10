@@ -1,6 +1,6 @@
 #include "Octree.h"
 #include <queue>
-void Octree::SetupOctree(const Scene scene, const int maxPhotonsPerNode, const float minSizeOfNodeBox)
+void Octree::SetupOctree(const Scene scene, const unsigned int maxPhotonsPerNode, const float minSizeOfNodeBox)
 {
 	SetUpRootNode(scene);
 	std::queue<OctreeNode*> nodeQueue;
@@ -94,7 +94,7 @@ OctreeNode* Octree::GetNodeClosestToPosition(glm::vec3 pos)
 	// and find the closest node to the given position.
 	while (!bestNode->isLeaf) {
 		float closestDistance = FLT_MAX;
-		OctreeNode* closestNode;
+		OctreeNode* closestNode = bestNode->children[0];
 		OctreeNode* tmpNode;
 		glm::vec3 tmpPos;
 		float tmpDist;
@@ -103,7 +103,7 @@ OctreeNode* Octree::GetNodeClosestToPosition(glm::vec3 pos)
 			tmpPos = glm::vec3(tmpNode->xMin + (tmpNode->xMax*0.5f - tmpNode->xMin)*0.5f,
 							   tmpNode->yMin + (tmpNode->yMax - tmpNode->yMin)*0.5f,
 							   tmpNode->zMin + (tmpNode->zMax - tmpNode->zMin)*0.5f);
-			tmpDist = (tmpPos - pos).length;
+			tmpDist = (tmpPos - pos).length();
 			if(tmpDist < closestDistance) {
 				closestDistance = tmpDist;
 				closestNode = bestNode->children[i];

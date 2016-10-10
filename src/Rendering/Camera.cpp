@@ -42,6 +42,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 	long long ctr = 0;
 #endif // __LOG_ITERATIONS
 
+	Ray ray;
 	/* For each pixel, shoot a bunch of rays through it. */
 	for (unsigned int y = 0; y < width; ++y) {
 		for (unsigned int z = 0; z < height; ++z) {
@@ -65,7 +66,8 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 
 					/* Create ray. */
 					const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
-					const Ray ray(planePosition, glm::normalize(planePosition - eye));
+					ray.dir = glm::normalize(planePosition - eye);
+					ray.from = planePosition;
 
 					/* Trace ray through the scene. */
 					colorAccumulator += scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
@@ -101,15 +103,15 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	}
 
 	// TODO: Change this to some other way of detecting whether the image is dark (with spots).
-	if (maxIntensity > BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
+	// if (maxIntensity > BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 		// std::cout << "Squashing brightness color due to high brightness." << std::endl;
-		for (size_t i = 0; i < width; ++i) {
-			for (size_t j = 0; j < height; ++j) {
-				pixels[i][j].color = sqrt(pixels[i][j].color);
-			}
+	for (size_t i = 0; i < width; ++i) {
+		for (size_t j = 0; j < height; ++j) {
+			pixels[i][j].color = sqrt(pixels[i][j].color);
 		}
-		maxIntensity = sqrt(maxIntensity);
 	}
+	maxIntensity = sqrt(maxIntensity);
+	// }
 
 	if (maxIntensity < FLT_EPSILON * 4.0f) {
 		std::cerr << "Rendered image intensity was very low. Impossible to discretize image." << std::endl;

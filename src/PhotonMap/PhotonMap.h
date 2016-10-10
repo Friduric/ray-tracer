@@ -14,8 +14,8 @@ public:
 	/// <param name='maxPhotonsPerNode'> The maximum amount of photons per node. </param>
 	/// <param name='minSizeOfNodeBox'> The minimum width, height and depth of a nodes box size. </param>
 	void CreatePhotonMap(const Scene scene,
-						 const int photonsPerLightSource = 100000,
-						 const int maxPhotonsPerNode = 100,
+						 const unsigned int photonsPerLightSource = 100000,
+						 const unsigned int maxPhotonsPerNode = 100,
 						 const float minSizeOfNodeBox = 0.5f);
 
 	/// <summary> 
@@ -27,7 +27,7 @@ public:
 private:
 
 	// The data structure photons are saved in.
-	Octree octree;	
+	Octree octree;
 };
 
 
