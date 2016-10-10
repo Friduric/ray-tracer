@@ -9,19 +9,18 @@ void PhotonMap::CreatePhotonMap(const Scene scene, const unsigned int photonsPer
 		for (unsigned int j = 0; j < photonsPerLightSource; ++j) {
 			// Shoot photon in a random direction
 			Photon p;
-			//  TODO: add more implementation
+			//  TODO: Shoot photon in a random direction
 
-			// Save photons in the octree
+			// Save photon in the octree
 			octree.photons.push_back(p);
 		}
 	}
 
 	// Setup the octree.
-	octree.SetupOctree();
+	octree.SetupOctree(scene, maxPhotonsPerNode, minSizeOfNodeBox);
 }
 
 std::vector<Photon*> PhotonMap::GetPhotonsAtPosition(const glm::vec3 pos)
 {
-	//  TODO: correct implementation
-	return std::vector<Photon*>();
+	return octree.GetNodeClosestToPosition(pos)->photons;
 }
