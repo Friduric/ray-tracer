@@ -1,6 +1,7 @@
 #include "Sphere.h"
 
 #include <iostream>
+#include "../Utility/Math.h"
 
 using namespace glm;
 
@@ -11,6 +12,12 @@ glm::vec3 Sphere::GetNormal(const glm::vec3 & position) const { return glm::norm
 
 glm::vec3 Sphere::GetCenter() const {
 	return center;
+}
+
+glm::vec3 Sphere::GetRandomPositionOnSurface() const
+{
+	int direction = (rand() & 1) == 0 ? -1 : 1;
+	return center + radius * Math::CosineWeightedHemisphereSampleDirection(glm::vec3(0, 0, direction));
 }
 
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {

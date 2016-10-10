@@ -7,6 +7,10 @@ class Primitive {
 public:
 	virtual glm::vec3 GetNormal(const glm::vec3 & position) const = 0;
 	virtual glm::vec3 GetCenter() const = 0;
+	virtual glm::vec3 GetRandomPositionOnSurface() const = 0;
+	virtual glm::vec3 GetAxisAlignedBoundBox(float & minX, float & maxX,
+											 float & minY, float & maxY,
+											 float & minZ, float & maxZ) const = 0;
 
 	/// <summary> 
 	/// Computes the ray intersection point.

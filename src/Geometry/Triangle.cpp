@@ -16,6 +16,11 @@ glm::vec3 Triangle::GetCenter() const {
 	return (vertices[0] + vertices[1] + vertices[2]) / 3.0f;
 }
 
+glm::vec3 Triangle::GetRandomPositionOnSurface() const
+{
+	return glm::vec3();
+}
+
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
 bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	if (dot(ray.dir, normal) > -FLT_EPSILON) {
