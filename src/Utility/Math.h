@@ -52,4 +52,10 @@ namespace Math {
 	/// Uses cosine-weighted hemisphere sampling.
 	/// </summary>
 	glm::vec3 CosineWeightedHemisphereSampleDirection(const glm::vec3 & n);
+
+	/// <summary>
+	/// Returns a random direction given a normal.
+	/// Uses uniform randomization.
+	/// </summary>
+	glm::vec3 RandomHemishpereSampleDirection(const glm::vec3 & n);
 }

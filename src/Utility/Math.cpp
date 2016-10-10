@@ -4,6 +4,9 @@
 #include <cassert>
 #include <iostream>
 
+#include "../../includes/glm/gtx/norm.hpp"
+#include "../../includes/glm/gtx/rotate_vector.hpp"
+
 using namespace std;
 
 float Math::BilinearInterpolation(const float dy, const float dz,
@@ -33,7 +36,7 @@ glm::vec3 Math::NonParallellVector(const glm::vec3 & v) {
 	}
 	else {
 		// None of v-parameters are zero. 
-		return glm::vec3(-v.y, v.x, 0);
+		return glm::vec3(-v.y, v.z, -v.x);
 	}
 }
 
@@ -45,12 +48,24 @@ glm::vec3 Math::SampleHemisphereUsingDiskCoordinates(const float u, const float 
 	return glm::vec3(x, y, sqrt(std::max<float>(0, 1 - u)));
 }
 
+glm::vec3 Math::RandomHemishpereSampleDirection(const glm::vec3 & n) {
+	float incl = (rand() / static_cast<float>(RAND_MAX)) * glm::half_pi<float>();
+	float azim = (rand() / static_cast<float>(RAND_MAX)) * glm::two_pi<float>();
+	glm::vec3 nonParallellVector = Math::NonParallellVector(n);
+	assert(glm::length(glm::cross(nonParallellVector, n)) > FLT_EPSILON);
+	glm::vec3 rotationVector = glm::cross(nonParallellVector, n);
+	glm::vec3 inclVector = rotate(n, incl, rotationVector);
+	return glm::normalize(rotate(inclVector, azim, n));
+}
+
 glm::vec3 Math::CosineWeightedHemisphereSampleDirection(const glm::vec3 & n) {
+	// See https://pathtracing.wordpress.com/2011/03/03/cosine-weighted-hemisphere/.
+
 	float r1 = rand() / static_cast<float>(RAND_MAX);
 	float r2 = rand() / static_cast<float>(RAND_MAX);
 
-	float phi = 2.0f * glm::pi<float>() * r1;
-	float theta = acos(sqrt(1.0f - r2));
+	float theta = acos(sqrt(1.0f - r1));
+	float phi = 2.0f * glm::pi<float>() * r2;
 
 	float xs = sinf(theta) * cosf(phi);
 	float ys = cosf(theta);
