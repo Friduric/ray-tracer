@@ -21,6 +21,11 @@ glm::vec3 Triangle::GetRandomPositionOnSurface() const
 	return glm::vec3();
 }
 
+glm::vec3 Triangle::GetAxisAlignedBoundingBox(float & minX, float & maxX, float & minY, float & maxY, float & minZ, float & maxZ) const
+{
+	return glm::vec3();
+}
+
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
 bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	if (dot(ray.dir, normal) > -FLT_EPSILON) {

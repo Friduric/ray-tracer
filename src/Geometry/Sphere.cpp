@@ -20,6 +20,11 @@ glm::vec3 Sphere::GetRandomPositionOnSurface() const
 	return center + radius * Math::CosineWeightedHemisphereSampleDirection(glm::vec3(0, 0, direction));
 }
 
+glm::vec3 Sphere::GetAxisAlignedBoundingBox(float & minX, float & maxX, float & minY, float & maxY, float & minZ, float & maxZ) const
+{
+	return glm::vec3();
+}
+
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	if (dot(ray.dir, GetNormal(ray.from)) > -FLT_EPSILON) {
 		return false; // The ray direction and normal are in the same direction (behind).
