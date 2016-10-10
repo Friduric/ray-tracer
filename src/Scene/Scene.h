@@ -29,7 +29,7 @@ public:
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color.
 	/// </summary>
-	glm::vec3 TraceRay(Ray & ray,
+	glm::vec3 TraceRay(const Ray & ray,
 					   const unsigned int BOUNCES_PER_HIT = 1,
 					   const unsigned int MAX_DEPTH = 5) const;
 
@@ -50,23 +50,4 @@ public:
 						unsigned int & intersectionRenderGroupIndex,
 						unsigned int & intersectionPrimitiveIndex,
 						float & intersectionDistance) const;
-
-	/// <summary>
-	///	Generates "bouncing" rays given a surface and it's properties.
-	/// </summary>
-	/// <param name='incomingDirection'> The direction of the incoming ray. </param>
-	/// <param name='hitNormal'> The normal of the surface for which we are bouncing on. </param>
-	/// <param name='intersectionPoint'> The origin of the generated rays </param>
-	/// <param name='material'> The material of the surface for which we are bouncing on. </param>
-	/// <param name='numberOfRays'> The number of rays to be generated. </param>
-	/// <param name='rayLength'> The length of the generated rays. </param>
-	/// <remarks> 
-	/// Parameter 'material' cannot be const since we re-use random generators from within the 
-	/// material.
-	/// </remarks>
-	std::vector<Ray> GenerateBouncingRays(const glm::vec3 & incomingDirection,
-										  const glm::vec3 & hitNormal,
-										  const glm::vec3 & intersectionPoint,
-										  Material* material,
-										  const unsigned int numberOfRays) const;
 };

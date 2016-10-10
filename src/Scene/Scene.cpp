@@ -34,7 +34,7 @@ void Scene::Initialize() {
 	}
 }
 
-glm::vec3 Scene::TraceRay(Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
+glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
 	if (depth == 0) { return glm::vec3(0, 0, 0); }
 
 	assert(depth > 0);
@@ -64,13 +64,11 @@ glm::vec3 Scene::TraceRay(Ray & ray, const unsigned int bouncesPerHit, const uns
 
 	/* Shoot rays and integrate based on BRDF sampling. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
-	const glm::vec3 previousRayDirection = ray.dir;
 	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
 		glm::vec3 reflectionDirection = Math::CosineWeightedHemisphereSampleDirection(hitNormal);
-		ray.dir = reflectionDirection;
-		ray.from = intersectionPoint;
-		const auto incomingRadiance = TraceRay(ray, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateBRDF(ray.dir, previousRayDirection, hitNormal, incomingRadiance);
+		Ray reflectedRay(intersectionPoint, reflectionDirection);
+		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
+		colorAccumulator += hitMaterial->CalculateBRDF(reflectedRay.dir, ray.dir, hitNormal, incomingRadiance);
 	}
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }
