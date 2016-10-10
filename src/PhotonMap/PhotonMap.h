@@ -13,7 +13,7 @@ public:
 	/// <param name='photonsPerLightSource'> The amount of photons used per light source. </param>
 	/// <param name='maxPhotonsPerNode'> The maximum amount of photons per node. </param>
 	/// <param name='minSizeOfNodeBox'> The minimum width, height and depth of a nodes box size. </param>
-	void CreatePhotonMap(const Scene scene,
+	void CreatePhotonMap(const Scene & scene,
 						 const unsigned int photonsPerLightSource = 100000,
 						 const unsigned int maxPhotonsPerNode = 100,
 						 const float minSizeOfNodeBox = 0.5f);

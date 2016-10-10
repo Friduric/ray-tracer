@@ -4,6 +4,8 @@
 
 class Photon {
 public:
+	Photon(glm::vec3 position, glm::vec3 direction, glm::vec3 color);
+
 	/// <summary> The direction the photon came from. </summary>
 	glm::vec3 direction;
 
