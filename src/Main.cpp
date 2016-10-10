@@ -29,9 +29,9 @@ int main()
 {
 	using cui = const unsigned int;
 
-	cui PIXELS_W = 200;
-	cui PIXELS_H = 200;
-	cui RAYS_PER_PIXEL = 256;
+	cui PIXELS_W = 100;
+	cui PIXELS_H = 100;
+	cui RAYS_PER_PIXEL = 512;
 	cui MAX_RAY_DEPTH = 4;
 	cui BOUNCES_PER_HIT = 1;
 
@@ -46,15 +46,15 @@ int main()
 	SceneObjectFactory::AddRoom(scene, false);
 	// SceneObjectFactory::AddSphere(scene, 10, 0, 2, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	// SceneObjectFactory::AddSphere(scene, 7, -3, 3, 1.5f, glm::vec3(0.0f, 1.0f, 0.0f));
-	SceneObjectFactory::AddOrenNayarSphere(scene, 6, 3, 0, 1.5f, glm::vec3(1.0f, 0.35f, 1.0f));
-	SceneObjectFactory::AddSphere(scene, 3, -3, 0, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
-	SceneObjectFactory::AddSphere(scene, 3, 0, -2, 1.25f, glm::vec3(0.0f, 1.0f, 0.0f));
-	// SceneObjectFactory::AddSphere(scene, 3, 3, -4, 1.25f, glm::vec3(0.0f, 0.0f, 1.0f));
-	// SceneObjectFactory::AddTetrahedron(scene, 3, 0, 0, glm::vec3(1.0f, 1.0f, 1.0f));
+	// SceneObjectFactory::AddOrenNayarSphere(scene, 6, 3, 0, 1.5f, glm::vec3(1.0f, 0.35f, 1.0f));
+	SceneObjectFactory::AddSphere(scene, 5, -3, 1.5f, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
+	SceneObjectFactory::AddSphere(scene, 6, 0, -0.5f, 1.25f, glm::vec3(0.0f, 1.0f, 0.0f));
+	SceneObjectFactory::AddSphere(scene, 5, 3, -2, 1.25f, glm::vec3(0.0f, 0.0f, 1.0f));
+	// SceneObjectFactory::AddTetrahedron(scene, 7, 0, 3, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	/* Lights. */
 	SceneObjectFactory::Add2DQuad(scene, glm::vec2(1.5f, -1), glm::vec2(3.5f, 1), 3.96f,
-								  glm::vec3(0, 0, -1), glm::vec3(1, 1, 1), glm::vec3(1.f, 0.86f, 0.78f));
+								  glm::vec3(0, 0, -1), glm::vec3(1, 1, 1), glm::vec3(1.f, 1.0f, 1.f));
 	// SceneObjectFactory::AddEmissiveSphere(scene, -2, 0, 0, 0.5f, glm::vec3(1, 1, 1), glm::vec3(2, 2, 2));
 	// SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1.0f, 0.35f, 0.55f));
 
