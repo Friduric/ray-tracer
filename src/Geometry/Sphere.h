@@ -15,7 +15,7 @@ public:
 	glm::vec3 GetRandomPositionOnSurface() const override;
 	virtual glm::vec3 GetAxisAlignedBoundBox(float & minX, float & maxX,
 											 float & minY, float & maxY,
-											 float & minZ, float & maxZ) const = 0;
+											 float & minZ, float & maxZ) const override;
 
 	/// <summary> 
 	/// Computes the ray intersection point between a ray and this sphere.

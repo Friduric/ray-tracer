@@ -24,16 +24,19 @@ bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) cons
 	if (dot(ray.dir, GetNormal(ray.from)) > -FLT_EPSILON) {
 		return false; // The ray direction and normal are in the same direction (behind).
 	}
+
 	const vec3 m = ray.from - center;
 	float b = glm::dot(m, ray.dir);
 	float c = glm::dot(m, m) - radius * radius;
 	if (c > FLT_EPSILON && b > FLT_EPSILON) {
 		return false;
 	}
+
 	float d = b * b - c;
 	if (d < FLT_EPSILON) {
 		return false;
 	}
+
 	intersectionDistance = -b - sqrt(d);
 	if (intersectionDistance < FLT_EPSILON) {
 		return false;
