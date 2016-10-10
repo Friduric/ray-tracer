@@ -1,6 +1,22 @@
 #include "Octree.h"
 #include <queue>
-void Octree::SetupOctree(const Scene scene, const unsigned int maxPhotonsPerNode, const float minSizeOfNodeBox)
+
+Octree::~Octree() {
+	DeleteRecursive(&root);
+}
+
+void Octree::DeleteRecursive(OctreeNode* node) {
+	if (node->IsLeaf()) {
+		delete node;
+	}
+	else {
+		for (unsigned int i = 0; i < OctreeNode::CHILDREN_PER_NODE; ++i) {
+			DeleteRecursive(node->children[i]);
+		}
+	}
+}
+
+void Octree::SetUpOctree(const Scene & scene, const unsigned int maxPhotonsPerNode, const float minSizeOfNodeBox)
 {
 	SetUpRootNode(scene);
 	std::queue<OctreeNode*> nodeQueue;
@@ -38,7 +54,7 @@ void Octree::SetupOctree(const Scene scene, const unsigned int maxPhotonsPerNode
 						nodeZMin = currentNode->zMin + nodeZHalf*zIdx;
 						nodeZMax = nodeZMin + nodeZHalf;
 						// Add new node
-						OctreeNode* newNode = &CreateNode(cpts, nodeXMin, nodeXMax, nodeYMin, nodeYMax, nodeZMin, nodeZMax);
+						OctreeNode* newNode = CreateNode(cpts, nodeXMin, nodeXMax, nodeYMin, nodeYMax, nodeZMin, nodeZMax);
 						currentNode->children[idxCounter] = newNode;
 						newNode->parent = currentNode;
 						nodeQueue.push(newNode);
@@ -47,14 +63,10 @@ void Octree::SetupOctree(const Scene scene, const unsigned int maxPhotonsPerNode
 				}
 			}
 		}
-		else {
-			// We did not split the node = leaf node
-			currentNode->isLeaf = true;
-		}
 	}
 }
 
-void Octree::SetUpRootNode(const Scene scene) {
+void Octree::SetUpRootNode(const Scene & scene) {
 	root.xMin = scene.xMin; root.xMax = scene.xMax;
 	root.yMin = scene.yMin; root.yMax = scene.yMax;
 	root.zMin = scene.zMin; root.zMax = scene.zMax;
@@ -64,15 +76,15 @@ void Octree::SetUpRootNode(const Scene scene) {
 	}
 }
 
-OctreeNode Octree::CreateNode(const std::vector<Photon*> photons,
+Octree::OctreeNode* Octree::CreateNode(const std::vector<Photon*> photons,
 							  const float xMin, const float xMax,
 							  const float yMin, const float yMax,
 							  const float zMin, const float zMax) {
-	OctreeNode node;
+	OctreeNode* node = new OctreeNode();
 	// Set min and max values.
-	node.xMin = xMin; node.xMax = xMax;
-	node.yMin = yMin; node.yMax = yMax;
-	node.zMin = zMin; node.zMax = zMax;
+	node->xMin = xMin; node->xMax = xMax;
+	node->yMin = yMin; node->yMax = yMax;
+	node->zMin = zMin; node->zMax = zMax;
 
 	// Find and add all photons inside the box of this node.
 	glm::vec3 pos;
@@ -81,29 +93,29 @@ OctreeNode Octree::CreateNode(const std::vector<Photon*> photons,
 		if (pos.x >= xMin && pos.x <= xMax &&
 			pos.y >= yMin && pos.y <= yMax &&
 			pos.z >= zMin && pos.z <= zMax) {
-			node.photons.push_back(photons[i]);
+			node->photons.push_back(photons[i]);
 		}
 	}
 	return node;
 }
 
-OctreeNode* Octree::GetNodeClosestToPosition(glm::vec3 pos)
+Octree::OctreeNode* Octree::GetNodeClosestToPosition(glm::vec3 pos)
 {
 	OctreeNode* bestNode = &root;
 	// Search as long as we're not at a leaf
 	// and find the closest node to the given position.
-	while (!bestNode->isLeaf) {
+	while (!bestNode->IsLeaf()) {
 		float closestDistance = FLT_MAX;
 		OctreeNode* closestNode = bestNode->children[0];
 		OctreeNode* tmpNode;
 		glm::vec3 tmpPos;
 		float tmpDist;
-		for (unsigned int i = 0; i < 8; ++i) {
+		for (unsigned int i = 0; i < OctreeNode::CHILDREN_PER_NODE; ++i) {
 			tmpNode = bestNode->children[i];
 			tmpPos = glm::vec3(tmpNode->xMin + (tmpNode->xMax*0.5f - tmpNode->xMin)*0.5f,
 							   tmpNode->yMin + (tmpNode->yMax - tmpNode->yMin)*0.5f,
 							   tmpNode->zMin + (tmpNode->zMax - tmpNode->zMin)*0.5f);
-			tmpDist = (tmpPos - pos).length();
+			tmpDist = glm::distance(tmpPos, pos);
 			if(tmpDist < closestDistance) {
 				closestDistance = tmpDist;
 				closestNode = bestNode->children[i];
@@ -112,4 +124,12 @@ OctreeNode* Octree::GetNodeClosestToPosition(glm::vec3 pos)
 		bestNode = closestNode;
 	}
 	return bestNode;
+}
+
+bool Octree::OctreeNode::IsLeaf() const
+{
+	if (children[0] == NULL) {
+		return true;
+	}
+	return false;
 }

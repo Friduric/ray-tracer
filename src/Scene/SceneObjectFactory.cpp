@@ -80,7 +80,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	// -------------------
 	RenderGroup wall1(redMaterial);
 
-	glm::vec3 w1Normal(2.0, -1.0, 0.0);
+	glm::vec3 w1Normal = normalize(glm::vec3(2.0f, -1.0f, 0.0f));
 
 	wall1.primitives.push_back(new Triangle(fv1, cv1, cv2, w1Normal));
 	wall1.primitives.push_back(new Triangle(fv2, fv1, cv2, w1Normal));
@@ -92,7 +92,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	// -------------------
 	RenderGroup wall2(greenMaterial);
 
-	glm::vec3 w2Normal(0.0, -1.0, 0.0);
+	glm::vec3 w2Normal = normalize(glm::vec3(0.0, -1.0, 0.0));
 
 	wall2.primitives.push_back(new Triangle(fv2, cv2, cv3, w2Normal));
 	wall2.primitives.push_back(new Triangle(fv3, fv2, cv3, w2Normal));
@@ -104,7 +104,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	// -------------------
 	RenderGroup wall3(blueMaterial);
 
-	glm::vec3 w3Normal(-2.0, -1.0, 0.0);
+	glm::vec3 w3Normal = normalize(glm::vec3(-2.0, -1.0, 0.0));
 
 	wall3.primitives.push_back(new Triangle(fv3, cv3, cv4, w3Normal));
 	wall3.primitives.push_back(new Triangle(fv4, fv3, cv4, w3Normal));
@@ -116,7 +116,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	// -------------------
 	RenderGroup wall4(yellowMaterial);
 
-	glm::vec3 w4Normal(-2.0, 1.0, 0.0);
+	glm::vec3 w4Normal = normalize(glm::vec3(-2.0, 1.0, 0.0));
 
 	wall4.primitives.push_back(new Triangle(fv4, cv4, cv5, w4Normal));
 	wall4.primitives.push_back(new Triangle(fv5, fv4, cv5, w4Normal));
@@ -128,7 +128,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	// -------------------
 	RenderGroup wall5(orangeMaterial);
 
-	glm::vec3 w5Normal(0.0, 1.0, 0.0);
+	glm::vec3 w5Normal = normalize(glm::vec3(0.0, 1.0, 0.0));
 
 	wall5.primitives.push_back(new Triangle(fv5, cv5, cv6, w5Normal));
 	wall5.primitives.push_back(new Triangle(fv6, fv5, cv6, w5Normal));
@@ -140,7 +140,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	// -------------------
 	RenderGroup wall6(purpleMaterial);
 
-	glm::vec3 w6Normal(2.0, 1.0, 0.0);
+	glm::vec3 w6Normal = normalize(glm::vec3(2.0, 1.0, 0.0));
 
 	wall6.primitives.push_back(new Triangle(fv6, cv6, cv1, w6Normal));
 	wall6.primitives.push_back(new Triangle(fv1, fv6, cv1, w6Normal));

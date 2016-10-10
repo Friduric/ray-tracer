@@ -156,6 +156,7 @@
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Geometry\Ray.cpp" />
     <ClCompile Include="src\PhotonMap\Octree.cpp" />
+    <ClCompile Include="src\PhotonMap\Photon.cpp" />
     <ClCompile Include="src\PhotonMap\PhotonMap.cpp" />
     <ClCompile Include="src\Rendering\Materials\OrenNayarMaterial.cpp" />
     <ClCompile Include="src\Rendering\RenderGroup.cpp" />
