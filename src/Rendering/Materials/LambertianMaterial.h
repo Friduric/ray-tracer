@@ -15,5 +15,5 @@ public:
 private:
 	glm::vec3 emissionColor;
 	glm::vec3 surfaceColor;
-	float albedo = 0.90f;
+	float albedo = 1.0f;
 };

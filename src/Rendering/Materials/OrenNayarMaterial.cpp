@@ -26,22 +26,21 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 
 	const float roughnessSquared = roughness * roughness;
 
-	const float cosIn = glm::dot(normal, inDirection);
-	const float cosOut = glm::dot(normal, outDirection);
-
 	const float A = 1 - 0.5f * roughnessSquared / (roughnessSquared + 0.57f);
 	const float B = 0.45f * roughnessSquared / (roughnessSquared + 0.09f);
 
-	const float alphaInclination = acos(cosOut);
-	const float betaInclination = acos(cosIn);
+	const float alphaInclination = acos(glm::dot(normal, inDirection));
+	const float betaInclination = acos(glm::dot(normal, outDirection));
 
 	const float alpha = std::max(alphaInclination, betaInclination);
 	const float beta = std::min(alphaInclination, betaInclination);
 
-	const float angleDifference = glm::dot(outDirection - normal * cosOut, inDirection - normal * cosIn);
+	// const float angleDifference = glm::dot(outDirection - normal * cosOut, inDirection - normal * cosIn);
 
-	const float reflectivity = (albedo * std::max(0.0f, cosIn)) / glm::pi<float>();
-	const float oren = A + B * std::max(0.0f, angleDifference) * sin(alphaInclination) * tan(betaInclination);
+	float gamma = glm::dot(inDirection, outDirection);
+
+	const float reflectivity = albedo / glm::pi<float>();
+	const float oren = A + B * std::max(0.0f, gamma) * sin(alphaInclination) * tan(betaInclination);
 
 	return reflectivity * oren * (incomingRadiance * surfaceColor);
 }
