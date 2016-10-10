@@ -24,25 +24,29 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 	std::cout << "Rendering the scene ..." << std::endl;
 	auto startTime = std::chrono::high_resolution_clock::now();
 
+	/* Initialize random engines. */
 	std::random_device rd;
 	std::default_random_engine gen(rd());
 	std::uniform_real_distribution<float> rand(0, 1.0f - FLT_EPSILON);
 
+	/* Precompute inv width and heights. */
 	const float invWidth = 1.0f / (float)width;
 	const float invHeight = 1.0f / (float)height;
 	const float INV_RAYS_PER_PIXEL = 1.0f / static_cast<float>(RAYS_PER_PIXEL);
 
-	/* Number of quads per pixel. */
+	/* Step lengths. */
 	const unsigned int SQRT_QUADS_PER_PIXEL = (unsigned int)(sqrt(RAYS_PER_PIXEL) + 0.5f); // Round.
 	const float INV_SQRT_QUADS_PER_PIXEL = 1.0f / (float)SQRT_QUADS_PER_PIXEL;
 	const float cstep = invWidth * INV_SQRT_QUADS_PER_PIXEL;
 	const float rstep = invHeight * INV_SQRT_QUADS_PER_PIXEL;
 
+	/* Initialize ray components. */
+	Ray ray;
+	const glm::vec3 cameraPlaneNormal = -glm::normalize(glm::cross(c1 - c2, c1 - c4));
+
 #ifdef __LOG_ITERATIONS
 	long long ctr = 0;
 #endif // __LOG_ITERATIONS
-
-	Ray ray;
 	/* For each pixel, shoot a bunch of rays through it. */
 	for (unsigned int y = 0; y < width; ++y) {
 		for (unsigned int z = 0; z < height; ++z) {
@@ -70,7 +74,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					ray.from = planePosition;
 
 					/* Trace ray through the scene. */
-					colorAccumulator += scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+					colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 				}
 			}
 
