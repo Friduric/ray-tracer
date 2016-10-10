@@ -246,10 +246,10 @@ void SceneObjectFactory::AddTetrahedron(Scene & scene, float x, float y, float z
 	glm::vec3 v4(1.0 + x, -0.54 + y, -0.57 + z);
 
 	// Normals.
-	glm::vec3 n1(-2.8036, 1.15, 1.63);
-	glm::vec3 n2(0.0, 1.14, -3.26);
-	glm::vec3 n3(2.8036, 1.15, 1.63);
-	glm::vec3 n4(0.0, -3.44, 0.0);
+	glm::vec3 n1 = normalize(glm::vec3(-2.8036, 1.15, 1.63));
+	glm::vec3 n2 = normalize(glm::vec3(0.0, 1.14, -3.26));
+	glm::vec3 n3 = normalize(glm::vec3(2.8036, 1.15, 1.63));
+	glm::vec3 n4 = normalize(glm::vec3(0.0, -3.44, 0.0));
 
 	// Render group + primitives.
 	RenderGroup tetrahedronGroup(tetraMaterial);
