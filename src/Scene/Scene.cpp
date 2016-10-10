@@ -52,12 +52,13 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 
 	/* Retrieve primitive and material information for the intersected object. */
 	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
+	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 	Material* hitMaterial = intersectionRenderGroup.material;
+	float intersectionRadianceFactor = glm::dot(-ray.dir, intersectionPrimitive->GetNormal(intersectionPoint));
 	if (hitMaterial->IsEmissive()) {
 		// We could also add emission color to the end result. Returning it here speeds up rendering.
-		return intersectionRenderGroup.material->GetEmissionColor();
+		return intersectionRadianceFactor * intersectionRenderGroup.material->GetEmissionColor();
 	}
-	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 
 	/* Calculate normal. */
 	glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
@@ -69,7 +70,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateDiffuseLighting(reflectedRay.dir, ray.dir, hitNormal, incomingRadiance);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
 	}
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }
