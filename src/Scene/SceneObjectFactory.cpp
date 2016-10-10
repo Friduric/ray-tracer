@@ -4,7 +4,7 @@
 #include "../Rendering/Materials/OrenNayarMaterial.h"
 #include "../Geometry/Sphere.h"
 
-void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
+void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissiveCeiling) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
@@ -76,17 +76,19 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 
 	renderGroups.push_back(floor);
 
-	// -------------------
-	// Wall 1.
-	// -------------------
-	RenderGroup wall1(redMaterial);
+	if (addBackWalls) {
+		// -------------------
+		// Wall 1.
+		// -------------------
+		RenderGroup wall1(yellowMaterial);
 
-	glm::vec3 w1Normal = normalize(glm::vec3(2.0f, -1.0f, 0.0f));
+		glm::vec3 w1Normal = normalize(glm::vec3(2.0f, -1.0f, 0.0f));
 
-	wall1.primitives.push_back(new Triangle(fv1, cv1, cv2, w1Normal));
-	wall1.primitives.push_back(new Triangle(fv2, fv1, cv2, w1Normal));
+		wall1.primitives.push_back(new Triangle(fv1, cv1, cv2, w1Normal));
+		wall1.primitives.push_back(new Triangle(fv2, fv1, cv2, w1Normal));
 
-	renderGroups.push_back(wall1);
+		renderGroups.push_back(wall1);
+	}
 
 	// -------------------
 	// Wall 2.
@@ -115,7 +117,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 	// -------------------
 	// Wall 4.
 	// -------------------
-	RenderGroup wall4(yellowMaterial);
+	RenderGroup wall4(redMaterial);
 
 	glm::vec3 w4Normal = normalize(glm::vec3(-2.0, 1.0, 0.0));
 
@@ -136,17 +138,19 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool emissiveCeiling) {
 
 	renderGroups.push_back(wall5);
 
-	// -------------------
-	// Wall 6.
-	// -------------------
-	RenderGroup wall6(purpleMaterial);
+	if (addBackWalls) {
+		// -------------------
+		// Wall 6.
+		// -------------------
+		RenderGroup wall6(purpleMaterial);
 
-	glm::vec3 w6Normal = normalize(glm::vec3(2.0, 1.0, 0.0));
+		glm::vec3 w6Normal = normalize(glm::vec3(2.0, 1.0, 0.0));
 
-	wall6.primitives.push_back(new Triangle(fv6, cv6, cv1, w6Normal));
-	wall6.primitives.push_back(new Triangle(fv1, fv6, cv1, w6Normal));
+		wall6.primitives.push_back(new Triangle(fv6, cv6, cv1, w6Normal));
+		wall6.primitives.push_back(new Triangle(fv1, fv6, cv1, w6Normal));
 
-	renderGroups.push_back(wall6);
+		renderGroups.push_back(wall6);
+	}
 
 	// Set min and max values, "magic constants" based on vertices above.
 	if (scene.xMin > -3.0f) { scene.xMin = -3.0f; }
