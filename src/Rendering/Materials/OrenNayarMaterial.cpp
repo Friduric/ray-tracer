@@ -2,7 +2,7 @@
 
 #include "../../../includes/glm/gtc/constants.hpp"
 #include <algorithm>
-
+#include <iostream>
 
 OrenNayarMaterial::OrenNayarMaterial(glm::vec3 _surfaceColor, glm::vec3 _emissionColor,
 									 float _roughness, float _albedo) :
@@ -17,10 +17,10 @@ glm::vec3 OrenNayarMaterial::GetSurfaceColor() const { return surfaceColor; }
 
 glm::vec3 OrenNayarMaterial::GetEmissionColor() const { return emissionColor; }
 
-float OrenNayarMaterial::CalculateBRDF(const glm::vec3 & inDirection,
-									   const glm::vec3 & outDirection,
-									   const glm::vec3 & normal,
-									   const glm::vec3 & incomingRadiance) const {
+glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirection,
+													  const glm::vec3 & outDirection,
+													  const glm::vec3 & normal,
+													  const glm::vec3 & incomingRadiance) const {
 
 	// See https://en.wikipedia.org/wiki/Oren-Nayar_reflectance_model for more information.
 
@@ -43,5 +43,5 @@ float OrenNayarMaterial::CalculateBRDF(const glm::vec3 & inDirection,
 	const float reflectivity = (albedo * std::max(0.0f, cosIn)) / glm::pi<float>();
 	const float oren = A + B * std::max(0.0f, angleDifference) * sin(alphaInclination) * tan(betaInclination);
 
-	return reflectivity * oren;
+	return reflectivity * oren * (incomingRadiance * surfaceColor);
 }

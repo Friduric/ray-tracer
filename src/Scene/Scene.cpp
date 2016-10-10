@@ -66,9 +66,10 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
 		glm::vec3 reflectionDirection = Math::CosineWeightedHemisphereSampleDirection(hitNormal);
+		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateBRDF(reflectedRay.dir, ray.dir, hitNormal, incomingRadiance);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(reflectedRay.dir, ray.dir, hitNormal, incomingRadiance);
 	}
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }

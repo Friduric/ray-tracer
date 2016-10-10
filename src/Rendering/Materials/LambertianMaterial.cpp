@@ -11,11 +11,11 @@ glm::vec3 LambertianMaterial::GetSurfaceColor() const { return surfaceColor; }
 
 glm::vec3 LambertianMaterial::GetEmissionColor() const { return emissionColor; }
 
-float LambertianMaterial::CalculateBRDF(const glm::vec3 & inDirection,
-										const glm::vec3 & outDirection,
-										const glm::vec3 & normal,
-										const glm::vec3 & incomingRadiance) const {
-	return albedo * glm::max(0.0f, glm::dot(inDirection, normal));
+glm::vec3 LambertianMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirection,
+													   const glm::vec3 & outDirection,
+													   const glm::vec3 & normal,
+													   const glm::vec3 & incomingRadiance) const {
+	return albedo * glm::max(0.0f, glm::dot(inDirection, normal)) * (incomingRadiance * surfaceColor) / glm::pi<float>();
 }
 
 
