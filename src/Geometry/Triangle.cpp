@@ -18,11 +18,28 @@ glm::vec3 Triangle::GetCenter() const {
 
 glm::vec3 Triangle::GetRandomPositionOnSurface() const
 {
-	return glm::vec3();
+	glm::vec3 v;
+	float quadArea, a1, a2, a3;
+	do {
+		float rand1 = rand() / (float)RAND_MAX;
+		float rand2 = rand() / (float)RAND_MAX;
+		v = rand1 * vertices[0] + rand2 * vertices[1];
+		// If v is outside of triangle => transform it inside.
+		quadArea = 0.5f * glm::length(glm::cross(vertices[0] - vertices[1], vertices[0] - vertices[2]));
+		a1 = 0.5f * glm::length(glm::cross(v - vertices[0], v - vertices[1]));
+		a2 = 0.5f * glm::length(glm::cross(v - vertices[1], v - vertices[2]));
+		a3 = 0.5f * glm::length(glm::cross(v - vertices[2], v - vertices[0]));
+	} while (abs(quadArea - (a1 + a2 + a3)) > FLT_EPSILON * 10.0f);
+
+	return v;
 }
 
 glm::vec3 Triangle::GetAxisAlignedBoundingBox(float & minX, float & maxX, float & minY, float & maxY, float & minZ, float & maxZ) const
 {
+	return glm::vec3();
+}
+
+glm::vec3 Triangle::ComputeOutgoingPosition(const glm::vec3 & incomingPosition, const glm::vec3 & incomingDirection, const float refractionIndexOfIncomingMedium, const Material & material) const {
 	return glm::vec3();
 }
 

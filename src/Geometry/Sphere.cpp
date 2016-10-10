@@ -25,6 +25,10 @@ glm::vec3 Sphere::GetAxisAlignedBoundingBox(float & minX, float & maxX, float & 
 	return glm::vec3();
 }
 
+glm::vec3 Sphere::ComputeOutgoingPosition(const glm::vec3 & incomingPosition, const glm::vec3 & incomingDirection, const float refractionIndexOfIncomingMedium, const Material & material) const {
+	return glm::vec3();
+}
+
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	if (dot(ray.dir, GetNormal(ray.from)) > -FLT_EPSILON) {
 		return false; // The ray direction and normal are in the same direction (behind).

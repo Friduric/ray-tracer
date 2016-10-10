@@ -16,6 +16,10 @@ public:
 	glm::vec3 GetAxisAlignedBoundingBox(float & minX, float & maxX,
 										float & minY, float & maxY,
 										float & minZ, float & maxZ) const override;
+	glm::vec3 ComputeOutgoingPosition(const glm::vec3 & incomingPosition,
+									  const glm::vec3 & incomingDirection,
+									  const float refractionIndexOfIncomingMedium,
+									  const Material & material) const override;
 
 	/// <summary> 
 	/// Computes the ray intersection point between a ray and this sphere.
