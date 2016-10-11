@@ -17,3 +17,5 @@ bool AABB::IsPointInsideAABB(const glm::vec3 & p) const {
 	}
 	return true;
 }
+
+glm::vec3 AABB::GetCenter() const { return 0.5f * (minimum + maximum); }
