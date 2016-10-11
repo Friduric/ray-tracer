@@ -30,11 +30,15 @@ int main()
 {
 	using cui = const unsigned int;
 
-	cui PIXELS_W = 100;
-	cui PIXELS_H = 100;
+	cui PIXELS_W = 400;
+	cui PIXELS_H = 400;
 	cui RAYS_PER_PIXEL = 512;
 	cui MAX_RAY_DEPTH = 4;
 	cui BOUNCES_PER_HIT = 1;
+	cui PHOTONS_PER_LIGHT_SOURCE = 1000000;
+	cui MAX_PHOTONS_PER_NODE = 100;
+	cui PHOTON_MAP_DEPTH = 5;
+	float MAX_NODE_SIZE_DIMENSION = 0.1f;
 
 	/* Initialize. */
 	auto startTime = std::chrono::high_resolution_clock::now();
@@ -65,10 +69,11 @@ int main()
 	scene.Initialize();
 
 	/* Generate PhotonMap. */
-	//c.GeneratePhotonMap(scene);
+	c.GeneratePhotonMap(scene, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
+						MAX_NODE_SIZE_DIMENSION, PHOTON_MAP_DEPTH);
 
 	/* Render scene. */
-	c.Render(scene, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.
+	c.Render(scene, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT, glm::vec3(-7, 0, 0));
 
 	/* Finalize. */
 	auto timeElapsed = chrono::high_resolution_clock::now() - startTime;
@@ -86,6 +91,10 @@ int main()
 	out << setw(COL_WIDTH) << left << "Max ray depth:" << MAX_RAY_DEPTH << endl;
 	out << setw(COL_WIDTH) << left << "Bounces per hit:" << BOUNCES_PER_HIT << endl;
 	out << setw(COL_WIDTH) << left << "Render time:" << took << " seconds." << endl;
+	out << setw(COL_WIDTH) << left << "Photons per light source:" << PHOTONS_PER_LIGHT_SOURCE << endl;
+	out << setw(COL_WIDTH) << left << "Max photons per node:" << MAX_PHOTONS_PER_NODE << endl;
+	out << setw(COL_WIDTH) << left << "Photon map depth:" << PHOTON_MAP_DEPTH << endl;
+	out << setw(COL_WIDTH) << left << "Node box max dimension:" << MAX_NODE_SIZE_DIMENSION << " seconds." << endl;
 	out.close();
 
 	/* Finished. */
