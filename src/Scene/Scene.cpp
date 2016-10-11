@@ -11,7 +11,6 @@
 #include "../Rendering/Materials/LambertianMaterial.h"
 #include "../Geometry/Sphere.h"
 
-
 Scene::Scene() {}
 
 Scene::~Scene() {
@@ -64,7 +63,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	float intersectionDistance;
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
 
-	/* If the ray doesn't intersect, simply return (0, 0, 0). */
+	/* If the reversedRay doesn't intersect, simply return (0, 0, 0). */
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/*  Calculate intersection point. */
@@ -105,7 +104,7 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 	float intersectionDistance;
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
 
-	/* If the ray doesn't intersect, simply return (0, 0, 0). */
+	/* If the reversedRay doesn't intersect, simply return (0, 0, 0). */
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/*  Calculate intersection point. */
@@ -141,7 +140,7 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 	float closestInterectionDistance = FLT_MAX;
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		for (unsigned int j = 0; j < renderGroups[i].primitives.size(); ++j) {
-			/* Check if the ray intersects with anything. */
+			/* Check if the reversedRay intersects with anything. */
 			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance);
 			if (intersects) {
 				assert(intersectionDistance > FLT_EPSILON);
@@ -155,6 +154,21 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 	}
 	intersectionDistance = closestInterectionDistance;
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
+}
+
+
+bool Scene::RefractionRayCast(const Ray & ray, const unsigned int renderGroupIndex,
+							  const glm::vec3 & normal,
+							  const glm::vec3 & intersectionPoint,
+							  const Material const * materialFrom,
+							  const Material const * materialTo) const {
+	// See https://en.wikipedia.org/wiki/Schlick%27s_approximation for more information.
+	float n1 = materialFrom->refractiveIndex;
+	float n2 = materialTo->refractiveIndex;
+	float R0 = glm::pow((n1 - n2) / (n1 + n2), 2.0f);
+	float alpha = glm::dot(normal, -ray.dir);
+	float RO = R0 + (1 - R0) * glm::pow((1 - alpha), 5.0f);
+
 }
 
 void Scene::GeneratePhotonMap(const unsigned int PHOTONS_PER_LIGHT_SOURCE,
