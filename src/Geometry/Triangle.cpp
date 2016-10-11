@@ -3,8 +3,8 @@
 #include "../../includes/glm/gtx/norm.hpp"
 
 // Default constructor.
-Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 _normal) :
-	vertices{ v1,v2,v3 }, normal(_normal) {
+Triangle::Triangle(glm::vec3 _v1, glm::vec3 _v2, glm::vec3 _v3, glm::vec3 _normal) :
+	vertices{ _v1, _v2, _v3 }, normal(_normal) {
 
 	const auto & v0 = vertices[0];
 	const auto & v1 = vertices[1];

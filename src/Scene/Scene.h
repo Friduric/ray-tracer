@@ -40,7 +40,8 @@ public:
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color, using photon map.
 	/// </summary>
-	glm::vec3 TraceRayUsingPhotonMap(const Ray & ray,
+	glm::vec3 TraceRayUsingPhotonMap(const Ray & ray, 
+									 const glm::vec3 & cameraPlaneNormal,
 									 const unsigned int BOUNCES_PER_HIT = 1,
 									 const unsigned int MAX_DEPTH = 5) const;
 

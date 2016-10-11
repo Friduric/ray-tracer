@@ -24,13 +24,16 @@ public:
 	/// Returns all photons located at the given world position.
 	/// </summary>
 	/// <param name='pos'> The position to search around. </param>
-	std::vector<Photon const*> & GetPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
-
+	std::vector<Photon const*> & GetDirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
+	std::vector<Photon const*> & GetIndirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
+	//std::vector<Photon const*> & GetShadowPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
 
 private:
 
 	/// <summary> All photons in the octree. </summary>
-	std::vector<Photon> photons;
+	std::vector<Photon> directPhotons;
+	std::vector<Photon> indirectPhotons;
+	std::vector<Photon> shadowPhotons;
 
 	// The data structure photons are saved in.
 	Octree* octree;

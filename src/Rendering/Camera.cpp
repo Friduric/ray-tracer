@@ -89,16 +89,27 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 						break;
 					case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
 						/* Trace a ray through the scene. */
-						colorAccumulator += rayFactor * scene.TraceRayUsingPhotonMap(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+						colorAccumulator += rayFactor * scene.TraceRayUsingPhotonMap(ray, cameraPlaneNormal, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 						break;
 					case RenderingMode::VISUALIZE_PHOTON_MAP:
 						/* Shoot a ray through the scene and sample using the photon map. */
 						unsigned int intersectionRenderGroupIndex, intersectionPrimitiveIndex;
 						float intersectionDistance;
+						float photonDistance;
+						glm::vec3 intersectionPoint;
 						if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
-							const auto & photons = scene.photonMap->GetPhotonsInOctreeNodeOfPosition(ray.from + intersectionDistance * ray.dir);
-							for (const Photon * p : photons) {
-								colorAccumulator += rayFactor * p->color;
+							// direct photons
+							intersectionPoint = ray.from + intersectionDistance * ray.dir;
+							const auto & dirPhotons = scene.photonMap->GetDirectPhotonsInOctreeNodeOfPosition(intersectionPoint);						
+							for (const Photon * dp : dirPhotons) {
+								//photonDistance = glm::distance(intersectionPoint, dp->position);
+								colorAccumulator += rayFactor * dp->color;// / photonDistance;
+							}
+							// indirect photons
+							const auto & indirPhotons = scene.photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+							for (const Photon * ip : indirPhotons) {
+								//photonDistance = glm::distance(intersectionPoint, ip->position);
+								colorAccumulator += rayFactor * ip->color;// / photonDistance;
 							}
 						}
 						break;
