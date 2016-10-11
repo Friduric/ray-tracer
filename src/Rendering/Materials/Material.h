@@ -6,6 +6,7 @@
 class Material {
 public:
 	virtual bool IsEmissive() const = 0;
+	virtual bool IsTransparent() { return transparency > FLT_EPSILON; }
 	virtual glm::vec3 GetSurfaceColor() const = 0;
 	virtual glm::vec3 GetEmissionColor() const = 0;
 
@@ -21,4 +22,7 @@ public:
 	/// <returns> The ratio of reflected radiance exiting along the outgoing ray direction. </returns>
 	virtual glm::vec3 CalculateDiffuseLighting(const glm::vec3 & inDirection, const glm::vec3 & outDirection,
 											   const glm::vec3 & normal, const glm::vec3 & incomingRadiance) const = 0;
+
+	float refractiveIndex = 1.0f;
+	float transparency = 0.0f;
 };
