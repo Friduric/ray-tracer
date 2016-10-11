@@ -85,8 +85,7 @@ glm::vec3 Math::CosineWeightedHemisphereSampleDirection(const glm::vec3 & n) {
 
 	glm::vec3 x = glm::normalize(glm::cross(h, y));
 	glm::vec3 z = glm::normalize(glm::cross(x, y));
-	glm::vec3 res = xs * x + ys * y + zs * z;
-	return glm::normalize(res);
+	return glm::normalize(xs * x + ys * y + zs * z);
 }
 
 Math::NormalDistributionGenerator::NormalDistributionGenerator(float _min, float _max) :

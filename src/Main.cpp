@@ -25,15 +25,15 @@ std::string CurrentDateTime() {
 	return date + "___" + time;
 }
 
-///<summary> The main start for pengine. </summary>
 int main()
 {
 	using cui = const unsigned int;
 
+	/* Settings. Adjust these to alter rendering. */
 	auto RENDERING_MODE = RenderingMode::MONTE_CARLO;
 	cui PIXELS_W = 400;
 	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 512;
+	cui RAYS_PER_PIXEL = 4900;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 1000000;
@@ -46,7 +46,7 @@ int main()
 	std::cout << "Starting..." << std::endl;
 	Camera c(PIXELS_W, PIXELS_H);
 
-	/* Create scene. */
+	/* Create the scene. */
 	std::cout << "Creating the scene..." << std::endl;
 	Scene scene;
 	SceneObjectFactory::AddRoom(scene, false);
@@ -80,14 +80,17 @@ int main()
 	auto timeElapsed = chrono::high_resolution_clock::now() - startTime;
 	double took = chrono::duration_cast<std::chrono::milliseconds>(timeElapsed).count() / 1000.0;
 
-	/* Write to files. */
-	auto curdt = CurrentDateTime();
-	const string imageFileName = /*"output/output_image.tga"; //*/"output/" + curdt + ".tga";
-	const string textFileName = /*"output/output_image.txt"; //*/ "output/" + curdt + ".txt";
+	/* Write render to file. */
+	auto currentDate = CurrentDateTime();
+	const string imageFileName = "output/" + currentDate + ".tga";
 	c.WriteImageToTGA(imageFileName);
+
+	/* Write text data to file. */
+	const string textFileName = "output/" + currentDate + ".txt";
 	ofstream out(textFileName);
+
 	const unsigned int COL_WIDTH = 30;
-	string renderingModeName;
+	string renderingModeName = "Unknown";
 	switch (RENDERING_MODE) {
 	case RenderingMode::MONTE_CARLO:
 		renderingModeName = "Monte Carlo";
@@ -95,8 +98,8 @@ int main()
 	case RenderingMode::VISUALIZE_PHOTON_MAP:
 		renderingModeName = "Visualize Photon Map";
 		break;
-	default: renderingModeName = "Unknown"; break;
 	}
+
 	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderingModeName << endl;
 	out << setw(COL_WIDTH) << left << "Dimensions:" << PIXELS_W << "x" << PIXELS_H << " pixels. " << endl;
 	out << setw(COL_WIDTH) << left << "Rays per pixel:" << RAYS_PER_PIXEL << endl;
@@ -113,6 +116,7 @@ int main()
 	std::cout << "Render saved to: " << imageFileName << "." << endl;
 	std::cout << "Info saved to: " << imageFileName << "." << endl;
 	std::cout << "Rendering finished... press any key to exit." << std::endl;
+	std::cout << "\b" << std::flush;
 	std::cin.get();
 
 	return 0;
