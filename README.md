@@ -5,6 +5,10 @@ Currently supports:
 - Intransparent materials using Oren-Nayar and Lambertian BRDFs.
 - Photon mapping to increase performance and approximate indirect lighting.
 
+TODO: 
+- Transparent materials.
+- Shadow photons.
+
 ## Sample images
 <p align="center">
 This is the second image that was rendered by this ray tracer after about 4 days of coding:
