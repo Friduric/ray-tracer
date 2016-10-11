@@ -15,10 +15,10 @@ public:
 	/// <param name='minSizeOfNodeBox'> The minimum width, height and depth of a nodes box size. </param>
 	/// <param name='MAX_DEPTH'> The amount of times each photon will bounce at most. </param>
 	void CreatePhotonMap(const Scene & scene,
-						 const unsigned int photonsPerLightSource = 300000,
-						 const unsigned int maxPhotonsPerNode = 100,
-						 const float minSizeOfNodeBox = 0.5f,
-						 const unsigned int MAX_DEPTH = 5);
+						 const unsigned int photonsPerLightSource,
+						 const unsigned int maxPhotonsPerNode,
+						 const float minSizeOfNodeBox,
+						 const unsigned int MAX_DEPTH);
 
 	/// <summary> 
 	/// Returns all photons located at the given world position.

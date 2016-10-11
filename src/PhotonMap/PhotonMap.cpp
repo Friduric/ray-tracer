@@ -10,20 +10,18 @@ void PhotonMap::CreatePhotonMap(const Scene & scene, const unsigned int photonsP
 	std::uniform_int_distribution<int> integerDistribution;
 	std::default_random_engine generator;
 	int primIdx;
-	Ray ray;
-
 	std::cout << "Creating PhotonMap ..." << std::endl;
-
 	// For each light source 
 	for (unsigned int i = 0; i < scene.emissiveRenderGroups.size(); ++i) {
 		const auto & lightSource = *scene.emissiveRenderGroups[i];
 		primIdx = rand() % lightSource.primitives.size();
 		const auto & prim = *lightSource.primitives[primIdx];
-		for (unsigned int j = 0; j < photonsPerLightSource; ++j) {	
+		for (unsigned int j = 0; j < photonsPerLightSource; ++j) {
 			// Shoot photon in a random direction
 			glm::vec3 surfPos = prim.GetRandomPositionOnSurface();
 			glm::vec3 normal = prim.GetNormal(surfPos);
 			glm::vec3 dir = Math::CosineWeightedHemisphereSampleDirection(normal);
+			Ray ray;
 			ray.from = surfPos;
 			ray.dir = dir;
 			unsigned int intersectionRenderGroupIdx;
@@ -32,16 +30,16 @@ void PhotonMap::CreatePhotonMap(const Scene & scene, const unsigned int photonsP
 
 			if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
 				// Save photon in the octree
-				glm::vec3 hitSurfPos = surfPos + intersectionDistance*dir;
+				glm::vec3 hitSurfPos = ray.from + intersectionDistance * ray.dir;
 				Primitive& prim = *(scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx]);
+				Material* material = scene.renderGroups[intersectionRenderGroupIdx].material;
 				glm::vec3 norm = prim.GetNormal(hitSurfPos);
-				glm::vec3  refl = glm::reflect(dir, norm);
-				glm::vec3 color = lightSource.material->CalculateDiffuseLighting(dir, refl, norm, lightSource.material->GetEmissionColor());
+				glm::vec3 refl = glm::reflect(dir, norm);
+				glm::vec3 color = material->CalculateDiffuseLighting(-dir, refl, norm, lightSource.material->GetEmissionColor());
 				octree.photons.emplace_back(hitSurfPos, dir, color);
 
 				// Trace each photon in scene
 				for (unsigned int k = 0; k < MAX_DEPTH; ++k) {
-					
 					ray.dir = refl;
 					ray.from = hitSurfPos;
 					dir = refl;
@@ -50,9 +48,10 @@ void PhotonMap::CreatePhotonMap(const Scene & scene, const unsigned int photonsP
 						// Save photon in the octree
 						hitSurfPos = surfPos + intersectionDistance*dir;
 						prim = *(scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx]);
+						material = scene.renderGroups[intersectionRenderGroupIdx].material;
 						norm = prim.GetNormal(hitSurfPos);
 						refl = glm::reflect(dir, norm);
-						color = lightSource.material->CalculateDiffuseLighting(dir, refl, norm, lightSource.material->GetEmissionColor());
+						color = material->CalculateDiffuseLighting(dir, refl, norm, color);
 						octree.photons.emplace_back(hitSurfPos, dir, color);
 					}
 					else {
@@ -61,7 +60,7 @@ void PhotonMap::CreatePhotonMap(const Scene & scene, const unsigned int photonsP
 					}
 				}
 			}
-			
+
 		}
 	}
 
