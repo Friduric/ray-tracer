@@ -8,6 +8,7 @@ Currently supports:
 TODO: 
 - Transparent materials.
 - Shadow photons.
+- Caustics mapping.
 
 ## Sample images
 <p align="center">
