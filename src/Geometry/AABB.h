@@ -5,5 +5,6 @@
 class AABB {
 public:
 	glm::vec3 minimum, maximum;
-	AABB(glm::vec3 minimum, glm::vec3 maximum);
+	AABB(const glm::vec3 minimum, const glm::vec3 maximum);
+	bool IsPointInsideAABB(const glm::vec3 & position) const;
 };
