@@ -27,11 +27,32 @@ Scene::~Scene() {
 }
 
 void Scene::Initialize() {
+	glm::vec3 minimumPosition = glm::vec3(FLT_MAX);
+	glm::vec3 maximumPosition = glm::vec3(-FLT_MAX);
+
+	/* Add emissive materials. */
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		if (renderGroups[i].material->IsEmissive()) {
 			emissiveRenderGroups.push_back(&renderGroups[i]);
 		}
 	}
+
+	/* Calculate scene bounding box. */
+	for (const auto & rg : renderGroups) {
+		for (const auto & p : rg.primitives) {
+			const auto & aabb = p->GetAxisAlignedBoundingBox();
+			const auto & min = aabb.minimum;
+			const auto & max = aabb.maximum;
+			minimumPosition.x = glm::min<float>(min.x, minimumPosition.x);
+			minimumPosition.y = glm::min<float>(min.y, minimumPosition.y);
+			minimumPosition.z = glm::min<float>(min.z, minimumPosition.z);
+			maximumPosition.x = glm::min<float>(max.x, maximumPosition.x);
+			maximumPosition.y = glm::min<float>(max.y, maximumPosition.y);
+			maximumPosition.z = glm::min<float>(max.z, maximumPosition.z);
+		}
+	}
+
+	axisAlignedBoundingBox = AABB(minimumPosition, maximumPosition);
 }
 
 glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
@@ -138,9 +159,9 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 }
 
 void Scene::GeneratePhotonMap(const unsigned int PHOTONS_PER_LIGHT_SOURCE,
-							   const unsigned int MAX_PHOTONS_PER_NODE,
-							   const float MAXIMUM_NODE_BOX_DIMENSION,
-							   const unsigned int MAX_DEPTH) {
+							  const unsigned int MAX_PHOTONS_PER_NODE,
+							  const float MAXIMUM_NODE_BOX_DIMENSION,
+							  const unsigned int MAX_DEPTH) {
 	photonMap = new PhotonMap(*this, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
 							  MAXIMUM_NODE_BOX_DIMENSION, MAX_DEPTH);
 }
