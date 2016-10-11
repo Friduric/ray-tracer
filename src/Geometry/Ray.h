@@ -2,6 +2,7 @@
 
 #include <glm.hpp>
 
+/// <summary> Describes a 3D ray. </summary>
 class Ray {
 public:
 	glm::vec3 dir, from;

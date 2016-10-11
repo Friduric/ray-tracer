@@ -2,9 +2,13 @@
 
 #include <glm.hpp>
 
+/// <summary> Describes an axis aligned bounding box. </summary>
 class AABB {
 public:
 	glm::vec3 minimum, maximum;
+
+	/// <summary> Creates an identity axis aligned cube. </summary>
+	AABB();
 
 	/// <summary> Constructs an AABB on the form (minimum, maximum). </summary>
 	AABB(const glm::vec3 minimum, const glm::vec3 maximum);

@@ -1,11 +1,29 @@
 ## Description
-A Monte Carlo ray tracer implementation.
+A Monte Carlo ray tracer implementation using photon mapping. 
+
+Currently supports:
+- Intransparent materials using Oren-Nayar and Lambertian BRDFs.
+- Photon mapping to increase performance and approximate indirect lighting.
+
+TODO: 
+- Transparent materials.
+- Shadow photons.
+- Caustics mapping.
+- kd-tree instead of octree.
 
 ## Sample images
-This is the first image that was rendered by this ray tracer (using only Lambertian reflections): 
-
-<img src="https://github.com/Friduric/raytracer/blob/master/first_lambertian_test.png" width="500" height="500">
-
+<p align="center">
+This is the second image that was rendered by this ray tracer after about 4 days of coding:
+</p>
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/second_lambertian_test.png" width="400" height="400">
+</p>
+<p align="center">
+This is the first image that was rendered by this ray tracer after about 2 days of coding: 
+</p>
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/first_lambertian_test.png" width="400" height="400">
+</p>
 ## A few troubleshooting tips
 - IMPORTANT: Use the 32-bit binaries (build using x86!). Otherwise GLM might bug out.
 
@@ -18,3 +36,6 @@ This is the first image that was rendered by this ray tracer (using only Lambert
   - Change Linker -> Debugging -> Generate Program Database File to: "$(TargetDir)$(TargetName).pdb"
 
 - OPTIONAL: Adding /FORCE:MULTIPLE to the Linker command line helps remove errors LNK1169 and LNK2005.
+
+## Tags
+TNCG15, Linköping University, Global Illumination, Advanced Rendering, Computer-Graphics, TSBK03, TSBK07

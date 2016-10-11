@@ -4,10 +4,12 @@
 #include "Primitive.h"
 #include "Ray.h"
 
+/// <summary> Describes a 3D sphere. </summary>
 class Sphere : public Primitive {
 public:
 	glm::vec3 center;
 	float radius;
+
 	Sphere(glm::vec3 center = glm::vec3(), float r = 1.0);
 
 	glm::vec3 GetNormal(const glm::vec3 & position) const override;
