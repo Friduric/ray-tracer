@@ -30,14 +30,14 @@ int main()
 	using cui = const unsigned int;
 
 	/* Settings. Adjust these to alter rendering. */
-	auto RENDERING_MODE = RenderingMode::MONTE_CARLO;
-	cui PIXELS_W = 400;
-	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 4900;
+	auto RENDERING_MODE = RenderingMode::VISUALIZE_PHOTON_MAP;
+	cui PIXELS_W = 100;
+	cui PIXELS_H = 100;
+	cui RAYS_PER_PIXEL = 128;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 1000000;
-	cui MAX_PHOTONS_PER_NODE = 1000;
+	cui MAX_PHOTONS_PER_NODE = 100;
 	cui PHOTON_MAP_DEPTH = 5;
 	float MAX_NODE_SIZE_DIMENSION = 0.1f;
 
@@ -70,7 +70,7 @@ int main()
 	scene.Initialize();
 
 	/* Generate PhotonMap. */
-	c.GeneratePhotonMap(scene, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
+	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
 						MAX_NODE_SIZE_DIMENSION, PHOTON_MAP_DEPTH);
 
 	/* Render scene. */
@@ -97,6 +97,9 @@ int main()
 		break;
 	case RenderingMode::VISUALIZE_PHOTON_MAP:
 		renderingModeName = "Visualize Photon Map";
+		break;
+	case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
+		renderingModeName = "Monte Carlo using Photon Map";
 		break;
 	}
 

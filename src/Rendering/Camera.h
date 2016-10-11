@@ -6,10 +6,10 @@
 
 #include "../Scene/Scene.h"
 #include "Pixel.h"
-#include "../PhotonMap/PhotonMap.h"
+
 
 enum RenderingMode {
-	VISUALIZE_PHOTON_MAP, MONTE_CARLO
+	VISUALIZE_PHOTON_MAP, MONTE_CARLO, MONTE_CARLO_USING_PHOTON_MAP
 };
 
 class Camera {
@@ -20,20 +20,6 @@ public:
 	/// <param name="width"> The width of the image in pixels. </param>
 	/// <param name="height"> The height of the image in pixels. </param>
 	Camera(const int width = 1000, const int height = 1000);
-
-	/// <summary> 
-	/// Generates a photonmap that can be used during rendering.
-	/// </summary>
-	/// <param name='scene'> The scene. </param>
-	/// <param name='PHOTONS_PER_LIGHT_SOURCE'> The amount of photons used per light source. </param>
-	/// <param name='MAX_PHOTONS_PER_NODE'> The maximum amount of photons per node. </param>
-	/// <param name='MAXIMUM_NODE_BOX_DIMENSION'> The maximum width, height and depth of a nodes box size. </param>
-	/// <param name='MAX_DEPTH'> The amount of times each photon will bounce at most. </param>
-	void GeneratePhotonMap(const Scene & scene,
-						   const unsigned int PHOTONS_PER_LIGHT_SOURCE = 200000,
-						   const unsigned int MAX_PHOTONS_PER_NODE = 100,
-						   const float MAXIMUM_NODE_BOX_DIMENSION = 0.1f,
-						   const unsigned int MAX_DEPTH = 5);
 
 	/// <summary>
 	/// Renders the image by setting the color of each pixel according to Monte Carlo 
@@ -68,7 +54,4 @@ private:
 
 	/// <summary> Discretizes the color of each pixel. </summary>
 	void CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD = 1.25f);
-
-	// PhotonMap
-	PhotonMap photonMap;
 };

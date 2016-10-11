@@ -11,7 +11,6 @@
 #include "../Rendering/Materials/LambertianMaterial.h"
 #include "../Geometry/Sphere.h"
 
-using namespace std;
 
 Scene::Scene() {}
 
@@ -24,6 +23,7 @@ Scene::~Scene() {
 	for (auto m : materials) {
 		delete m;
 	}
+	delete photonMap;
 }
 
 void Scene::Initialize() {
@@ -35,6 +35,47 @@ void Scene::Initialize() {
 }
 
 glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
+	if (depth == 0) { return glm::vec3(0, 0, 0); }
+
+	assert(depth > 0);
+	assert(bouncesPerHit > 0);
+
+	unsigned int intersectionPrimitiveIndex, intersectionRenderGroupIndex;
+	float intersectionDistance;
+	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
+
+	/* If the ray doesn't intersect, simply return (0, 0, 0). */
+	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
+
+	/*  Calculate intersection point. */
+	glm::vec3 intersectionPoint = ray.from + ray.dir * intersectionDistance;
+
+	/* Retrieve primitive and material information for the intersected object. */
+	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
+	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
+	Material* hitMaterial = intersectionRenderGroup.material;
+	if (hitMaterial->IsEmissive()) {
+		// We could also add emission color to the end result. Returning it here speeds up rendering.
+		const float intersectionRadianceFactor = glm::dot(-ray.dir, intersectionPrimitive->GetNormal(intersectionPoint));
+		return intersectionRadianceFactor * intersectionRenderGroup.material->GetEmissionColor();
+	}
+
+	/* Calculate normal. */
+	glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
+
+	/* Shoot rays and integrate based on BRDF sampling. */
+	glm::vec3 colorAccumulator = { 0,0,0 };
+	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
+		glm::vec3 reflectionDirection = Math::RandomHemishpereSampleDirection(hitNormal);
+		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
+		Ray reflectedRay(intersectionPoint, reflectionDirection);
+		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
+	}
+	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
+}
+
+glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
 	if (depth == 0) { return glm::vec3(0, 0, 0); }
 
 	assert(depth > 0);
@@ -94,4 +135,12 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 	}
 	intersectionDistance = closestInterectionDistance;
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
+}
+
+void Scene::GeneratePhotonMap(const unsigned int PHOTONS_PER_LIGHT_SOURCE,
+							   const unsigned int MAX_PHOTONS_PER_NODE,
+							   const float MAXIMUM_NODE_BOX_DIMENSION,
+							   const unsigned int MAX_DEPTH) {
+	photonMap = new PhotonMap(*this, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
+							  MAXIMUM_NODE_BOX_DIMENSION, MAX_DEPTH);
 }

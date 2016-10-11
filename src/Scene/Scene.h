@@ -22,7 +22,7 @@ public:
 	AABB axisAlignedBoundingBox;
 
 	/// <summary> Photon Map. </summary>
-	PhotonMap photonMap;
+	PhotonMap* photonMap;
 
 	/// <summary> Call this after all primitives has been added to the scene (pre-render). </summary>
 	void Initialize();

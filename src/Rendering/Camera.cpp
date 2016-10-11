@@ -16,15 +16,6 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 	discretizedPixels.assign(width, std::vector<glm::u8vec3>(height));
 }
 
-void Camera::GeneratePhotonMap(const Scene & scene,
-							   const unsigned int PHOTONS_PER_LIGHT_SOURCE,
-							   const unsigned int MAX_PHOTONS_PER_NODE,
-							   const float MAXIMUM_NODE_BOX_DIMENSION,
-							   const unsigned int MAX_DEPTH) {
-	photonMap.CreatePhotonMap(scene, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
-							  MAXIMUM_NODE_BOX_DIMENSION, MAX_DEPTH);
-}
-
 void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, const unsigned int RAYS_PER_PIXEL,
 					const unsigned int RAY_MAX_DEPTH, const unsigned int RAY_MAX_BOUNCE,
 					const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
@@ -79,7 +70,7 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 					const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
 					ray.dir = glm::normalize(planePosition - eye);
 					ray.from = planePosition;
-
+					
 					switch (RENDERING_MODE) {
 					case RenderingMode::MONTE_CARLO:
 						/* Trace ray through the scene. */
@@ -90,19 +81,22 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 						unsigned int intrendgroupidx;
 						unsigned int intprimidx;
 						float intdist;
-						if (scene.RayCast(ray, intrendgroupidx, intprimidx, intdist)) {
-							std::vector<Photon*> photons = photonMap.GetPhotonsAtPosition(ray.from + intdist*ray.dir);
-							if (photons.size() > 0) {
+						if (scene.RayCast(ray, intrendgroupidx, intprimidx, intdist)) {				
+							std::vector<Photon const*> photons = scene.photonMap->GetPhotonsInOctreeNodeOfPosition(ray.from + intdist*ray.dir);
+							if (photons.size() > 0) {								
 								for (unsigned int pi = 0; pi < photons.size(); ++pi) {
 									colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * photons[pi]->color;
 								}
 							}
 						}
 						break;
-					}
+					case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
+						/* Trace ray through the scene. */
+						colorAccumulator += std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal)) * scene.TraceRayUsingPhotonMap(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+						break;
+					}					
 				}
 			}
-
 			/* Set pixel color dependent on ray trace. */
 			pixels[y][z].color = INV_RAYS_PER_PIXEL * colorAccumulator;
 		}
