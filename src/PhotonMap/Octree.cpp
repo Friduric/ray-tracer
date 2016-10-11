@@ -59,7 +59,6 @@ void Octree::SetUpOctree(const Scene & scene, const unsigned int maxPhotonsPerNo
 						OctreeNode* newNode = CreateNode(currentNode->photons, nodeXMin, nodeXMax,
 														 nodeYMin, nodeYMax, nodeZMin, nodeZMax);
 						currentNode->children[idxCounter] = newNode;
-						newNode->parent = currentNode;
 						nodeQueue.push(newNode);
 						idxCounter++;
 					}
@@ -84,13 +83,14 @@ Octree::OctreeNode* Octree::CreateNode(const std::vector<Photon*> & photons,
 									   const float yMin, const float yMax,
 									   const float zMin, const float zMax) {
 	OctreeNode* node = new OctreeNode();
+
 	// Set min and max values.
 	node->xMin = xMin; node->xMax = xMax;
 	node->yMin = yMin; node->yMax = yMax;
 	node->zMin = zMin; node->zMax = zMax;
 	// Find and add all photons inside the box of this node.
 	for (unsigned int i = 0; i < photons.size(); ++i) {
-		glm::vec3 pos = photons[i]->position;
+		const glm::vec3 & pos = photons[i]->position;
 		if (pos.x >= xMin && pos.x <= xMax &&
 			pos.y >= yMin && pos.y <= yMax &&
 			pos.z >= zMin && pos.z <= zMax) {

@@ -4,21 +4,17 @@
 #include "../Scene/Scene.h"
 
 class Octree {
-	class OctreeNode
-	{
+	class OctreeNode {
 	public:
 
 		/// <summary> Boundaries of node box. </summary>
-		float xMin, yMin, zMin = FLT_MAX*0.5f;
-		float xMax, yMax, zMax = -FLT_MAX*0.5f;
+		float xMin = 0.5f * FLT_MAX, yMin = 0.5f * FLT_MAX, zMin = 0.5f * FLT_MAX;
+		float xMax = -0.5f * FLT_MAX, yMax = -0.5f * FLT_MAX, zMax = -0.5f * FLT_MAX;
 
 		const static unsigned int CHILDREN_PER_NODE = 8;
 
 		/// <summary> Child nodes, null if leaf node. </summary>
 		OctreeNode* children[CHILDREN_PER_NODE];
-
-		/// <summary> Parent node, null if root node. </summary>
-		OctreeNode* parent;
 
 		/// <summary> Pointers to photons in this node, empty if not leaf node. </summary>
 		std::vector<Photon*> photons;
