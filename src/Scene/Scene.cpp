@@ -54,9 +54,9 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
 	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 	Material* hitMaterial = intersectionRenderGroup.material;
-	float intersectionRadianceFactor = glm::dot(-ray.dir, intersectionPrimitive->GetNormal(intersectionPoint));
 	if (hitMaterial->IsEmissive()) {
 		// We could also add emission color to the end result. Returning it here speeds up rendering.
+		const float intersectionRadianceFactor = glm::dot(-ray.dir, intersectionPrimitive->GetNormal(intersectionPoint));
 		return intersectionRadianceFactor * intersectionRenderGroup.material->GetEmissionColor();
 	}
 
