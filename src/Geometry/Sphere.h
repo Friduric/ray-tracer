@@ -4,6 +4,7 @@
 #include "Primitive.h"
 #include "Ray.h"
 
+/// <summary> Describes a 3D sphere. </summary>
 class Sphere : public Primitive {
 public:
 	glm::vec3 center;

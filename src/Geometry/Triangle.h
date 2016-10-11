@@ -4,6 +4,7 @@
 #include "Primitive.h"
 #include "Ray.h"
 
+/// <summary> Describes a 3D triangle. </summary>
 class Triangle : public Primitive {
 public:
 	glm::vec3 vertices[3];

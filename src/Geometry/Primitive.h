@@ -6,6 +6,7 @@
 #include "../Rendering/Materials/Material.h"
 #include "Ray.h"
 
+/// <summary> Abstract base class for geometrical primitives such as spheres and triangles </summary> 
 class Primitive {
 public:
 	virtual glm::vec3 GetNormal(const glm::vec3 & position) const = 0;

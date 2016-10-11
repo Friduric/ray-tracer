@@ -2,6 +2,7 @@
 
 #include <glm.hpp>
 
+/// <summary> Describes an axis aligned bounding box. </summary>
 class AABB {
 public:
 	glm::vec3 minimum, maximum;
