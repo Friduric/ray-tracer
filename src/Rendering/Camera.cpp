@@ -42,6 +42,7 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 
 	/* Initialize ray components. */
 	Ray ray;
+	glm::vec3 colorAccumulator;
 	const glm::vec3 cameraPlaneNormal = -glm::normalize(glm::cross(c1 - c2, c1 - c4));
 #ifdef __LOG_ITERATIONS
 	long long ctr = 0;
@@ -55,7 +56,7 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 			}
 #endif // __LOG_ITERATIONS	
 			/* Shoot a bunch of rays through the pixel (y, z), and accumulate color. */
-			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
+			colorAccumulator = glm::vec3(0, 0, 0);
 			for (float c = 0; c < invWidth; c += cstep) {
 				for (float r = 0; r < invHeight; r += rstep) {
 
@@ -67,34 +68,32 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 					const float nz = Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
 
 					/* Create ray. */
-					const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
-					ray.dir = glm::normalize(planePosition - eye);
-					ray.from = planePosition;
-					
+					ray.from = glm::vec3(nx, ny, nz);
+					ray.dir = glm::normalize(ray.from - eye);
+					const float rayFactor = std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal));
+
+					/* Choose render mode. */
 					switch (RENDERING_MODE) {
 					case RenderingMode::MONTE_CARLO:
 						/* Trace ray through the scene. */
-						colorAccumulator += std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal)) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+						colorAccumulator += rayFactor * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+						break;
+					case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
+						/* Trace a ray through the scene. */
+						colorAccumulator += rayFactor * scene.TraceRayUsingPhotonMap(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 						break;
 					case RenderingMode::VISUALIZE_PHOTON_MAP:
-						// Direct visualization of photon map.
-						unsigned int intrendgroupidx;
-						unsigned int intprimidx;
-						float intdist;
-						if (scene.RayCast(ray, intrendgroupidx, intprimidx, intdist)) {				
-							std::vector<Photon const*> photons = scene.photonMap->GetPhotonsInOctreeNodeOfPosition(ray.from + intdist*ray.dir);
-							if (photons.size() > 0) {								
-								for (unsigned int pi = 0; pi < photons.size(); ++pi) {
-									colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * photons[pi]->color;
-								}
+						/* Shoot a ray through the scene and sample using the photon map. */
+						unsigned int intersectionRenderGroupIndex, intersectionPrimitiveIndex;
+						float intersectionDistance;
+						if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
+							const auto & photons = scene.photonMap->GetPhotonsInOctreeNodeOfPosition(ray.from + intersectionDistance * ray.dir);
+							for (const Photon * p : photons) {
+								colorAccumulator += rayFactor * p->color;
 							}
 						}
 						break;
-					case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
-						/* Trace ray through the scene. */
-						colorAccumulator += std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal)) * scene.TraceRayUsingPhotonMap(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
-						break;
-					}					
+					}
 				}
 			}
 			/* Set pixel color dependent on ray trace. */
