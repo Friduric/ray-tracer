@@ -9,6 +9,7 @@ TODO:
 - Transparent materials.
 - Shadow photons.
 - Caustics mapping.
+- kd-tree instead of octree.
 
 ## Sample images
 <p align="center">
