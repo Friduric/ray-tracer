@@ -109,7 +109,6 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 							const auto & allIndirPhotons = scene.photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
 							std::vector<Photon const*> closestIndirPhotons;
 							scene.photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allIndirPhotons, intersectionPoint, 10, closestIndirPhotons);
-							const auto & indirPhotons = scene.photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
 							for (const Photon * ip : closestIndirPhotons) {
 								colorAccumulator += rayFactor * ip->color;
 							}
