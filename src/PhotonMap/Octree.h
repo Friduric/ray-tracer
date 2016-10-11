@@ -47,7 +47,7 @@ public:
 	/// Returns the node closest to the given world position.
 	/// </summary>
 	/// <param name='pos'> The world position. </param>
-	OctreeNode* GetNodeClosestToPosition(glm::vec3 pos);
+	OctreeNode* GetNodeClosestToPosition(const glm::vec3 & pos);
 
 private:
 
@@ -60,7 +60,7 @@ private:
 	/// Creates and returns an octree node.
 	// Size of node is given by min and max values.
 	/// </summary>
-	OctreeNode* CreateNode(const std::vector<Photon*> photons,
+	OctreeNode* CreateNode(const std::vector<Photon*> & photons,
 						   const float xMin, const float xMax,
 						   const float yMin, const float yMax,
 						   const float zMin, const float zMax);

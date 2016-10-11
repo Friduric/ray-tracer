@@ -24,7 +24,7 @@ public:
 	/// Returns all photons located at the given world position.
 	/// </summary>
 	/// <param name='pos'> The position to search around. </param>
-	std::vector<Photon*> GetPhotonsAtPosition(const glm::vec3 pos);
+	std::vector<Photon*> & GetPhotonsAtPosition(const glm::vec3 pos);
 
 private:
 
