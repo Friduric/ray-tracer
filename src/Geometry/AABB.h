@@ -19,4 +19,7 @@ public:
 
 	/// <summary> Returns true if the given point is inside this AABB. </summary>
 	bool IsPointInsideAABB(const glm::vec3 & point) const;
+
+	/// <summary> Returns the center of the AABB. </summary>
+	glm::vec3 GetCenter() const;
 };
