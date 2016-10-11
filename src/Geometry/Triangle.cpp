@@ -18,10 +18,9 @@ glm::vec3 Triangle::GetCenter() const {
 
 glm::vec3 Triangle::GetRandomPositionOnSurface() const
 {
-	int count = 0;
 	glm::vec3 v;
-	float quadArea, a1, a2, a3;
-	quadArea = glm::length(glm::cross(vertices[0] - vertices[1], vertices[0] - vertices[2]));
+	float a1, a2, a3;
+	float quadArea = glm::length(glm::cross(vertices[0] - vertices[1], vertices[0] - vertices[2]));
 	do {
 		float rand1 = rand() / (float)RAND_MAX;
 		float rand2 = rand() / (float)RAND_MAX;
@@ -30,8 +29,7 @@ glm::vec3 Triangle::GetRandomPositionOnSurface() const
 		a1 = glm::length(glm::cross(v - vertices[0], v - vertices[1]));
 		a2 = glm::length(glm::cross(v - vertices[1], v - vertices[2]));
 		a3 = glm::length(glm::cross(v - vertices[2], v - vertices[0]));
-	}while (glm::length((quadArea - (a1 + a2 + a3))) > FLT_EPSILON * 10.0f);
-
+	} while (glm::length(a1 + a2 + a3 - quadArea) > FLT_EPSILON);
 	return v;
 }
 
