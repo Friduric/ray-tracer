@@ -50,7 +50,6 @@ void Scene::Initialize() {
 			maximumPosition.z = glm::max<float>(max.z, maximumPosition.z);
 		}
 	}
-
 	axisAlignedBoundingBox = AABB(minimumPosition, maximumPosition);
 }
 
@@ -126,13 +125,17 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 
 	/* Shoot rays and integrate based on BRDF sampling. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
-	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
-		glm::vec3 reflectionDirection = Math::RandomHemishpereSampleDirection(hitNormal);
+	// Only cast against light sources for direct light
+	for (unsigned int i = 0; i < emissiveRenderGroups.size(); ++i) {
+		glm::vec3 surfPos = emissiveRenderGroups[i]->primitives[i]->GetRandomPositionOnSurface();
+		glm::vec3 reflectionDirection = glm::normalize(surfPos - intersectionPoint);// = Math::RandomHemishpereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);	
 	}
+	// Add indirect light from photons
+
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }
 

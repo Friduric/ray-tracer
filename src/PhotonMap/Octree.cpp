@@ -7,21 +7,18 @@
 
 Octree::Octree(const std::vector<Photon> & container,
 						 const unsigned int maxPhotonsPerNode,
-						 const float maxSizeOfNodeBox, const AABB & aabb) {
-	root.axisAlignedBoundingBox = aabb;
-
+						 const float maxSizeOfNodeBox, const AABB & aabb) : root(new OctreeNode(aabb)){
 	// Add all photons to the root	
 	for (unsigned int n = 0; n < container.size(); ++n) {
-		root.dataPointers.push_back(&container[n]);
+		root->dataPointers.push_back(&container[n]);
 	}
 
 	std::queue<OctreeNode*> nodeQueue;
-	nodeQueue.push(&root);
+	nodeQueue.push(root);
 	float nodeWidth, nodeHeight, nodeDepth;
 	float nodeXHalf, nodeYHalf, nodeZHalf;
 	float nodeXMin, nodeYMin, nodeZMin;
 	float nodeXMax, nodeYMax, nodeZMax;
-
 	// While there are nodes left in the queue divide into 8 subnodes.
 	while (!nodeQueue.empty()) {
 		OctreeNode* currentNode = nodeQueue.front();
@@ -68,7 +65,7 @@ Octree::Octree(const std::vector<Photon> & container,
 }
 
 Octree::~Octree() {
-	DeleteRecursive(&root);
+	DeleteRecursive(root);
 }
 
 void Octree::DeleteRecursive(OctreeNode* node) {
@@ -83,6 +80,7 @@ void Octree::DeleteRecursive(OctreeNode* node) {
 }
 
 void Octree::OctreeNode::AddDataTypesInsideAABB(const std::vector<Photon const*> & photons) {
+
 	// Find and add all photons inside the box of this node.
 	for (unsigned int i = 0; i < photons.size(); ++i) {
 		const glm::vec3 & pos = photons[i]->position;
@@ -93,26 +91,28 @@ void Octree::OctreeNode::AddDataTypesInsideAABB(const std::vector<Photon const*>
 }
 
 Octree::OctreeNode* Octree::GetNodeClosestToPosition(const glm::vec3 & pos) const {
-	OctreeNode bestNode = root;
+	OctreeNode* bestNode = root;
 	// Search as long as we're not at a leaf and find the closest node to the given position.
-	while (!bestNode.IsLeaf()) {
+	while (!bestNode->IsLeaf()) {
 		float closestDistance = FLT_MAX;
-		OctreeNode* closestNode = bestNode.children[0];
+		OctreeNode* closestNode = bestNode->children[0];
 		for (unsigned int i = 0; i < OctreeNode::CHILDREN_PER_NODE; ++i) {
-			OctreeNode* tmpNode = bestNode.children[i];
+			OctreeNode* tmpNode = bestNode->children[i];
 			float tmpDist = glm::distance2(tmpNode->axisAlignedBoundingBox.GetCenter(), pos);
 			if (tmpDist < closestDistance) {
 				closestDistance = tmpDist;
-				closestNode = bestNode.children[i];
+				closestNode = bestNode->children[i];
 			}
 		}
-		bestNode = *closestNode;
+		bestNode = closestNode;
 	}
-	return &bestNode;
+	return bestNode;
 }
 
 Octree::OctreeNode::OctreeNode() {
 }
+
+Octree::OctreeNode::OctreeNode(AABB _aabb) : axisAlignedBoundingBox(_aabb){}
 
 bool Octree::OctreeNode::IsLeaf() const {
 	return children[0] == NULL;

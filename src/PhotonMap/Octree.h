@@ -13,6 +13,12 @@ class Octree {
 		/// </summary>
 		OctreeNode();
 
+		/// <summary> 
+		/// Creates and returns an octree node.
+		// Size of node is given by min and max values.
+		/// </summary>
+		OctreeNode(AABB axisAlignedBoundingBox);
+
 		/// <summary> Boundaries of node box. </summary>
 		AABB axisAlignedBoundingBox;
 
@@ -42,12 +48,12 @@ public:
 	/// <param name='maxSizeOfNodeBox'> The maximum width, height and depth of a nodes box size. </param>
 	/// <param name='axisAlignedBoundingBox'> The axisAlignedBoundingBox. </param>
 	Octree(const std::vector<Photon> & container,
-					 const unsigned int maxPhotonsPerNode,
-					 const float maxSizeOfNodeBox, const AABB & axisAlignedBoundingBox);
+		   const unsigned int maxPhotonsPerNode,
+		   const float maxSizeOfNodeBox, const AABB & axisAlignedBoundingBox);
 
 	~Octree();
 	/// <summary> The root node. </summary>
-	OctreeNode root;
+	OctreeNode* root;
 
 	/// <summary> 
 	/// Returns the node closest to the given world position.
