@@ -2,10 +2,15 @@
 A Monte Carlo ray tracer implementation.
 
 ## Sample images
-This is the first image that was rendered by this ray tracer (using only Lambertian reflections): 
 
-<img src="https://github.com/Friduric/raytracer/blob/master/first_lambertian_test.png" width="500" height="500">
-
+This is the second image that was rendered by this ray tracer (using only Lambertian reflections) after about 4 days of coding:
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/second_lambertian_test.png" width="400" height="400">
+</p>
+This is the first image that was rendered by this ray tracer (using only Lambertian reflections) after 2 days of coding: 
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/first_lambertian_test.png" width="400" height="400">
+</p>
 ## A few troubleshooting tips
 - IMPORTANT: Use the 32-bit binaries (build using x86!). Otherwise GLM might bug out.
 
