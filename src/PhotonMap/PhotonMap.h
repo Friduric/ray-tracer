@@ -21,12 +21,20 @@ public:
 	~PhotonMap();
 
 	/// <summary> 
+	/// Returns N closest photons located around the given world position.
+	/// Photons are stored in closestPhotons.
+	/// </summary>
+	/// <param name='pos'> The position to search around. </param>
+	void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
+															 const int N, std::vector<Photon const*> & closestPhotons) const;
+
+	/// <summary> 
 	/// Returns all photons located at the given world position.
 	/// </summary>
 	/// <param name='pos'> The position to search around. </param>
 	std::vector<Photon const*> & GetDirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
 	std::vector<Photon const*> & GetIndirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
-	//std::vector<Photon const*> & GetShadowPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
+	std::vector<Photon const*> & GetShadowPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
 
 private:
 
@@ -37,9 +45,12 @@ private:
 
 	// The data structure photons are saved in.
 	Octree* octree;
-	
+
+	/// <summary>
+	/// Returns a vector with indexes sorted based on value
+	/// in vector v.
+	/// </summary>
+	std::vector<int> PhotonMap::sortIndexes(const std::vector<float>& v) const;
 };
-
-
 
 

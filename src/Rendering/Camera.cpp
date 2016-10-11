@@ -93,21 +93,23 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 						/* Shoot a ray through the scene and sample using the photon map. */
 						unsigned int intersectionRenderGroupIndex, intersectionPrimitiveIndex;
 						float intersectionDistance;
-						float photonDistance;
 						glm::vec3 intersectionPoint;
 						if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 							// direct photons
 							intersectionPoint = ray.from + intersectionDistance * ray.dir;
-							const auto & dirPhotons = scene.photonMap->GetDirectPhotonsInOctreeNodeOfPosition(intersectionPoint);						
-							for (const Photon * dp : dirPhotons) {
-								//photonDistance = glm::distance(intersectionPoint, dp->position);
-								colorAccumulator += rayFactor * dp->color;// / photonDistance;
+							const auto & allDirPhotons = scene.photonMap->GetDirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+							std::vector<Photon const*> closestDirPhotons;
+							scene.photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allDirPhotons, intersectionPoint, 10, closestDirPhotons);							
+							for (const Photon * dp : closestDirPhotons) {
+								colorAccumulator += rayFactor * dp->color;
 							}
 							// indirect photons
+							const auto & allIndirPhotons = scene.photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+							std::vector<Photon const*> closestIndirPhotons;
+							scene.photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allIndirPhotons, intersectionPoint, 10, closestIndirPhotons);
 							const auto & indirPhotons = scene.photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
-							for (const Photon * ip : indirPhotons) {
-								//photonDistance = glm::distance(intersectionPoint, ip->position);
-								colorAccumulator += rayFactor * ip->color;// / photonDistance;
+							for (const Photon * ip : closestIndirPhotons) {
+								colorAccumulator += rayFactor * ip->color;
 							}
 						}
 						break;

@@ -131,8 +131,8 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const glm::vec3 & camer
 		glm::vec3 reflectionDirection = glm::normalize(surfPos - intersectionPoint);// = Math::RandomHemishpereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		Ray reflectedRay(intersectionPoint, reflectionDirection);
-		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);	
+		//const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
+		//colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);	
 	}
 	// Add indirect light from photons
 	const float rayFactor = std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal));

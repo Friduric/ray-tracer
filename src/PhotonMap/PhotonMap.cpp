@@ -1,8 +1,12 @@
 #include <iostream>
 #include <random>
+#include <numeric>
+#include <algorithm>
+#include "../../includes/glm/gtx/norm.hpp"
 #include "PhotonMap.h"
 #include "../Utility/Math.h"
 #include "../Scene/Scene.h"
+
 PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 					 const unsigned int MAX_PHOTONS_PER_NODE,
 					 const float MAXIMUM_NODE_BOX_DIMENSION,
@@ -69,6 +73,20 @@ PhotonMap::~PhotonMap()
 	delete octree;
 }
 
+void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
+														  const int N, std::vector<Photon const*> & closestPhotons) const {
+	std::vector<float> distances;
+	for (Photon const* p : photons) {
+		distances.push_back(glm::distance2(p->position, pos));
+	}
+	int cappedN = std::min((int)photons.size(), N);
+	std::vector<int> sortedIdxs = sortIndexes(distances);
+	closestPhotons.clear();
+	for (int i = 0; i < cappedN; ++i) {
+		closestPhotons.push_back(photons[i]);
+	}
+}
+
 std::vector<Photon const*> & PhotonMap::GetDirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const {
 	return octree->GetNodeClosestToPosition(pos)->directPhotons;
 }
@@ -77,6 +95,18 @@ std::vector<Photon const*> & PhotonMap::GetIndirectPhotonsInOctreeNodeOfPosition
 	return octree->GetNodeClosestToPosition(pos)->indirectPhotons;
 }
 
-/*std::vector<Photon const*> & PhotonMap::GetShadowPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const {
+std::vector<Photon const*> & PhotonMap::GetShadowPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const {
 	return octree->GetNodeClosestToPosition(pos)->shadowPhotons;
-}*/
+}
+
+std::vector<int> PhotonMap::sortIndexes(const std::vector<float>& v) const
+{
+	// initialize original index locations
+	std::vector<int> idx(v.size());
+	std::iota(idx.begin(), idx.end(), 0);
+
+	// sort indexes based on comparing values in v
+	std::sort(idx.begin(), idx.end(),
+			  [&v](size_t i1, size_t i2) {return v[i1] < v[i2]; });
+	return idx;
+}

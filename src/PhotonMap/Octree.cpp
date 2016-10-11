@@ -114,7 +114,7 @@ void Octree::OctreeNode::AddDataTypesInsideAABB(const std::vector<Photon const*>
 	// Shadow photons
 	for (auto sp : _shadowPhotons) {
 		if (axisAlignedBoundingBox.IsPointInsideAABB(sp->position)) {
-			indirectPhotons.push_back(sp);
+			shadowPhotons.push_back(sp);
 		}
 	}
 }
