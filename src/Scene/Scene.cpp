@@ -27,9 +27,6 @@ Scene::~Scene() {
 }
 
 void Scene::Initialize() {
-	glm::vec3 minimumPosition = glm::vec3(FLT_MAX);
-	glm::vec3 maximumPosition = glm::vec3(-FLT_MAX);
-
 	/* Add emissive materials. */
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		if (renderGroups[i].material->IsEmissive()) {
@@ -37,7 +34,9 @@ void Scene::Initialize() {
 		}
 	}
 
-	/* Calculate scene bounding box. */
+	/* Calculate the bounding box of the scene. */
+	glm::vec3 minimumPosition = glm::vec3(FLT_MAX);
+	glm::vec3 maximumPosition = glm::vec3(-FLT_MAX);
 	for (const auto & rg : renderGroups) {
 		for (const auto & p : rg.primitives) {
 			const auto & aabb = p->GetAxisAlignedBoundingBox();
