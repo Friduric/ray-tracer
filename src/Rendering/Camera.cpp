@@ -25,7 +25,7 @@ void Camera::GeneratePhotonMap(const Scene & scene,
 							  MAXIMUM_NODE_BOX_DIMENSION, MAX_DEPTH);
 }
 
-void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
+void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, const unsigned int RAYS_PER_PIXEL,
 					const unsigned int RAY_MAX_DEPTH, const unsigned int RAY_MAX_BOUNCE,
 					const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 					const glm::vec3 c3, const glm::vec3 c4) {
@@ -80,21 +80,26 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					ray.dir = glm::normalize(planePosition - eye);
 					ray.from = planePosition;
 
-					// Direct visualization of photon map.
-					unsigned int intrendgroupidx;
-					unsigned int intprimidx;
-					float intdist;
-					if (scene.RayCast(ray, intrendgroupidx, intprimidx, intdist)) {
-						std::vector<Photon*> photons = photonMap.GetPhotonsAtPosition(ray.from + intdist*ray.dir);
-						if (photons.size() > 0) {
-							for (unsigned int pi = 0; pi < photons.size(); ++pi) {
-								colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * photons[pi]->color;
+					switch (RENDERING_MODE) {
+					case RenderingMode::MONTE_CARLO:
+						/* Trace ray through the scene. */
+						colorAccumulator += std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal)) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+						break;
+					case RenderingMode::VISUALIZE_PHOTON_MAP:
+						// Direct visualization of photon map.
+						unsigned int intrendgroupidx;
+						unsigned int intprimidx;
+						float intdist;
+						if (scene.RayCast(ray, intrendgroupidx, intprimidx, intdist)) {
+							std::vector<Photon*> photons = photonMap.GetPhotonsAtPosition(ray.from + intdist*ray.dir);
+							if (photons.size() > 0) {
+								for (unsigned int pi = 0; pi < photons.size(); ++pi) {
+									colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * photons[pi]->color;
+								}
 							}
 						}
+						break;
 					}
-
-					/* Trace ray through the scene. */
-					// colorAccumulator += std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal)) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 				}
 			}
 

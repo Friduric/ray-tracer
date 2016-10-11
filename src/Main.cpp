@@ -30,13 +30,14 @@ int main()
 {
 	using cui = const unsigned int;
 
+	auto RENDERING_MODE = RenderingMode::MONTE_CARLO;
 	cui PIXELS_W = 400;
 	cui PIXELS_H = 400;
 	cui RAYS_PER_PIXEL = 512;
-	cui MAX_RAY_DEPTH = 4;
+	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 1000000;
-	cui MAX_PHOTONS_PER_NODE = 100;
+	cui MAX_PHOTONS_PER_NODE = 1000;
 	cui PHOTON_MAP_DEPTH = 5;
 	float MAX_NODE_SIZE_DIMENSION = 0.1f;
 
@@ -73,7 +74,7 @@ int main()
 						MAX_NODE_SIZE_DIMENSION, PHOTON_MAP_DEPTH);
 
 	/* Render scene. */
-	c.Render(scene, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT, glm::vec3(-7, 0, 0));
+	c.Render(scene, RENDERING_MODE, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT, glm::vec3(-7, 0, 0));
 
 	/* Finalize. */
 	auto timeElapsed = chrono::high_resolution_clock::now() - startTime;
@@ -85,7 +86,18 @@ int main()
 	const string textFileName = /*"output/output_image.txt"; //*/ "output/" + curdt + ".txt";
 	c.WriteImageToTGA(imageFileName);
 	ofstream out(textFileName);
-	const unsigned int COL_WIDTH = 21;
+	const unsigned int COL_WIDTH = 30;
+	string renderingModeName;
+	switch (RENDERING_MODE) {
+	case RenderingMode::MONTE_CARLO:
+		renderingModeName = "Monte Carlo";
+		break;
+	case RenderingMode::VISUALIZE_PHOTON_MAP:
+		renderingModeName = "Visualize Photon Map";
+		break;
+	default: renderingModeName = "Unknown"; break;
+	}
+	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderingModeName << endl;
 	out << setw(COL_WIDTH) << left << "Dimensions:" << PIXELS_W << "x" << PIXELS_H << " pixels. " << endl;
 	out << setw(COL_WIDTH) << left << "Rays per pixel:" << RAYS_PER_PIXEL << endl;
 	out << setw(COL_WIDTH) << left << "Max ray depth:" << MAX_RAY_DEPTH << endl;
