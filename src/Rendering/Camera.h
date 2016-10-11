@@ -6,6 +6,7 @@
 
 #include "../Scene/Scene.h"
 #include "Pixel.h"
+#include "../PhotonMap/PhotonMap.h"
 
 class Camera {
 public:
@@ -15,6 +16,20 @@ public:
 	/// <param name="width"> The width of the image in pixels. </param>
 	/// <param name="height"> The height of the image in pixels. </param>
 	Camera(const int width = 1000, const int height = 1000);
+
+	/// <summary> 
+	/// Generates a photonmap that can be used during rendering.
+	/// </summary>
+	/// <param name='scene'> The scene. </param>
+	/// <param name='photonsPerLightSource'> The amount of photons used per light source. </param>
+	/// <param name='maxPhotonsPerNode'> The maximum amount of photons per node. </param>
+	/// <param name='maxSizeOfNodeBox'> The maximum width, height and depth of a nodes box size. </param>
+	/// <param name='MAX_DEPTH'> The amount of times each photon will bounce at most. </param>
+	void GeneratePhotonMap(const Scene & scene,
+						   const unsigned int photonsPerLightSource = 200000,
+						   const unsigned int maxPhotonsPerNode = 100,
+						   const float maxSizeOfNodeBox = 0.1f,
+						   const unsigned int MAX_DEPTH = 5);
 
 	/// <summary>
 	/// Renders the image by setting the color of each pixel according to Monte Carlo 
@@ -48,4 +63,7 @@ private:
 
 	/// <summary> Discretizes the color of each pixel. </summary>
 	void CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD = 1.25f);
+
+	// PhotonMap
+	PhotonMap photonMap;
 };

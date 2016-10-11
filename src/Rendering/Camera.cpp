@@ -16,6 +16,15 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 	discretizedPixels.assign(width, std::vector<glm::u8vec3>(height));
 }
 
+void Camera::GeneratePhotonMap(const Scene & scene,
+							   const unsigned int photonsPerLightSource,
+							   const unsigned int maxPhotonsPerNode,
+							   const float minSizeOfNodeBox,
+							   const unsigned int MAX_DEPTH) {
+	photonMap.CreatePhotonMap(scene, photonsPerLightSource, maxPhotonsPerNode,
+							  minSizeOfNodeBox, MAX_DEPTH);
+}
+
 void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					const unsigned int RAY_MAX_DEPTH, const unsigned int RAY_MAX_BOUNCE,
 					const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
@@ -43,7 +52,6 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 	/* Initialize ray components. */
 	Ray ray;
 	const glm::vec3 cameraPlaneNormal = -glm::normalize(glm::cross(c1 - c2, c1 - c4));
-
 #ifdef __LOG_ITERATIONS
 	long long ctr = 0;
 #endif // __LOG_ITERATIONS
@@ -54,8 +62,7 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 			if (++ctr % 10000 == 0) {
 				std::cout << ctr << "/" << width * height << " pixels." << std::endl;
 			}
-#endif // __LOG_ITERATIONS
-
+#endif // __LOG_ITERATIONS	
 			/* Shoot a bunch of rays through the pixel (y, z), and accumulate color. */
 			glm::vec3 colorAccumulator = glm::vec3(0, 0, 0);
 			for (float c = 0; c < invWidth; c += cstep) {
@@ -72,6 +79,19 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					const glm::vec3 planePosition(nx, ny, nz); // The camera plane intersection position.
 					ray.dir = glm::normalize(planePosition - eye);
 					ray.from = planePosition;
+
+					// Direct visualization of photon map.
+					/*unsigned int intrendgroupidx;
+					unsigned int intprimidx;
+					float intdist;
+					if (scene.RayCast(ray, intrendgroupidx, intprimidx, intdist)) {
+						std::vector<Photon*> photons = photonMap.GetPhotonsAtPosition(ray.from + intdist*ray.dir);
+						if (photons.size() > 0) {
+							for (unsigned int pi = 0; pi < photons.size(); ++pi) {
+								colorAccumulator += photons[pi]->color;// glm::dot(ray.from, cameraPlaneNormal) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+							}
+						}
+					}*/
 
 					/* Trace ray through the scene. */
 					colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);

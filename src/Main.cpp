@@ -10,6 +10,7 @@
 #include "Rendering\Camera.h"
 #include "Utility\Math.h"
 #include "Scene\SceneObjectFactory.h"
+#include "PhotonMap\PhotonMap.h"
 
 using namespace std;
 
@@ -47,9 +48,11 @@ int main()
 	// SceneObjectFactory::AddSphere(scene, 10, 0, 2, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	// SceneObjectFactory::AddSphere(scene, 7, -3, 3, 1.5f, glm::vec3(0.0f, 1.0f, 0.0f));
 	// SceneObjectFactory::AddOrenNayarSphere(scene, 6, 3, 0, 1.5f, glm::vec3(1.0f, 0.35f, 1.0f));
+
 	SceneObjectFactory::AddSphere(scene, 5, -3, 1.5f, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
 	SceneObjectFactory::AddSphere(scene, 6, 0, -0.5f, 1.25f, glm::vec3(0.0f, 1.0f, 0.0f));
 	SceneObjectFactory::AddSphere(scene, 5, 3, -2, 1.25f, glm::vec3(0.0f, 0.0f, 1.0f));
+
 	// SceneObjectFactory::AddTetrahedron(scene, 7, 0, 3, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	/* Lights. */
@@ -60,6 +63,9 @@ int main()
 
 	/* Initialize scene. */
 	scene.Initialize();
+
+	/* Generate PhotonMap. */
+	//c.GeneratePhotonMap(scene);
 
 	/* Render scene. */
 	c.Render(scene, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT, glm::vec3(-7, 0, 0)); // Keep number of rays N so that you can write N as N = X^2 for some integer X.

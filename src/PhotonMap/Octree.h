@@ -40,8 +40,8 @@ public:
 	/// </summary>
 	/// <param name='scene'> The scene. </param>
 	/// <param name='maxPhotonsPerNode'> The maximum amount of photons per node. </param>
-	/// <param name='minSizeOfNodeBox'> The minimum width, height and depth of a nodes box size. </param>
-	void SetUpOctree(const Scene & scene, const unsigned int maxPhotonsPerNode, const float minSizeOfNodeBox);
+	/// <param name='maxSizeOfNodeBox'> The maximum width, height and depth of a nodes box size. </param>
+	void SetUpOctree(const Scene & scene, const unsigned int maxPhotonsPerNode, const float maxSizeOfNodeBox);
 
 	/// <summary> 
 	/// Returns the node closest to the given world position.
