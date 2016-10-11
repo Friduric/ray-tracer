@@ -37,7 +37,7 @@ void PhotonMap::CreatePhotonMap(const Scene & scene, const unsigned int PHOTONS_
 					Primitive * prim = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
 					Material * material = scene.renderGroups[intersectionRenderGroupIdx].material;
 					glm::vec3 intersectionNormal = prim->GetNormal(intersectionPosition);
-					glm::vec3 rayReflection = glm::reflect(ray.dir, intersectionNormal);
+					glm::vec3 rayReflection = Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
 					photonRadiance = material->CalculateDiffuseLighting(ray.dir, rayReflection, intersectionNormal, photonRadiance);
 					octree.photons.push_back(Photon(intersectionPosition, ray.dir, photonRadiance));
 					ray.from = intersectionPosition;
