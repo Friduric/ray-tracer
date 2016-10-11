@@ -153,6 +153,7 @@
     <Text Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Geometry\AABB.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Geometry\Ray.cpp" />
     <ClCompile Include="src\PhotonMap\Octree.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="src\Utility\Math.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Geometry\AABB.h" />
     <ClInclude Include="src\Geometry\Primitive.h" />
     <ClInclude Include="src\Geometry\Ray.h" />
     <ClInclude Include="src\PhotonMap\Octree.h" />
