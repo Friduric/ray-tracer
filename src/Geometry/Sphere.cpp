@@ -14,19 +14,15 @@ glm::vec3 Sphere::GetCenter() const {
 	return center;
 }
 
-glm::vec3 Sphere::GetRandomPositionOnSurface() const
-{
+glm::vec3 Sphere::GetRandomPositionOnSurface() const {
 	int direction = (rand() & 1) == 0 ? -1 : 1;
 	return center + radius * Math::CosineWeightedHemisphereSampleDirection(glm::vec3(0, 0, direction));
 }
 
-glm::vec3 Sphere::GetAxisAlignedBoundingBox(float & minX, float & maxX, float & minY, float & maxY, float & minZ, float & maxZ) const
-{
-	return glm::vec3();
-}
-
-glm::vec3 Sphere::ComputeOutgoingPosition(const glm::vec3 & incomingPosition, const glm::vec3 & incomingDirection, const float refractionIndexOfIncomingMedium, const Material & material) const {
-	return glm::vec3();
+AABB Sphere::GetAxisAlignedBoundingBox() const {
+	glm::vec3 minimum(center.x - radius, center.y - radius, center.z - radius);
+	glm::vec3 maximum(center.x + radius, center.y + radius, center.z + radius);
+	return AABB(minimum, maximum);
 }
 
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
@@ -47,9 +43,5 @@ bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) cons
 	}
 
 	intersectionDistance = -b - sqrt(d);
-	if (intersectionDistance < FLT_EPSILON) {
-		return false;
-	}
-	assert(intersectionDistance > FLT_EPSILON);
-	return true;
+	return intersectionDistance > FLT_EPSILON;
 }

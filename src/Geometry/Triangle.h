@@ -16,13 +16,7 @@ public:
 	glm::vec3 GetNormal(const glm::vec3 & position) const override;
 	glm::vec3 GetCenter() const override;
 	glm::vec3 GetRandomPositionOnSurface() const override;
-	glm::vec3 GetAxisAlignedBoundingBox(float & minX, float & maxX,
-										float & minY, float & maxY,
-										float & minZ, float & maxZ) const override;
-	glm::vec3 ComputeOutgoingPosition(const glm::vec3 & incomingPosition,
-									  const glm::vec3 & incomingDirection,
-									  const float refractionIndexOfIncomingMedium,
-									  const Material & material) const override;
+	AABB GetAxisAlignedBoundingBox() const override;
 
 	/// <summary> 
 	/// Computes the ray intersection point between a ray and this triangle.
