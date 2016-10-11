@@ -17,12 +17,12 @@ Camera::Camera(const int _width, const int _height) : width(_width), height(_hei
 }
 
 void Camera::GeneratePhotonMap(const Scene & scene,
-							   const unsigned int photonsPerLightSource,
-							   const unsigned int maxPhotonsPerNode,
-							   const float minSizeOfNodeBox,
+							   const unsigned int PHOTONS_PER_LIGHT_SOURCE,
+							   const unsigned int MAX_PHOTONS_PER_NODE,
+							   const float MAXIMUM_NODE_BOX_DIMENSION,
 							   const unsigned int MAX_DEPTH) {
-	photonMap.CreatePhotonMap(scene, photonsPerLightSource, maxPhotonsPerNode,
-							  minSizeOfNodeBox, MAX_DEPTH);
+	photonMap.CreatePhotonMap(scene, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
+							  MAXIMUM_NODE_BOX_DIMENSION, MAX_DEPTH);
 }
 
 void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
@@ -81,20 +81,20 @@ void Camera::Render(const Scene & scene, const unsigned int RAYS_PER_PIXEL,
 					ray.from = planePosition;
 
 					// Direct visualization of photon map.
-					/*unsigned int intrendgroupidx;
+					unsigned int intrendgroupidx;
 					unsigned int intprimidx;
 					float intdist;
 					if (scene.RayCast(ray, intrendgroupidx, intprimidx, intdist)) {
 						std::vector<Photon*> photons = photonMap.GetPhotonsAtPosition(ray.from + intdist*ray.dir);
 						if (photons.size() > 0) {
 							for (unsigned int pi = 0; pi < photons.size(); ++pi) {
-								colorAccumulator += photons[pi]->color;// glm::dot(ray.from, cameraPlaneNormal) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+								colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * photons[pi]->color;
 							}
 						}
-					}*/
+					}
 
 					/* Trace ray through the scene. */
-					colorAccumulator += glm::dot(ray.from, cameraPlaneNormal) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+					// colorAccumulator += std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal)) * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 				}
 			}
 

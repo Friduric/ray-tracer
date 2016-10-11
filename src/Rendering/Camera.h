@@ -21,14 +21,14 @@ public:
 	/// Generates a photonmap that can be used during rendering.
 	/// </summary>
 	/// <param name='scene'> The scene. </param>
-	/// <param name='photonsPerLightSource'> The amount of photons used per light source. </param>
-	/// <param name='maxPhotonsPerNode'> The maximum amount of photons per node. </param>
-	/// <param name='maxSizeOfNodeBox'> The maximum width, height and depth of a nodes box size. </param>
+	/// <param name='PHOTONS_PER_LIGHT_SOURCE'> The amount of photons used per light source. </param>
+	/// <param name='MAX_PHOTONS_PER_NODE'> The maximum amount of photons per node. </param>
+	/// <param name='MAXIMUM_NODE_BOX_DIMENSION'> The maximum width, height and depth of a nodes box size. </param>
 	/// <param name='MAX_DEPTH'> The amount of times each photon will bounce at most. </param>
 	void GeneratePhotonMap(const Scene & scene,
-						   const unsigned int photonsPerLightSource = 200000,
-						   const unsigned int maxPhotonsPerNode = 100,
-						   const float maxSizeOfNodeBox = 0.1f,
+						   const unsigned int PHOTONS_PER_LIGHT_SOURCE = 200000,
+						   const unsigned int MAX_PHOTONS_PER_NODE = 100,
+						   const float MAXIMUM_NODE_BOX_DIMENSION = 0.1f,
 						   const unsigned int MAX_DEPTH = 5);
 
 	/// <summary>
