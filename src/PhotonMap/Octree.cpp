@@ -5,12 +5,21 @@
 #include "../../includes/glm/gtx/norm.hpp"
 #include "Octree.h"
 
-Octree::Octree(const std::vector<Photon> & container,
-						 const unsigned int maxPhotonsPerNode,
-						 const float maxSizeOfNodeBox, const AABB & aabb) : root(new OctreeNode(aabb)){
+Octree::Octree(const std::vector<Photon> & _directPhotons,
+			   const std::vector<Photon> & _indirectPhotons,
+			   const std::vector<Photon> & _shadowPhotons,
+			   const unsigned int maxPhotonsPerNode,
+			   const float maxSizeOfNodeBox, const AABB & aabb) : root(new OctreeNode(aabb)) {
 	// Add all photons to the root	
-	for (unsigned int n = 0; n < container.size(); ++n) {
-		root->dataPointers.push_back(&container[n]);
+
+	for (unsigned int n = 0; n < _directPhotons.size(); ++n) {
+		root->directPhotons.push_back(&_directPhotons[n]);
+	}
+	for (unsigned int n = 0; n < _indirectPhotons.size(); ++n) {
+		root->indirectPhotons.push_back(&_indirectPhotons[n]);
+	}
+	for (unsigned int n = 0; n < _shadowPhotons.size(); ++n) {
+		root->shadowPhotons.push_back(&_shadowPhotons[n]);
 	}
 
 	std::queue<OctreeNode*> nodeQueue;
@@ -19,6 +28,9 @@ Octree::Octree(const std::vector<Photon> & container,
 	float nodeXHalf, nodeYHalf, nodeZHalf;
 	float nodeXMin, nodeYMin, nodeZMin;
 	float nodeXMax, nodeYMax, nodeZMax;
+
+
+	int counter = 0;
 	// While there are nodes left in the queue divide into 8 subnodes.
 	while (!nodeQueue.empty()) {
 		OctreeNode* currentNode = nodeQueue.front();
@@ -30,8 +42,11 @@ Octree::Octree(const std::vector<Photon> & container,
 		// If the amount of photons in the node is larger than/equal to maxPhotonsPerNode,
 		// and if all sides of the node box is larger than maxSizeOfNodeBox,
 		// then split the node into 8 new nodes.
-		if (currentNode->dataPointers.size() >= maxPhotonsPerNode || maxSizeOfNodeBox <= nodeWidth ||
-			maxSizeOfNodeBox <= nodeHeight || maxSizeOfNodeBox <= nodeDepth) {
+		unsigned int currentTotalPhotons = currentNode->directPhotons.size() + currentNode->indirectPhotons.size() + currentNode->shadowPhotons.size();
+		if (currentTotalPhotons < maxPhotonsPerNode) {
+			continue;
+		}
+		if (maxSizeOfNodeBox <= nodeWidth || maxSizeOfNodeBox <= nodeHeight || maxSizeOfNodeBox <= nodeDepth) {
 			nodeXHalf = 0.5f * nodeWidth;
 			nodeYHalf = 0.5f * nodeHeight;
 			nodeZHalf = 0.5f * nodeDepth;
@@ -53,7 +68,7 @@ Octree::Octree(const std::vector<Photon> & container,
 						newNode->axisAlignedBoundingBox.maximum.y = nodeYMax;
 						newNode->axisAlignedBoundingBox.minimum.z = nodeZMin;
 						newNode->axisAlignedBoundingBox.maximum.z = nodeZMax;
-						newNode->AddDataTypesInsideAABB(currentNode->dataPointers);
+						newNode->AddDataTypesInsideAABB(currentNode->directPhotons, currentNode->indirectPhotons, currentNode->shadowPhotons);
 						currentNode->children[idxCounter] = newNode;
 						nodeQueue.push(newNode);
 						idxCounter++;
@@ -79,13 +94,27 @@ void Octree::DeleteRecursive(OctreeNode* node) {
 	}
 }
 
-void Octree::OctreeNode::AddDataTypesInsideAABB(const std::vector<Photon const*> & photons) {
+void Octree::OctreeNode::AddDataTypesInsideAABB(const std::vector<Photon const*> & _directPhotons,
+												const std::vector<Photon const*> & _indirectPhotons,
+												const std::vector<Photon const*> & _shadowPhotons) {
 
 	// Find and add all photons inside the box of this node.
-	for (unsigned int i = 0; i < photons.size(); ++i) {
-		const glm::vec3 & pos = photons[i]->position;
-		if (axisAlignedBoundingBox.IsPointInsideAABB(pos)) {
-			dataPointers.push_back(photons[i]);
+	// Direct photons
+	for (auto dp : _directPhotons) {
+		if (axisAlignedBoundingBox.IsPointInsideAABB(dp->position)) {
+			directPhotons.push_back(dp);
+		}
+	}
+	// Indirect photons
+	for (auto ip : _indirectPhotons) {
+		if (axisAlignedBoundingBox.IsPointInsideAABB(ip->position)) {
+			indirectPhotons.push_back(ip);
+		}
+	}
+	// Shadow photons
+	for (auto sp : _shadowPhotons) {
+		if (axisAlignedBoundingBox.IsPointInsideAABB(sp->position)) {
+			indirectPhotons.push_back(sp);
 		}
 	}
 }
@@ -112,7 +141,7 @@ Octree::OctreeNode* Octree::GetNodeClosestToPosition(const glm::vec3 & pos) cons
 Octree::OctreeNode::OctreeNode() {
 }
 
-Octree::OctreeNode::OctreeNode(AABB _aabb) : axisAlignedBoundingBox(_aabb){}
+Octree::OctreeNode::OctreeNode(AABB _aabb) : axisAlignedBoundingBox(_aabb) {}
 
 bool Octree::OctreeNode::IsLeaf() const {
 	return children[0] == NULL;

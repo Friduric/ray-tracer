@@ -94,7 +94,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }
 
-glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
+glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const glm::vec3 & cameraPlaneNormal, const unsigned int bouncesPerHit, const unsigned int depth) const {
 	if (depth == 0) { return glm::vec3(0, 0, 0); }
 
 	assert(depth > 0);
@@ -135,8 +135,15 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);	
 	}
 	// Add indirect light from photons
+	const float rayFactor = std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal));
+	const auto & indirPhotons = photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+	float photonDistance;
+	for (const Photon * ip : indirPhotons) {
+		photonDistance = glm::distance(intersectionPoint, ip->position);
+		colorAccumulator += rayFactor*ip->color / photonDistance;
+	}
 
-	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
+	return (1.0f / (float)bouncesPerHit) *colorAccumulator;
 }
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
