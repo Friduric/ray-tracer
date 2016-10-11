@@ -151,14 +151,6 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 
 		renderGroups.push_back(wall6);
 	}
-
-	// Set min and max values, "magic constants" based on vertices above.
-	if (scene.xMin > -3.0f) { scene.xMin = -3.0f; }
-	if (scene.xMax < 13.0f) { scene.xMax = 13.0f; }
-	if (scene.yMin > -6.0f) { scene.yMin = -6.0f; }
-	if (scene.yMax < 6.0f) { scene.yMax = 6.0f; }
-	if (scene.zMin > -5.0f) { scene.zMin = -5.0f; }
-	if (scene.zMax < 5.0f) { scene.zMax = 5.0f; }
 }
 
 void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, float z,
@@ -174,14 +166,6 @@ void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, flo
 	RenderGroup sphereGroup(sphereMaterial);
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
 	renderGroups.push_back(sphereGroup);
-
-	// Set min and max values
-	if (scene.xMin > -3.0f) { scene.xMin = -3.0f; }
-	if (scene.xMax < 13.0f) { scene.xMax = 13.0f; }
-	if (scene.yMin > -6.0f) { scene.yMin = -6.0f; }
-	if (scene.yMax < 6.0f) { scene.yMax = 6.0f; }
-	if (scene.zMin > -5.0f) { scene.zMin = -5.0f; }
-	if (scene.zMax < 5.0f) { scene.zMax = 5.0f; }
 }
 
 void SceneObjectFactory::AddTriangle(Scene & scene, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,

@@ -1,5 +1,7 @@
 #include "AABB.h"
 
+AABB::AABB() : AABB(-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f) {}
+
 AABB::AABB(const glm::vec3 _min, const glm::vec3 _max) : minimum(_min), maximum(_max) {}
 
 AABB::AABB(const float minX, const float minY, const float minZ,

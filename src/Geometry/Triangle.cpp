@@ -2,15 +2,6 @@
 
 #include "../../includes/glm/gtx/norm.hpp"
 
-namespace {
-	constexpr float min3(float x, float y, float z) {
-		return glm::min<float>(x, glm::min<float>(y, z));
-	}
-	constexpr float max3(float x, float y, float z) {
-		return glm::max<float>(x, glm::max<float>(y, z));
-	}
-}
-
 Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 _normal) :
 	vertices{ v1,v2,v3 }, normal(_normal) { }
 
@@ -45,14 +36,14 @@ AABB Triangle::GetAxisAlignedBoundingBox() const {
 	const auto & v2 = vertices[2];
 
 	glm::vec3 minimum;
-	minimum.x = min3(v0.x, v1.x, v2.x);
-	minimum.y = min3(v0.y, v1.y, v2.y);
-	minimum.z = min3(v0.z, v1.z, v2.z);
+	minimum.x = glm::min<float>(v0.x, glm::min<float>(v1.x, v2.x));
+	minimum.y = glm::min<float>(v0.y, glm::min<float>(v1.y, v2.y));
+	minimum.z = glm::min<float>(v0.z, glm::min<float>(v1.z, v2.z));
 
 	glm::vec3 maximum;
-	maximum.x = max3(v0.x, v1.x, v2.x);
-	maximum.y = max3(v0.y, v1.y, v2.y);
-	maximum.z = max3(v0.z, v1.z, v2.z);
+	maximum.x = glm::max<float>(v0.x, glm::max<float>(v1.x, v2.x));
+	maximum.y = glm::max<float>(v0.y, glm::max<float>(v1.y, v2.y));
+	maximum.z = glm::max<float>(v0.z, glm::max<float>(v1.z, v2.z));
 
 	return AABB(minimum, maximum);
 }

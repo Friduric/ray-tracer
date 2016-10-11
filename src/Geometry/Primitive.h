@@ -13,11 +13,6 @@ public:
 	virtual glm::vec3 GetRandomPositionOnSurface() const = 0;
 	virtual AABB GetAxisAlignedBoundingBox() const = 0;
 
-	/// <summary> Calculates the outgoing ray position. </summary>
-	virtual glm::vec3 ComputeOutgoingPosition(const glm::vec3 & incomingPosition,
-											  const glm::vec3 & incomingDirection,
-											  const float refractionIndexOfIncomingMedium,
-											  const Material & material) const = 0;
 	/// <summary> 
 	/// Computes the ray intersection point.
 	/// Returns true if there is an intersection.
