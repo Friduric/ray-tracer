@@ -1,6 +1,8 @@
 #pragma once
 
 #include "glm.hpp"
+
+#include "AABB.h"
 #include "../Rendering/Materials/Material.h"
 #include "Ray.h"
 
@@ -9,9 +11,7 @@ public:
 	virtual glm::vec3 GetNormal(const glm::vec3 & position) const = 0;
 	virtual glm::vec3 GetCenter() const = 0;
 	virtual glm::vec3 GetRandomPositionOnSurface() const = 0;
-	virtual glm::vec3 GetAxisAlignedBoundingBox(float & outMinX, float & outMaxX,
-												float & outMinY, float & outMaxY,
-												float & outMinZ, float & outMaxZ) const = 0;
+	virtual AABB GetAxisAlignedBoundingBox() const = 0;
 
 	/// <summary> Calculates the outgoing ray position. </summary>
 	virtual glm::vec3 ComputeOutgoingPosition(const glm::vec3 & incomingPosition,

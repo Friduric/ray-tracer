@@ -9,6 +9,7 @@
 #include "../Rendering/RenderGroup.h"
 #include "../Geometry/Triangle.h"
 #include "../PhotonMap/PhotonMap.h"
+#include "../Geometry/AABB.h"
 
 class Scene {
 public:
@@ -18,8 +19,7 @@ public:
 	std::vector<RenderGroup*> emissiveRenderGroups;
 
 	/// <summary> Boundaries of the scene. </summary>
-	float xMin, yMin, zMin = FLT_MAX*0.5f;
-	float xMax, yMax, zMax = -FLT_MAX*0.5f;
+	AABB axisAlignedBoundingBox;
 
 	/// <summary> Photon Map. </summary>
 	PhotonMap photonMap;

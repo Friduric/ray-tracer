@@ -16,8 +16,7 @@ glm::vec3 Triangle::GetCenter() const {
 	return (vertices[0] + vertices[1] + vertices[2]) / 3.0f;
 }
 
-glm::vec3 Triangle::GetRandomPositionOnSurface() const
-{
+glm::vec3 Triangle::GetRandomPositionOnSurface() const {
 	glm::vec3 v;
 	float a1, a2, a3;
 	float quadArea = glm::length(glm::cross(vertices[0] - vertices[1], vertices[0] - vertices[2]));
@@ -33,12 +32,8 @@ glm::vec3 Triangle::GetRandomPositionOnSurface() const
 	return v;
 }
 
-glm::vec3 Triangle::GetAxisAlignedBoundingBox(float & minX, float & maxX, float & minY, float & maxY, float & minZ, float & maxZ) const
-{
-	return glm::vec3();
-}
-
-glm::vec3 Triangle::ComputeOutgoingPosition(const glm::vec3 & incomingPosition, const glm::vec3 & incomingDirection, const float refractionIndexOfIncomingMedium, const Material & material) const {
+glm::vec3 Triangle::GetAxisAlignedBoundingBox(float & minX, float & maxX, float & minY,
+											  float & maxY, float & minZ, float & maxZ) const {
 	return glm::vec3();
 }
 
@@ -68,9 +63,5 @@ bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) co
 	}
 
 	intersectionDistance = inv_den * dot(E2, Q);
-	if (intersectionDistance < FLT_EPSILON) {
-		return false;
-	}
-
-	return true;
+	return intersectionDistance > FLT_EPSILON;
 }
