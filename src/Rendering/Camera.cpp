@@ -21,6 +21,13 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 					const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 					const glm::vec3 c3, const glm::vec3 c4) {
 
+	if (RENDERING_MODE != RenderingMode::MONTE_CARLO) {
+		if (scene.photonMap == nullptr) {
+			std::cerr << "The photon map for the scene has not yet been initialized! ";
+			std::cerr << "Impossible to render using the photon map." << std::endl;
+		}
+	}
+
 	std::cout << "Rendering the scene ..." << std::endl;
 	auto startTime = std::chrono::high_resolution_clock::now();
 

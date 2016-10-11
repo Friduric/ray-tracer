@@ -45,9 +45,9 @@ void Scene::Initialize() {
 			minimumPosition.x = glm::min<float>(min.x, minimumPosition.x);
 			minimumPosition.y = glm::min<float>(min.y, minimumPosition.y);
 			minimumPosition.z = glm::min<float>(min.z, minimumPosition.z);
-			maximumPosition.x = glm::min<float>(max.x, maximumPosition.x);
-			maximumPosition.y = glm::min<float>(max.y, maximumPosition.y);
-			maximumPosition.z = glm::min<float>(max.z, maximumPosition.z);
+			maximumPosition.x = glm::max<float>(max.x, maximumPosition.x);
+			maximumPosition.y = glm::max<float>(max.y, maximumPosition.y);
+			maximumPosition.z = glm::max<float>(max.z, maximumPosition.z);
 		}
 	}
 

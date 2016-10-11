@@ -22,7 +22,7 @@ public:
 	AABB axisAlignedBoundingBox;
 
 	/// <summary> Photon Map. </summary>
-	PhotonMap* photonMap;
+	PhotonMap* photonMap = nullptr;
 
 	/// <summary> Call this after all primitives has been added to the scene (pre-render). </summary>
 	void Initialize();
@@ -41,8 +41,8 @@ public:
 	/// Traces a ray through the scene and returns a color, using photon map.
 	/// </summary>
 	glm::vec3 TraceRayUsingPhotonMap(const Ray & ray,
-					   const unsigned int BOUNCES_PER_HIT = 1,
-					   const unsigned int MAX_DEPTH = 5) const;
+									 const unsigned int BOUNCES_PER_HIT = 1,
+									 const unsigned int MAX_DEPTH = 5) const;
 
 	/// <summary> 
 	/// Casts a ray through the scene. Returns true if the was an intersection.
