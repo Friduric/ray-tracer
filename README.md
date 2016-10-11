@@ -2,7 +2,7 @@
 A Monte Carlo ray tracer implementation using photon mapping. 
 
 Currently supports:
-- Intransparent material using Oren-Nayar and Lambertian BRDFs.
+- Intransparent materials using Oren-Nayar and Lambertian BRDFs.
 - Photon mapping to increase performance and approximate indirect lighting.
 
 ## Sample images
