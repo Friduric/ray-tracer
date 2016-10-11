@@ -53,8 +53,8 @@ const AABB & Triangle::GetAxisAlignedBoundingBox() const {
 }
 
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
-bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) const {
-	if (glm::dot(ray.dir, normal) > -FLT_EPSILON) {
+bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance, bool cullBackFace) const {
+	if (cullBackFace && glm::dot(ray.dir, normal) > -FLT_EPSILON) {
 		return false; // The ray direction and normal are in the same direction (behind).
 	}
 

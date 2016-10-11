@@ -22,5 +22,5 @@ public:
 	/// <param name='intersectionPoint'> 
 	/// The distance to the intersection point (if there is an intersection). 
 	/// </param>
-	virtual bool RayIntersection(const Ray& ray, float & intersectionDistance) const = 0;
+	virtual bool RayIntersection(const Ray& ray, float & intersectionDistance, bool cullBackFace = true) const = 0;
 };

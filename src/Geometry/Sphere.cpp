@@ -25,8 +25,8 @@ const AABB & Sphere::GetAxisAlignedBoundingBox() const {
 	return axisAlignedBoundingBox;
 }
 
-bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
-	if (dot(ray.dir, GetNormal(ray.from)) > -FLT_EPSILON) {
+bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance, bool cullBackFace) const {
+	if (cullBackFace && dot(ray.dir, GetNormal(ray.from)) > -FLT_EPSILON) {
 		return false; // The ray direction and normal are in the same direction (behind).
 	}
 
