@@ -20,16 +20,18 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 					const unsigned int RAY_MAX_DEPTH, const unsigned int RAY_MAX_BOUNCE,
 					const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 					const glm::vec3 c3, const glm::vec3 c4) {
+
+	/* Default error checks. */
 	if (RENDERING_MODE != RenderingMode::MONTE_CARLO) {
 		if (scene.photonMap == nullptr) {
-			std::cerr << "The photon map for the scene has not yet been initialized! ";
+			std::cerr << "The photon map for the scene has not yet been generated! ";
 			std::cerr << "Impossible to render using the photon map." << std::endl;
 			return;
 		}
 	}
 
 	std::cout << "Rendering the scene ..." << std::endl;
-	auto startTime = std::chrono::high_resolution_clock::now();
+	const auto startTime = std::chrono::high_resolution_clock::now();
 
 	/* Initialize random engines. */
 	std::random_device rd;
@@ -67,7 +69,7 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 			for (float c = 0; c < invWidth; c += cstep) {
 				for (float r = 0; r < invHeight; r += rstep) {
 
-					/* Calculate new randomized point in the camera plane. */
+					/* Calculate new randomized point in the camera plane using stratified sampling. */
 					const float ylerp = (y + c + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * invWidth;
 					const float zlerp = (z + r + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * invHeight;
 					const float nx = Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
@@ -108,9 +110,8 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 		}
 	}
 
-	auto endTime = std::chrono::high_resolution_clock::now();
-
-	auto took = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
+	const auto endTime = std::chrono::high_resolution_clock::now();
+	const auto took = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
 	std::cout << "Rendering finished and took: " << (took / 1000.0) << " seconds." << std::endl;
 
 	/* Create the final discretized image from float the values. */
