@@ -14,6 +14,6 @@ public:
 private:
 	glm::vec3 emissionColor;
 	glm::vec3 surfaceColor;
-	float roughness = 1.0f;
+	float roughness = 0.1f;
 	float albedo = 0.98f;
 };
