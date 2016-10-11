@@ -3,11 +3,11 @@ A Monte Carlo ray tracer implementation.
 
 ## Sample images
 
-This is the second image that was rendered by this ray tracer (4k rays, using only Lambertian reflections) after about 4 days of coding:
+This is the second image that was rendered by this ray tracer after about 4 days of coding:
 <p align="center">
 <img src="https://github.com/Friduric/raytracer/blob/master/second_lambertian_test.png" width="400" height="400">
 </p>
-This is the first image that was rendered by this ray tracer (10k rays, using only Lambertian reflections) after about 2 days of coding: 
+This is the first image that was rendered by this ray tracer after about 2 days of coding: 
 <p align="center">
 <img src="https://github.com/Friduric/raytracer/blob/master/first_lambertian_test.png" width="400" height="400">
 </p>
