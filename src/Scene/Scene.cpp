@@ -126,20 +126,22 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const glm::vec3 & camer
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	// Only cast against light sources for direct light
 	for (unsigned int i = 0; i < emissiveRenderGroups.size(); ++i) {
-		glm::vec3 surfPos = emissiveRenderGroups[i]->primitives[i]->GetRandomPositionOnSurface();
+		glm::vec3 surfPos = emissiveRenderGroups[i]->primitives[i]->GetRandomPositionOnSurface();//GetCenter();// 
 		glm::vec3 reflectionDirection = glm::normalize(surfPos - intersectionPoint);// = Math::RandomHemishpereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		Ray reflectedRay(intersectionPoint, reflectionDirection);
-		//const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
-		//colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);	
+		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
 	}
 	// Add indirect light from photons
+	const auto & allIndirPhotons = photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+	std::vector<Photon const*> closestIndirPhotons;
+	photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allIndirPhotons, intersectionPoint, 10, closestIndirPhotons);
 	const float rayFactor = std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal));
-	const auto & indirPhotons = photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
 	float photonDistance;
-	for (const Photon * ip : indirPhotons) {
-		photonDistance = glm::distance(intersectionPoint, ip->position);
-		colorAccumulator += rayFactor*ip->color / photonDistance;
+	for (const Photon * ip : closestIndirPhotons) {
+		//photonDistance = glm::distance(intersectionPoint, ip->position);
+		//colorAccumulator += 0.01f*rayFactor*ip->color;// / photonDistance;
 	}
 
 	return (1.0f / (float)bouncesPerHit) *colorAccumulator;
