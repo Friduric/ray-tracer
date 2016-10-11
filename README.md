@@ -30,3 +30,5 @@ This is the first image that was rendered by this ray tracer after about 2 days 
   - Change Linker -> Debugging -> Generate Program Database File to: "$(TargetDir)$(TargetName).pdb"
 
 - OPTIONAL: Adding /FORCE:MULTIPLE to the Linker command line helps remove errors LNK1169 and LNK2005.
+
+Tags: TNCG15, Linköping University, Global Illumination, Advanced Rendering, Computer-Graphics, TSBK03, TSBK07
