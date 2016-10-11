@@ -6,7 +6,11 @@
 using namespace glm;
 
 Sphere::Sphere(vec3 _center, float _radius) :
-	Primitive(), center(_center), radius(_radius) {}
+	Primitive(), center(_center), radius(_radius) {
+	glm::vec3 minimum(center.x - radius, center.y - radius, center.z - radius);
+	glm::vec3 maximum(center.x + radius, center.y + radius, center.z + radius);
+	axisAlignedBoundingBox = AABB(minimum, maximum);
+}
 
 glm::vec3 Sphere::GetNormal(const glm::vec3 & position) const { return glm::normalize(position - center); }
 
@@ -17,10 +21,8 @@ glm::vec3 Sphere::GetRandomPositionOnSurface() const {
 	return center + radius * Math::CosineWeightedHemisphereSampleDirection(glm::vec3(0, 0, direction));
 }
 
-AABB Sphere::GetAxisAlignedBoundingBox() const {
-	glm::vec3 minimum(center.x - radius, center.y - radius, center.z - radius);
-	glm::vec3 maximum(center.x + radius, center.y + radius, center.z + radius);
-	return AABB(minimum, maximum);
+const AABB & Sphere::GetAxisAlignedBoundingBox() const {
+	return axisAlignedBoundingBox;
 }
 
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {

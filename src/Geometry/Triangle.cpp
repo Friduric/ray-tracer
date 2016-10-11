@@ -2,12 +2,30 @@
 
 #include "../../includes/glm/gtx/norm.hpp"
 
+// Default constructor.
 Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 _normal) :
-	vertices{ v1,v2,v3 }, normal(_normal) { }
+	vertices{ v1,v2,v3 }, normal(_normal) {
 
-Triangle::Triangle(glm::vec3 _vertices[3], glm::vec3 _normal) : normal(_normal) {
-	for (unsigned int i = 0; i < 3; ++i) { vertices[i] = _vertices[i]; }
+	const auto & v0 = vertices[0];
+	const auto & v1 = vertices[1];
+	const auto & v2 = vertices[2];
+
+	glm::vec3 minimum;
+	minimum.x = glm::min<float>(v0.x, glm::min<float>(v1.x, v2.x));
+	minimum.y = glm::min<float>(v0.y, glm::min<float>(v1.y, v2.y));
+	minimum.z = glm::min<float>(v0.z, glm::min<float>(v1.z, v2.z));
+
+	glm::vec3 maximum;
+	maximum.x = glm::max<float>(v0.x, glm::max<float>(v1.x, v2.x));
+	maximum.y = glm::max<float>(v0.y, glm::max<float>(v1.y, v2.y));
+	maximum.z = glm::max<float>(v0.z, glm::max<float>(v1.z, v2.z));
+
+	axisAlignedBoundingBox = AABB(minimum, maximum);
 }
+
+// Shadowed.
+Triangle::Triangle(glm::vec3 _vertices[3], glm::vec3 _normal) :
+	Triangle(_vertices[0], _vertices[1], _vertices[2], _normal) { }
 
 glm::vec3 Triangle::GetNormal(const glm::vec3 & position) const { return normal; }
 
@@ -30,22 +48,8 @@ glm::vec3 Triangle::GetRandomPositionOnSurface() const {
 	return v;
 }
 
-AABB Triangle::GetAxisAlignedBoundingBox() const {
-	const auto & v0 = vertices[0];
-	const auto & v1 = vertices[1];
-	const auto & v2 = vertices[2];
-
-	glm::vec3 minimum;
-	minimum.x = glm::min<float>(v0.x, glm::min<float>(v1.x, v2.x));
-	minimum.y = glm::min<float>(v0.y, glm::min<float>(v1.y, v2.y));
-	minimum.z = glm::min<float>(v0.z, glm::min<float>(v1.z, v2.z));
-
-	glm::vec3 maximum;
-	maximum.x = glm::max<float>(v0.x, glm::max<float>(v1.x, v2.x));
-	maximum.y = glm::max<float>(v0.y, glm::max<float>(v1.y, v2.y));
-	maximum.z = glm::max<float>(v0.z, glm::max<float>(v1.z, v2.z));
-
-	return AABB(minimum, maximum);
+const AABB & Triangle::GetAxisAlignedBoundingBox() const {
+	return axisAlignedBoundingBox;
 }
 
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
