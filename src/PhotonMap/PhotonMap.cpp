@@ -52,9 +52,27 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 						directPhotons.push_back(Photon(intersectionPosition, ray.dir, photonRadiance));
 					}
 
-					// TODO: add shadow photons
+					// Add shadow photons
+					Ray shadowRay;
+					glm::vec3 shadowIntersectionPosition = intersectionPosition - 0.01f * prim->GetNormal(intersectionPosition);// Add space from it to not hit itself
+					shadowRay.from = shadowIntersectionPosition;
+					shadowRay.dir = ray.dir;
+					unsigned int shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx;
+					float shadowIntersectionDistance;
+					
+					// While we hit a surface keep casting and add shadow photons
+					while (true) {					
+						if (scene.RayCast(shadowRay, shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx, shadowIntersectionDistance)) {
+							shadowIntersectionPosition = shadowRay.from +  shadowIntersectionDistance* shadowRay.dir;
+						}
+						else {
+							break;
+						}
+						// Setup next ray based on previous
+						shadowRay.from = intersectionPosition + ;
+					}
 
-					ray.from = intersectionPosition;
+					ray.from = shadowIntersectionPosition;
 					ray.dir = rayReflection;
 				}
 				else {

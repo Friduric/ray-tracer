@@ -135,7 +135,7 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 	// if we should not trace this ray any further.
 	float r = (float)std::rand() / (float)RAND_MAX;
 	if (depth == 0 ||  r > 0.75f) { 
-		return CalculateDirectIlluminationAtPos(intersectionPoint, ray.dir, 
+		return CalculateDirectIlluminationAtPos(intersectionPoint, ray.dir,
 												*renderGroups[intersectionRenderGroupIndex].primitives[intersectionPrimitiveIndex], 
 												*renderGroups[intersectionRenderGroupIndex].material);
 	}
