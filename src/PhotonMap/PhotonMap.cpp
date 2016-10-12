@@ -28,7 +28,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			// Shoot photon in a random direction. 
 			ray.from = prim->GetRandomPositionOnSurface();
 			glm::vec3 normal = prim->GetNormal(ray.from);
-			ray.dir = Math::CosineWeightedHemisphereSampleDirection(normal);
+			ray.direction = Math::CosineWeightedHemisphereSampleDirection(normal);
 			glm::vec3 photonRadiance = lightSource->material->GetEmissionColor();
 
 			unsigned int intersectionRenderGroupIdx, intersectionPrimitiveIdx;
@@ -37,43 +37,43 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 				if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
 
 					// Save photon in the octree.
-					glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.dir;
+					glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.direction;
 					Primitive * prim = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
 					Material * material = scene.renderGroups[intersectionRenderGroupIdx].material;
 					glm::vec3 intersectionNormal = prim->GetNormal(intersectionPosition);
 					glm::vec3 rayReflection = Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
-					photonRadiance = material->CalculateDiffuseLighting(ray.dir, rayReflection, intersectionNormal, photonRadiance);
+					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
 					// Indirect photon if not on first cast
 					if (k > 0) {
-						indirectPhotons.push_back(Photon(intersectionPosition, ray.dir, photonRadiance));
+						indirectPhotons.push_back(Photon(intersectionPosition, ray.direction, photonRadiance));
 					}
 					else {
 						// else direct photon
-						directPhotons.push_back(Photon(intersectionPosition, ray.dir, photonRadiance));
+						directPhotons.push_back(Photon(intersectionPosition, ray.direction, photonRadiance));
 					}
 
 					// Add shadow photons
 					Ray shadowRay;
 					glm::vec3 shadowIntersectionPosition = intersectionPosition - 0.01f * prim->GetNormal(intersectionPosition);// Add space from it to not hit itself
 					shadowRay.from = shadowIntersectionPosition;
-					shadowRay.dir = ray.dir;
+					shadowRay.direction = ray.direction;
 					unsigned int shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx;
 					float shadowIntersectionDistance;
 					
 					// While we hit a surface keep casting and add shadow photons
-					while (true) {					
+					/*while (true) {					
 						if (scene.RayCast(shadowRay, shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx, shadowIntersectionDistance)) {
-							shadowIntersectionPosition = shadowRay.from +  shadowIntersectionDistance* shadowRay.dir;
+							shadowIntersectionPosition = shadowRay.from +  shadowIntersectionDistance* shadowRay.direction;
 						}
 						else {
 							break;
 						}
 						// Setup next ray based on previous
-						shadowRay.from = intersectionPosition + ;
-					}
+						shadowRay.from = intersectionPosition;
+					}*/
 
 					ray.from = shadowIntersectionPosition;
-					ray.dir = rayReflection;
+					ray.direction = rayReflection;
 				}
 				else {
 					break;

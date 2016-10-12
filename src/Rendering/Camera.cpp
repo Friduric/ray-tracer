@@ -78,7 +78,7 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 
 					/* Create ray. */
 					ray.from = glm::vec3(nx, ny, nz);
-					ray.dir = glm::normalize(ray.from - eye);
+					ray.direction = glm::normalize(ray.from - eye);
 					const float rayFactor = std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal));
 
 					/* Choose render mode. */
@@ -98,7 +98,7 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 						glm::vec3 intersectionPoint;
 						if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 							// direct photons
-							intersectionPoint = ray.from + intersectionDistance * ray.dir;
+							intersectionPoint = ray.from + intersectionDistance * ray.direction;
 							const auto & allDirPhotons = scene.photonMap->GetDirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
 							std::vector<Photon const*> closestDirPhotons;
 							scene.photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allDirPhotons, intersectionPoint, 10, closestDirPhotons);							
