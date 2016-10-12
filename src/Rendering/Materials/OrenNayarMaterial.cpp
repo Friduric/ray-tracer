@@ -9,7 +9,7 @@ OrenNayarMaterial::OrenNayarMaterial(glm::vec3 color, float _roughness, float _e
 									 float _reflectivity, float _transparency,
 									 float _refractiveIndex) :
 	surfaceColor(color), roughness(_roughness),
-	Material(_refractiveIndex, _transparency, _emissivity, _reflectivity) {}
+	Material(_emissivity, _reflectivity, _transparency, _refractiveIndex) {}
 
 glm::vec3 OrenNayarMaterial::GetSurfaceColor() const { return surfaceColor; }
 
