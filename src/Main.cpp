@@ -1,5 +1,6 @@
 #pragma once
 
+// Stdlib.
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -7,13 +8,21 @@
 #include <chrono>
 #include <iomanip>
 
+// Rendering.
 #include "Rendering\Camera.h"
+#include "Rendering\Renderers\Renderer.h"
+#include "Rendering\Renderers\MonteCarloRenderer.h"
+#include "Rendering\Renderers\PhotonMapRenderer.h"
+#include "Rendering\Renderers\PhotonMapVisualizer.h"
+
+// Other.
 #include "Utility\Math.h"
 #include "Scene\SceneObjectFactory.h"
-#include "PhotonMap\PhotonMap.h"
+#include "PhotonMap\PhotonMap.h" // TODO: Remove this.
 
-using namespace std;
+using namespace std; // TODO: Remove this.
 
+// Returns a tring that has information about current date and time.
 std::string CurrentDateTime() {
 	auto now = time(0);
 	struct tm tstruct;
@@ -29,8 +38,9 @@ int main()
 {
 	using cui = const unsigned int;
 
-	/* Settings. Adjust these to alter rendering. */
-	auto RENDERING_MODE = RenderingMode::MONTE_CARLO_USING_PHOTON_MAP;
+	// --------------------------------------
+	// Settings.
+	// --------------------------------------
 	cui PIXELS_W = 200;
 	cui PIXELS_H = 200;
 	cui RAYS_PER_PIXEL = 128;
@@ -39,15 +49,14 @@ int main()
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
 	cui MIN_PHOTONS_PER_NODE = 10;
 	cui PHOTON_MAP_DEPTH = 5;
-
-	/* Initialize. */
-	auto startTime = std::chrono::high_resolution_clock::now();
-	std::cout << "Starting..." << std::endl;
-	Camera c(PIXELS_W, PIXELS_H);
-
-	/* Create the scene. */
-	std::cout << "Creating the scene..." << std::endl;
 	Scene scene;
+	MonteCarloRenderer renderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
+
+	// --------------------------------------
+	// Create the scene.
+	// --------------------------------------
+	std::cout << "Creating the scene..." << std::endl;
+
 	SceneObjectFactory::AddRoom(scene, false);
 	// SceneObjectFactory::AddSphere(scene, 10, 0, 2, 1.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 	// SceneObjectFactory::AddSphere(scene, 7, -3, 3, 1.5f, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -59,49 +68,54 @@ int main()
 
 	// SceneObjectFactory::AddTetrahedron(scene, 7, 0, 3, glm::vec3(1.0f, 1.0f, 1.0f));
 
-	/* Lights. */
+	// Lights.
 	SceneObjectFactory::Add2DQuad(scene, glm::vec2(1.5f, -1), glm::vec2(3.5f, 1), 3.96f,
 								  glm::vec3(0, 0, -1), glm::vec3(1, 1, 1), 1.0f);
-	 SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.5f, glm::vec3(1, 1, 1), 1.0f);
-	 //SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1.0f, 0.35f, 0.55f));
+	SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.5f, glm::vec3(1, 1, 1), 1.0f);
+	//SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1.0f, 0.35f, 0.55f));
 
-	/* Initialize scene. */
+   // --------------------------------------
+   // Initialize camera and time keeping.
+   // --------------------------------------
 	scene.Initialize();
+	auto startTime = std::chrono::high_resolution_clock::now();
+	std::cout << "Starting..." << std::endl;
+	Camera camera(PIXELS_W, PIXELS_H);
 
-	/* Generate PhotonMap. */
+	// --------------------------------------
+	// Generate PhotonMap.
+	// --------------------------------------
+	// TODO: Move this to the renderers.
 	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
 
-	/* Render scene. */
-	c.Render(scene, RENDERING_MODE, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
 
-	/* Finalize. */
+	// --------------------------------------
+	// Render scene.
+	// --------------------------------------
+	camera.Render(scene, renderer, RAYS_PER_PIXEL, glm::vec3(-7, 0, 0));
+
+	// --------------------------------------
+	// Finalize.
+	// --------------------------------------
 	auto timeElapsed = chrono::high_resolution_clock::now() - startTime;
 	double took = chrono::duration_cast<std::chrono::milliseconds>(timeElapsed).count() / 1000.0;
 
-	/* Write render to file. */
+	// --------------------------------------
+	// Write render to file.
+	// --------------------------------------
 	auto currentDate = CurrentDateTime();
 	const string imageFileName = "output/" + currentDate + ".tga";
-	c.WriteImageToTGA(imageFileName);
+	camera.WriteImageToTGA(imageFileName);
 
-	/* Write text data to file. */
+	// --------------------------------------
+	// Write text data to file.
+	// --------------------------------------
 	const string textFileName = "output/" + currentDate + ".txt";
 	ofstream out(textFileName);
 
 	const unsigned int COL_WIDTH = 30;
-	string renderingModeName = "Unknown";
-	switch (RENDERING_MODE) {
-	case RenderingMode::MONTE_CARLO:
-		renderingModeName = "Monte Carlo";
-		break;
-	case RenderingMode::VISUALIZE_PHOTON_MAP:
-		renderingModeName = "Visualize Photon Map";
-		break;
-	case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
-		renderingModeName = "Monte Carlo using Photon Map";
-		break;
-	}
 
-	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderingModeName << endl;
+	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderer.RENDERER_NAME << endl;
 	out << setw(COL_WIDTH) << left << "Dimensions:" << PIXELS_W << "x" << PIXELS_H << " pixels. " << endl;
 	out << setw(COL_WIDTH) << left << "Rays per pixel:" << RAYS_PER_PIXEL << endl;
 	out << setw(COL_WIDTH) << left << "Max ray depth:" << MAX_RAY_DEPTH << endl;
@@ -112,7 +126,9 @@ int main()
 	out << setw(COL_WIDTH) << left << "Photon map depth:" << PHOTON_MAP_DEPTH << endl;
 	out.close();
 
-	/* Finished. */
+	// --------------------------------------
+	// Finished!
+	// --------------------------------------
 	std::cout << "Render saved to: " << imageFileName << "." << endl;
 	std::cout << "Info saved to: " << imageFileName << "." << endl;
 	std::cout << "Rendering finished... press any key to exit." << std::endl;

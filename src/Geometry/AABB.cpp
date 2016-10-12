@@ -1,5 +1,7 @@
 #include "AABB.h"
 
+#include <iostream>
+
 AABB::AABB() : AABB(-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f) {}
 
 AABB::AABB(const glm::vec3 _min, const glm::vec3 _max) : minimum(_min), maximum(_max) {}
@@ -23,6 +25,6 @@ glm::vec3 AABB::GetCenter() const { return 0.5f * (minimum + maximum); }
 bool AABB::RayIntersection(const Ray & ray) {
 	// Using the fast ray AABB overlap test using ray slopes as described by M. Eisemann et al.
 	// http://www.cg.cs.tu-bs.de/media/publications/fast-rayaxis-aligned-bounding-box-overlap-tests-using-ray-slopes.pdf
-
-	return true;
+	std::cerr << "AABB ray intersection has not been implemented yet." << std::endl;
+	return false;
 }

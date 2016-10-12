@@ -5,11 +5,12 @@
 
 class Material {
 public:
-	float refractiveIndex, reflectivity, transparency, emissivity;
+	float refractiveIndex, reflectivity, transparency, emissivity, specularity;
 
-	bool IsEmissive() {return glm::abs<float>(emissivity) > FLT_EPSILON; };
+	bool IsEmissive() { return emissivity > FLT_EPSILON; };
 	bool IsTransparent() { return transparency > FLT_EPSILON; }
-	glm::vec3 GetEmissionColor() { return emissivity * GetSurfaceColor(); }
+	bool IsSpecular() { return specularity > FLT_EPSILON; }
+	virtual glm::vec3 GetEmissionColor() { return emissivity * GetSurfaceColor(); }
 	virtual glm::vec3 GetSurfaceColor() const = 0;
 
 	/// <summary> 
@@ -26,7 +27,8 @@ public:
 											   const glm::vec3 & normal, const glm::vec3 & incomingRadiance) const = 0;
 protected:
 	Material(float _emissivity = 0.0f, float _reflectivity = 0.98f,
-			 float _transparency = 0.0f, float _refractiveIndex = 1.0f) :
+			 float _transparency = 0.0f, float _refractiveIndex = 1.0f,
+			 float _specularity = 0.0f) :
 		refractiveIndex(_refractiveIndex), transparency(_transparency),
-		emissivity(_emissivity), reflectivity(_reflectivity) {}
+		emissivity(_emissivity), reflectivity(_reflectivity), specularity(_specularity) {}
 };

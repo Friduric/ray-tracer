@@ -40,15 +40,8 @@ glm::vec3 Math::NonParallellVector(const glm::vec3 & v) {
 	}
 }
 
-glm::vec3 Math::SampleHemisphereUsingDiskCoordinates(const float u, const float v) {
-	const float r = sqrt(u);
-	const float theta = 2 * glm::pi<float>() * v;
-	const float x = r * cos(theta);
-	const float y = r * sin(theta);
-	return glm::vec3(x, y, sqrt(std::max<float>(0, 1 - u)));
-}
-
 glm::vec3 Math::RandomHemishpereSampleDirection(const glm::vec3 & n) {
+	// Samples uniform angles.
 	float incl = (rand() / static_cast<float>(RAND_MAX)) * glm::half_pi<float>();
 	float azim = (rand() / static_cast<float>(RAND_MAX)) * glm::two_pi<float>();
 	glm::vec3 nonParallellVector = Math::NonParallellVector(n);
@@ -60,7 +53,7 @@ glm::vec3 Math::RandomHemishpereSampleDirection(const glm::vec3 & n) {
 
 glm::vec3 Math::CosineWeightedHemisphereSampleDirection(const glm::vec3 & n) {
 	// See https://pathtracing.wordpress.com/2011/03/03/cosine-weighted-hemisphere/.
-
+	// Samples cosine weighted positions.
 	float r1 = rand() / static_cast<float>(RAND_MAX);
 	float r2 = rand() / static_cast<float>(RAND_MAX);
 

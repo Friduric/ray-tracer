@@ -5,7 +5,7 @@
 #include "../../includes/glm/gtc/constants.hpp"
 
 namespace Math {
-	/// <summary> Returns an interpolated value between 4 corner values. </summary>
+	/// <summary> Returns an bilinearly interpolated value between 4 corner values. </summary>
 	/// <param name='dy'> 
 	/// The amount interpolated in the y-direction (on the "width axis"). 
 	/// Must be normalized to [0,1]. 
@@ -41,11 +41,6 @@ namespace Math {
 	/// Returns a vector that is non-parallell to a given vector.
 	/// </summary>
 	glm::vec3 NonParallellVector(const glm::vec3 & v);
-
-	/// <summary> 
-	/// Returns a hemisphere coordinate given two coordinates on a disk.
-	/// </summary>
-	glm::vec3 SampleHemisphereUsingDiskCoordinates(const float u, const float v);
 
 	/// <summary>
 	/// Returns a random direction given a normal.
