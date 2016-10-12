@@ -76,10 +76,11 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 
 	renderGroups.push_back(floor);
 
+	// -------------------
+	// Wall 1.
+	// -------------------
 	if (addBackWalls) {
-		// -------------------
-		// Wall 1.
-		// -------------------
+
 		RenderGroup wall1(yellowMaterial);
 
 		glm::vec3 w1Normal = normalize(glm::vec3(2.0f, -1.0f, 0.0f));
@@ -138,10 +139,11 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 
 	renderGroups.push_back(wall5);
 
+	// -------------------
+	// Wall 6.
+	// -------------------
 	if (addBackWalls) {
-		// -------------------
-		// Wall 6.
-		// -------------------
+
 		RenderGroup wall6(purpleMaterial);
 
 		glm::vec3 w6Normal = normalize(glm::vec3(2.0, 1.0, 0.0));
