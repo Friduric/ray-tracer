@@ -31,27 +31,6 @@ public:
 	~Scene();
 
 	/// <summary> 
-	/// Casts rays towards all lightsources from the intersectionPoint pos at
-	/// the Primitive prim and calculate the direct illumination at the 
-	/// Primitive prim at with Material material.
-	/// </summary>
-	glm::vec3 Scene::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection, const Primitive & prim, const Material & material) const;
-
-	/// <summary> 
-	/// Traces a ray through the scene and returns a color.
-	/// </summary>
-	glm::vec3 TraceRay(const Ray & ray,
-					   const unsigned int BOUNCES_PER_HIT = 1,
-					   const unsigned int MAX_DEPTH = 5) const;
-
-	/// <summary> 
-	/// Traces a ray through the scene and returns a color, using photon map.
-	/// </summary>
-	glm::vec3 TraceRayUsingPhotonMap(const Ray & ray,
-									 const unsigned int BOUNCES_PER_HIT = 1,
-									 const unsigned int MAX_DEPTH = 5) const;
-
-	/// <summary> 
 	/// Casts a ray through the scene. Returns true if there was an intersection.
 	/// </summary>
 	/// <param name='ray'> The ray which we cast. </param>
