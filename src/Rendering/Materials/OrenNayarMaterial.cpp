@@ -9,7 +9,7 @@ OrenNayarMaterial::OrenNayarMaterial(glm::vec3 color, float _roughness, float _e
 									 float _reflectivity, float _transparency,
 									 float _refractiveIndex) :
 	surfaceColor(color), roughness(_roughness),
-	Material(_emissivity, _reflectivity, _transparency, _refractiveIndex) {}
+	Material(_emissivity, _reflectivity, _transparency, _refractiveIndex, 0.0f) {}
 
 glm::vec3 OrenNayarMaterial::GetSurfaceColor() const { return surfaceColor; }
 
@@ -30,8 +30,6 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 
 	const float alpha = std::max(alphaInclination, betaInclination);
 	const float beta = std::min(alphaInclination, betaInclination);
-
-	// const float angleDifference = glm::dot(outDirection - normal * cosOut, inDirection - normal * cosIn);
 
 	float gamma = glm::dot(-inDirection, outDirection);
 
