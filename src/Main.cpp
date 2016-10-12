@@ -31,15 +31,14 @@ int main()
 
 	/* Settings. Adjust these to alter rendering. */
 	auto RENDERING_MODE = RenderingMode::MONTE_CARLO;
-	cui PIXELS_W = 100;
-	cui PIXELS_H = 100;
-	cui RAYS_PER_PIXEL = 128;
-	cui MAX_RAY_DEPTH = 5;
+	cui PIXELS_W = 200;
+	cui PIXELS_H = 200;
+	cui RAYS_PER_PIXEL = 8;
+	cui MAX_RAY_DEPTH = 2;
 	cui BOUNCES_PER_HIT = 1;
-	cui PHOTONS_PER_LIGHT_SOURCE = 1;
-	cui MAX_PHOTONS_PER_NODE = 100;
+	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
+	cui MAX_PHOTONS_PER_NODE = 10;
 	cui PHOTON_MAP_DEPTH = 5;
-	float MAX_NODE_SIZE_DIMENSION = 0.1f;
 
 	/* Initialize. */
 	auto startTime = std::chrono::high_resolution_clock::now();
@@ -63,18 +62,17 @@ int main()
 	/* Lights. */
 	SceneObjectFactory::Add2DQuad(scene, glm::vec2(1.5f, -1), glm::vec2(3.5f, 1), 3.96f,
 								  glm::vec3(0, 0, -1), glm::vec3(1, 1, 1), 1.0f);
-	// SceneObjectFactory::AddEmissiveSphere(scene, -2, 0, 0, 0.5f, glm::vec3(1, 1, 1), glm::vec3(2, 2, 2));
-	// SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1.0f, 0.35f, 0.55f));
+	 SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.5f, glm::vec3(1, 1, 1), 1.0f);
+	 //SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1.0f, 0.35f, 0.55f));
 
 	/* Initialize scene. */
 	scene.Initialize();
 
 	/* Generate PhotonMap. */
-	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
-						MAX_NODE_SIZE_DIMENSION, PHOTON_MAP_DEPTH);
+	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
 
 	/* Render scene. */
-	c.Render(scene, RENDERING_MODE, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT, glm::vec3(-6, 0, 0));
+	c.Render(scene, RENDERING_MODE, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
 
 	/* Finalize. */
 	auto timeElapsed = chrono::high_resolution_clock::now() - startTime;
@@ -112,7 +110,6 @@ int main()
 	out << setw(COL_WIDTH) << left << "Photons per light source:" << PHOTONS_PER_LIGHT_SOURCE << endl;
 	out << setw(COL_WIDTH) << left << "Max photons per node:" << MAX_PHOTONS_PER_NODE << endl;
 	out << setw(COL_WIDTH) << left << "Photon map depth:" << PHOTON_MAP_DEPTH << endl;
-	out << setw(COL_WIDTH) << left << "Node box max dimension:" << MAX_NODE_SIZE_DIMENSION << " seconds." << endl;
 	out.close();
 
 	/* Finished. */

@@ -55,7 +55,7 @@ public:
 		   const std::vector<Photon> & indirectPhotons,
 		   const std::vector<Photon> & shadowPhotons,
 		   const unsigned int maxPhotonsPerNode,
-		   const float maxSizeOfNodeBox, const AABB & axisAlignedBoundingBox);
+		   const AABB & axisAlignedBoundingBox);
 
 	~Octree();
 	/// <summary> The root node. </summary>

@@ -53,9 +53,27 @@ void Scene::Initialize() {
 }
 
 glm::vec3 Scene::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection, const Primitive & prim, const Material & material) const {
-	Ray ray;
-	ray.from = pos + 0.01f * prim.GetNormal(pos); // + 0.01 normal to not cast from inside the object
 	glm::vec3 colorAccumulator = { 0,0,0 };
+	// If there are now shadow photons then we assume its lit by all sources
+	if (photonMap != NULL) {
+		if (photonMap->GetShadowPhotonsInOctreeNodeOfPosition(pos).size() == 0) {
+			for (RenderGroup* lightSource : emissiveRenderGroups) {
+				/*glm::vec3 surfPos = lightSource->GetRandomPositionOnSurface();
+				Primitive* lightPrim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
+				const float intersectionRadianceFactor = glm::dot(-ray.direction, lightPrim->GetNormal(lightSurfPos));
+				colorAccumulator += material.CalculateDiffuseLighting(-ray.direction, incomingDirection,
+																	  prim.GetNormal(ray.from),
+																	  lightSource->material->GetEmissionColor()*intersectionRadianceFactor);*/
+			}
+		}
+		// If there are no direct or indirect photons we assume its complete black
+		if (photonMap->GetDirectPhotonsInOctreeNodeOfPosition(pos).size() +
+			photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(pos).size() == 0) {
+			return glm::vec3(0, 0, 0);
+		}
+	}
+	Ray ray;
+	ray.from = pos + 0.01f * prim.GetNormal(pos); // + 0.01 normal to not cast from inside the object	
 	unsigned int intersectionRenderGroupIdx;
 	unsigned int intersectionPrimitiveIdx;
 	float intersectionDistance;
@@ -65,13 +83,14 @@ glm::vec3 Scene::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const g
 		ray.direction = glm::normalize(lightSurfPos - ray.from);
 		// Cast ray towards light source
 		if (RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
-			// Only add color if we did hit a light source	
-			if (renderGroups[intersectionRenderGroupIdx].material->IsEmissive()) {
+			// Only add color if we did hit the light source we casted towards
+			if (&(renderGroups[intersectionRenderGroupIdx]) == lightSource) {
 				Primitive* lightPrim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
-				const float intersectionRadianceFactor = glm::dot(-ray.direction, lightPrim->GetNormal(lightSurfPos));
+				glm::vec3 lightNormal = lightPrim->GetNormal(ray.from + intersectionDistance * ray.direction);
+				const float intersectionRadianceFactor = glm::dot(-ray.direction, lightNormal);
 				colorAccumulator +=  material.CalculateDiffuseLighting(-ray.direction, incomingDirection,
 																	   prim.GetNormal(ray.from),
-																	   lightSource->material->GetEmissionColor()*intersectionRadianceFactor);
+																	   lightSource->material->GetEmissionColor() * intersectionRadianceFactor);
 			}
 		}
 	}
@@ -227,8 +246,6 @@ bool Scene::RefractionRayCast(const Ray & ray, const unsigned int renderGroupInd
 
 void Scene::GeneratePhotonMap(const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 							  const unsigned int MAX_PHOTONS_PER_NODE,
-							  const float MAXIMUM_NODE_BOX_DIMENSION,
 							  const unsigned int MAX_DEPTH) {
-	photonMap = new PhotonMap(*this, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE,
-							  MAXIMUM_NODE_BOX_DIMENSION, MAX_DEPTH);
+	photonMap = new PhotonMap(*this, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE, MAX_DEPTH);
 }

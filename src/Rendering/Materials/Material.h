@@ -7,7 +7,7 @@ class Material {
 public:
 	float refractiveIndex, reflectivity, transparency, emissivity;
 
-	bool IsEmissive() { return glm::abs<float>(emissivity) > FLT_EPSILON; };
+	bool IsEmissive() {return glm::abs<float>(emissivity) > FLT_EPSILON; };
 	bool IsTransparent() { return transparency > FLT_EPSILON; }
 	glm::vec3 GetEmissionColor() { return emissivity * GetSurfaceColor(); }
 	virtual glm::vec3 GetSurfaceColor() const = 0;

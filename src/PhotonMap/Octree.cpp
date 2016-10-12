@@ -9,7 +9,7 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 			   const std::vector<Photon> & _indirectPhotons,
 			   const std::vector<Photon> & _shadowPhotons,
 			   const unsigned int maxPhotonsPerNode,
-			   const float maxSizeOfNodeBox, const AABB & aabb) : root(new OctreeNode(aabb)) {
+			   const AABB & aabb) : root(new OctreeNode(aabb)) {
 	// Add all photons to the root	
 
 	for (unsigned int n = 0; n < _directPhotons.size(); ++n) {
@@ -43,36 +43,34 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 		// and if all sides of the node box is larger than maxSizeOfNodeBox,
 		// then split the node into 8 new nodes.
 		unsigned int currentTotalPhotons = currentNode->directPhotons.size() + currentNode->indirectPhotons.size() + currentNode->shadowPhotons.size();
-		if (currentTotalPhotons < maxPhotonsPerNode) {
+		if (currentTotalPhotons < maxPhotonsPerNode*8) {
 			continue;
 		}
-		if (maxSizeOfNodeBox <= nodeWidth || maxSizeOfNodeBox <= nodeHeight || maxSizeOfNodeBox <= nodeDepth) {
-			nodeXHalf = 0.5f * nodeWidth;
-			nodeYHalf = 0.5f * nodeHeight;
-			nodeZHalf = 0.5f * nodeDepth;
-			unsigned int idxCounter = 0;
-			for (unsigned int xIdx = 0; xIdx < 2; ++xIdx) {
-				nodeXMin = currentNode->axisAlignedBoundingBox.minimum.x + nodeXHalf*xIdx;
-				nodeXMax = nodeXMin + nodeXHalf;
-				for (unsigned int yIdx = 0; yIdx < 2; ++yIdx) {
-					nodeYMin = currentNode->axisAlignedBoundingBox.minimum.y + nodeYHalf*yIdx;
-					nodeYMax = nodeYMin + nodeYHalf;
-					for (unsigned int zIdx = 0; zIdx < 2; ++zIdx) {
-						nodeZMin = currentNode->axisAlignedBoundingBox.minimum.z + nodeZHalf*zIdx;
-						nodeZMax = nodeZMin + nodeZHalf;
-						// Add new node									
-						OctreeNode* newNode = new OctreeNode();
-						newNode->axisAlignedBoundingBox.minimum.x = nodeXMin;
-						newNode->axisAlignedBoundingBox.maximum.x = nodeXMax;
-						newNode->axisAlignedBoundingBox.minimum.y = nodeYMin;
-						newNode->axisAlignedBoundingBox.maximum.y = nodeYMax;
-						newNode->axisAlignedBoundingBox.minimum.z = nodeZMin;
-						newNode->axisAlignedBoundingBox.maximum.z = nodeZMax;
-						newNode->AddDataTypesInsideAABB(currentNode->directPhotons, currentNode->indirectPhotons, currentNode->shadowPhotons);
-						currentNode->children[idxCounter] = newNode;
-						nodeQueue.push(newNode);
-						idxCounter++;
-					}
+		nodeXHalf = 0.5f * nodeWidth;
+		nodeYHalf = 0.5f * nodeHeight;
+		nodeZHalf = 0.5f * nodeDepth;
+		unsigned int idxCounter = 0;
+		for (unsigned int xIdx = 0; xIdx < 2; ++xIdx) {
+			nodeXMin = currentNode->axisAlignedBoundingBox.minimum.x + nodeXHalf*xIdx;
+			nodeXMax = nodeXMin + nodeXHalf;
+			for (unsigned int yIdx = 0; yIdx < 2; ++yIdx) {
+				nodeYMin = currentNode->axisAlignedBoundingBox.minimum.y + nodeYHalf*yIdx;
+				nodeYMax = nodeYMin + nodeYHalf;
+				for (unsigned int zIdx = 0; zIdx < 2; ++zIdx) {
+					nodeZMin = currentNode->axisAlignedBoundingBox.minimum.z + nodeZHalf*zIdx;
+					nodeZMax = nodeZMin + nodeZHalf;
+					// Add new node									
+					OctreeNode* newNode = new OctreeNode();
+					newNode->axisAlignedBoundingBox.minimum.x = nodeXMin;
+					newNode->axisAlignedBoundingBox.maximum.x = nodeXMax;
+					newNode->axisAlignedBoundingBox.minimum.y = nodeYMin;
+					newNode->axisAlignedBoundingBox.maximum.y = nodeYMax;
+					newNode->axisAlignedBoundingBox.minimum.z = nodeZMin;
+					newNode->axisAlignedBoundingBox.maximum.z = nodeZMax;
+					newNode->AddDataTypesInsideAABB(currentNode->directPhotons, currentNode->indirectPhotons, currentNode->shadowPhotons);
+					currentNode->children[idxCounter] = newNode;
+					nodeQueue.push(newNode);
+					idxCounter++;
 				}
 			}
 		}
