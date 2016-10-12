@@ -26,12 +26,12 @@ const AABB & Sphere::GetAxisAlignedBoundingBox() const {
 }
 
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance, bool cullBackFace) const {
-	if (cullBackFace && dot(ray.dir, GetNormal(ray.from)) > -FLT_EPSILON) {
+	if (cullBackFace && dot(ray.direction, GetNormal(ray.from)) > -FLT_EPSILON) {
 		return false; // The ray direction and normal are in the same direction (behind).
 	}
 
 	const vec3 m = ray.from - center;
-	float b = glm::dot(m, ray.dir);
+	float b = glm::dot(m, ray.direction);
 	float c = glm::dot(m, m) - radius * radius;
 	if (c > FLT_EPSILON && b > FLT_EPSILON) {
 		return false;
