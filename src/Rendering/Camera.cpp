@@ -77,59 +77,6 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 					colorAccumulator += rayFactor * renderer.GetPixelColor(ray);
 				}
 			}
-
-			/*
-			for (float c = 0; c < INV_WIDTH; c += COLUMN_PIXEL_STEP) {
-				for (float r = 0; r < INV_HEIGHT; r += ROW_PIXEL_STEP) {
-
-					// Calculate new randomized point in the camera plane using stratified sampling.
-					const float ylerp = (y + c + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * INV_WIDTH;
-					const float zlerp = (z + r + rand(gen) * INV_SQRT_QUADS_PER_PIXEL) * INV_HEIGHT;
-					const float nx = Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
-					const float ny = Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
-					const float nz = Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
-
-					// Create ray.
-					ray.from = glm::vec3(nx, ny, nz);
-					ray.direction = glm::normalize(ray.from - eye);
-					const float rayFactor = std::max(0.0f, glm::dot(ray.from, CAMERA_PLANE_NORMAL));
-
-					// Choose render mode.
-					switch (RENDERING_MODE) {
-					case RenderingMode::MONTE_CARLO:
-						// Trace ray through the scene.
-						colorAccumulator += rayFactor * scene.GetPixelColor(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
-						break;
-					case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
-						// Trace a ray through the scene.
-						colorAccumulator += rayFactor * scene.TraceRayUsingPhotonMap(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
-						break;
-					case RenderingMode::VISUALIZE_PHOTON_MAP:
-						// Shoot a ray through the scene and sample using the photon map.
-						unsigned int intersectionRenderGroupIndex, intersectionPrimitiveIndex;
-						float intersectionDistance;
-						glm::vec3 intersectionPoint;
-						if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
-							// direct photons
-							intersectionPoint = ray.from + intersectionDistance * ray.direction;
-							const auto & allDirPhotons = scene.photonMap->GetDirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
-							std::vector<Photon const*> closestDirPhotons;
-							scene.photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allDirPhotons, intersectionPoint, 10, closestDirPhotons);
-							for (const Photon * dp : closestDirPhotons) {
-								colorAccumulator += rayFactor * dp->color;
-							}
-							// indirect photons
-							const auto & allIndirPhotons = scene.photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
-							std::vector<Photon const*> closestIndirPhotons;
-							scene.photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allIndirPhotons, intersectionPoint, 10, closestIndirPhotons);
-							for (const Photon * ip : closestIndirPhotons) {
-								colorAccumulator += rayFactor * ip->color;
-							}
-						}
-						break;
-					}
-				}
-			} */
 			// Set pixel color dependent on ray trace.
 			pixels[y][z].color = INV_RAYS_PER_PIXEL * colorAccumulator;
 		}
