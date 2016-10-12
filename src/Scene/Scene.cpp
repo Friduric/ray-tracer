@@ -91,9 +91,3 @@ bool Scene::RefractionRayCast(const Ray & ray, const unsigned int renderGroupInd
 	float RO = R0 + (1 - R0) * glm::pow((1 - alpha), 5.0f);
 
 }
-
-void Scene::GeneratePhotonMap(const unsigned int PHOTONS_PER_LIGHT_SOURCE,
-							  const unsigned int MAX_PHOTONS_PER_NODE,
-							  const unsigned int MAX_DEPTH) {
-	photonMap = new PhotonMap(*this, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE, MAX_DEPTH);
-}

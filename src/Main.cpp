@@ -102,7 +102,7 @@ int main()
 	}
 	if (renderer == nullptr) {
 		std::cerr << "Failed to initialize renderer." << std::endl;
-		return;
+		return 0;
 	}
 	camera.Render(scene, *renderer, RAYS_PER_PIXEL, glm::vec3(-7, 0, 0));
 
