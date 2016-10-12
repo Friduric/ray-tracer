@@ -95,6 +95,5 @@ public:
 	/// <param name='MAX_DEPTH'> The amount of times each photon will bounce at most. </param>
 	void GeneratePhotonMap(const unsigned int PHOTONS_PER_LIGHT_SOURCE = 200000,
 						   const unsigned int MAX_PHOTONS_PER_NODE = 100,
-						   const float MAXIMUM_NODE_BOX_DIMENSION = 0.1f,
 						   const unsigned int MAX_DEPTH = 5);
 };

@@ -9,7 +9,6 @@
 
 PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 					 const unsigned int MAX_PHOTONS_PER_NODE,
-					 const float MAXIMUM_NODE_BOX_DIMENSION,
 					 const unsigned int MAX_DEPTH) {
 
 	// Initialize.
@@ -35,7 +34,6 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			float intersectionDistance;
 			for (unsigned int k = 0; k < MAX_DEPTH; ++k) {
 				if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
-
 					// Save photon in the octree.
 					glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.direction;
 					Primitive * prim = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
@@ -50,29 +48,30 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					else {
 						// else direct photon
 						directPhotons.push_back(Photon(intersectionPosition, ray.direction, photonRadiance));
+						// Add shadow photons
+						Ray shadowRay;
+						glm::vec3 shadowIntersectionPosition = intersectionPosition - 0.01f * prim->GetNormal(intersectionPosition);// Add space from it to not hit itself
+						shadowRay.from = shadowIntersectionPosition;
+						shadowRay.direction = ray.direction;
+						unsigned int shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx;
+						float shadowIntersectionDistance;
+						Primitive * shadowPrim = prim;
+						// While we hit a surface keep casting and add shadow photons
+						while (true) {
+							if (scene.RayCast(shadowRay, shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx, shadowIntersectionDistance)) {
+								shadowPrim = scene.renderGroups[shadowIntersectionRenderGroupIdx].primitives[shadowIntersectionPrimitiveIdx];
+								shadowIntersectionPosition = shadowRay.from + shadowIntersectionDistance* shadowRay.direction;
+								shadowPhotons.push_back(Photon(shadowIntersectionPosition, shadowRay.direction, glm::vec3(0, 0, 0)));
+							}
+							else {
+								break;
+							}
+							// Setup next ray based on previous, direction is same all the time
+							shadowRay.from = shadowIntersectionPosition - 0.1f * shadowPrim->GetNormal(shadowIntersectionPosition);
+						}
 					}
 
-					// Add shadow photons
-					Ray shadowRay;
-					glm::vec3 shadowIntersectionPosition = intersectionPosition - 0.01f * prim->GetNormal(intersectionPosition);// Add space from it to not hit itself
-					shadowRay.from = shadowIntersectionPosition;
-					shadowRay.direction = ray.direction;
-					unsigned int shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx;
-					float shadowIntersectionDistance;
-					
-					// While we hit a surface keep casting and add shadow photons
-					/*while (true) {					
-						if (scene.RayCast(shadowRay, shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx, shadowIntersectionDistance)) {
-							shadowIntersectionPosition = shadowRay.from +  shadowIntersectionDistance* shadowRay.direction;
-						}
-						else {
-							break;
-						}
-						// Setup next ray based on previous
-						shadowRay.from = intersectionPosition;
-					}*/
-
-					ray.from = shadowIntersectionPosition;
+					ray.from = intersectionPosition;
 					ray.direction = rayReflection;
 				}
 				else {
@@ -83,7 +82,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 	}
 
 	// Create octree
-	octree = new Octree(directPhotons, indirectPhotons, shadowPhotons, MAX_PHOTONS_PER_NODE, MAXIMUM_NODE_BOX_DIMENSION, scene.axisAlignedBoundingBox);
+	octree = new Octree(directPhotons, indirectPhotons, shadowPhotons, MAX_PHOTONS_PER_NODE, scene.axisAlignedBoundingBox);
 }
 
 PhotonMap::~PhotonMap()
@@ -92,7 +91,7 @@ PhotonMap::~PhotonMap()
 }
 
 void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
-														  const int N, std::vector<Photon const*> & closestPhotons) const {
+														 const int N, std::vector<Photon const*> & closestPhotons) const {
 	std::vector<float> distances;
 	for (Photon const* p : photons) {
 		distances.push_back(glm::distance2(p->position, pos));
