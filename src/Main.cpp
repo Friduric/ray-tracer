@@ -94,10 +94,10 @@ int main()
 		renderer = new MonteCarloRenderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
 		break;
 	case RendererType::PHOTON_MAP:
-		renderer = new PhotonMapRenderer(scene, /* ... add parameters here ... */);
+		renderer = new PhotonMapRenderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
 		break;
 	case RendererType::PHOTON_MAP_VISUALIZATION:
-		renderer = new PhotonMapVisualizer(scene, /* ... add parameters here ... */);
+		renderer = new PhotonMapVisualizer(scene, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
 		break;
 	}
 	if (renderer == nullptr) {
