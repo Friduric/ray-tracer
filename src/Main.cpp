@@ -88,7 +88,6 @@ int main()
 	// TODO: Move this to the renderers.
 	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
 
-
 	// --------------------------------------
 	// Render scene.
 	// --------------------------------------
