@@ -7,8 +7,10 @@
 class PhotonMapVisualizer : public Renderer {
 public:
 	glm::vec3 GetPixelColor(const Ray & ray) override;
-	PhotonMapVisualizer(const Scene & scene);
+	PhotonMapVisualizer(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE = 1000000, 
+						const unsigned int MIN_PHOTONS_PER_NODE = 50, const unsigned int MAX_PHOTON_DEPTH = 3);
 private:
 	glm::vec3 TraceRay(const Ray & ray, const unsigned int DEPTH = 0);
 	const Scene & SCENE;
+	PhotonMap* photonMap;
 };

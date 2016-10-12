@@ -8,8 +8,11 @@ glm::vec3 PhotonMapRenderer::GetPixelColor(const Ray & ray) {
 	return TraceRay(ray);
 }
 
-PhotonMapRenderer::PhotonMapRenderer(const Scene & _SCENE, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT) :
-	SCENE(_SCENE), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Photon Map Renderer") { }
+PhotonMapRenderer::PhotonMapRenderer(const Scene & _SCENE, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT,
+									 const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MIN_PHOTONS_PER_NODE, const unsigned int MAX_PHOTON_DEPTH) :
+	SCENE(_SCENE), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Photon Map Renderer") { 
+	photonMap = new PhotonMap(_SCENE, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, MAX_PHOTON_DEPTH);
+}
 
 glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
 	unsigned int intersectionPrimitiveIndex, intersectionRenderGroupIndex;
