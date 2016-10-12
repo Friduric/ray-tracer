@@ -33,7 +33,7 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 	materials.push_back(orangeMaterial);
 	const auto purpleMaterial = new LambertianMaterial(purpleColor);
 	materials.push_back(purpleMaterial);
-	const auto emissiveMaterial = new LambertianMaterial(whiteColor, whiteColor);
+	const auto emissiveMaterial = new LambertianMaterial(whiteColor, 1.0f);
 	materials.push_back(emissiveMaterial);
 
 	// -------------------
@@ -169,12 +169,12 @@ void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, flo
 }
 
 void SceneObjectFactory::AddTriangle(Scene & scene, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3,
-									 glm::vec3 normal, glm::vec3 surfaceColor, glm::vec3 emissionColor) {
+									 glm::vec3 normal, glm::vec3 surfaceColor, float emissivity) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
 	// Material.
-	const auto sphereMaterial = new LambertianMaterial(surfaceColor, emissionColor);
+	const auto sphereMaterial = new LambertianMaterial(surfaceColor, emissivity);
 	materials.push_back(sphereMaterial);
 
 	// Render group + primitive.
@@ -184,7 +184,7 @@ void SceneObjectFactory::AddTriangle(Scene & scene, glm::vec3 p1, glm::vec3 p2, 
 }
 
 void SceneObjectFactory::Add2DQuad(Scene & scene, glm::vec2 corner1, glm::vec2 corner2, float height,
-								   glm::vec3 normal, glm::vec3 surfaceColor, glm::vec3 emissionColor) {
+								   glm::vec3 normal, glm::vec3 surfaceColor, float emissivity) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
@@ -194,7 +194,7 @@ void SceneObjectFactory::Add2DQuad(Scene & scene, glm::vec2 corner1, glm::vec2 c
 	glm::vec3 c4 = glm::vec3(corner2.x, corner1.y, height);
 
 	// Material.
-	const auto sphereMaterial = new LambertianMaterial(surfaceColor, emissionColor);
+	const auto sphereMaterial = new LambertianMaterial(surfaceColor, emissivity);
 	materials.push_back(sphereMaterial);
 
 	// Render group + primitive.
@@ -253,13 +253,13 @@ void SceneObjectFactory::AddTetrahedron(Scene & scene, float x, float y, float z
 }
 
 void SceneObjectFactory::AddEmissiveSphere(Scene & scene, float x, float y, float z, float radius,
-										   glm::vec3 surfaceColor, glm::vec3 emissionColor) {
+										   glm::vec3 surfaceColor, float emissivity) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
 	// Material.
 	glm::vec3 c(1.0, 1.0, 1.0);
-	const auto sphereMaterial = new LambertianMaterial(c, emissionColor);
+	const auto sphereMaterial = new LambertianMaterial(c, emissivity);
 	materials.push_back(sphereMaterial);
 
 	// Render group + primitive.
