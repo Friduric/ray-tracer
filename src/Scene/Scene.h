@@ -31,6 +31,12 @@ public:
 	~Scene();
 
 	/// <summary> 
+	/// Casts rays towards all lightsources from the intersectionPoint.
+	/// Returns a color.
+	/// </summary>
+	glm::vec3 Scene::CastShadowRays(const Ray & ray) const;
+
+	/// <summary> 
 	/// Traces a ray through the scene and returns a color.
 	/// </summary>
 	glm::vec3 TraceRay(const Ray & ray,
@@ -41,7 +47,6 @@ public:
 	/// Traces a ray through the scene and returns a color, using photon map.
 	/// </summary>
 	glm::vec3 TraceRayUsingPhotonMap(const Ray & ray, 
-									 const glm::vec3 & cameraPlaneNormal,
 									 const unsigned int BOUNCES_PER_HIT = 1,
 									 const unsigned int MAX_DEPTH = 5) const;
 
@@ -61,7 +66,7 @@ public:
 	bool RayCast(const Ray & ray,
 				 unsigned int & intersectionRenderGroupIndex,
 				 unsigned int & intersectionPrimitiveIndex,
-				 float & intersectionDistance) const;
+				 float & intersectionDistance, bool cullBackFace = true) const;
 
 	/// <summary> 
 	/// Casts a refractive ray through the scene. Returns true if there was an intersection.

@@ -52,6 +52,48 @@ void Scene::Initialize() {
 	axisAlignedBoundingBox = AABB(minimumPosition, maximumPosition);
 }
 
+glm::vec3 Scene::CastShadowRays(const Ray & ray) const {
+	glm::vec3 surfPos;
+	unsigned int intersectionRenderGroupIdx, intersectionPrimitiveIdx;
+	float intersectionDistance;
+	glm::vec3 incomingDirection = ray.dir;
+	Ray rayTowardsLight;
+	Primitive* prim;
+	Material* material;
+	// Cast ray into the scene
+	if (RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
+		prim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
+		material = renderGroups[intersectionRenderGroupIdx].material;
+		surfPos = ray.from + ray.dir * intersectionDistance;
+		rayTowardsLight.from = surfPos + 0.001f*prim->GetNormal(surfPos);
+	}
+	else {
+		// Nothing was hit return 0 color
+		return glm::vec3(0, 0, 0);
+	}
+
+	glm::vec3 colorAccumulator = { 0,0,0 };
+	// Check all light sources
+	for (RenderGroup* lightSource : emissiveRenderGroups) {
+		glm::vec3 lightSurfPos = lightSource->GetRandomPositionOnSurface();
+		
+		rayTowardsLight.dir = glm::normalize(lightSurfPos - rayTowardsLight.from);
+		// Cast ray towards light source
+		if (RayCast(rayTowardsLight, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
+			// Only add color if we did hit a light source	
+			if (renderGroups[intersectionRenderGroupIdx].material->IsEmissive()) {
+				Primitive* lightPrim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
+				const float intersectionRadianceFactor = glm::dot(-rayTowardsLight.dir, lightPrim->GetNormal(lightSurfPos));
+				colorAccumulator += material->CalculateDiffuseLighting(incomingDirection, ray.dir,
+																	   prim->GetNormal(rayTowardsLight.from),
+																	   lightSource->material->GetEmissionColor()*intersectionRadianceFactor);
+			}
+		}
+	}
+
+	return (1.0f / (float)emissiveRenderGroups.size()) *colorAccumulator;
+}
+
 glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
 	if (depth == 0) { return glm::vec3(0, 0, 0); }
 
@@ -62,7 +104,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	float intersectionDistance;
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
 
-	/* If the reversedRay doesn't intersect, simply return (0, 0, 0). */
+	/* If the ray doesn't intersect, simply return (0, 0, 0). */
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/*  Calculate intersection point. */
@@ -93,8 +135,11 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }
 
-glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const glm::vec3 & cameraPlaneNormal, const unsigned int bouncesPerHit, const unsigned int depth) const {
-	if (depth == 0) { return glm::vec3(0, 0, 0); }
+glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
+	float r = (float)std::rand() / (float)RAND_MAX;
+	if (depth == 0 ||  r > 0.75f) { 
+		return CastShadowRays(ray);// glm::vec3(0, 0, 0);
+	}
 
 	assert(depth > 0);
 	assert(bouncesPerHit > 0);
@@ -103,7 +148,7 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const glm::vec3 & camer
 	float intersectionDistance;
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
 
-	/* If the reversedRay doesn't intersect, simply return (0, 0, 0). */
+	/* If the ray doesn't intersect, simply return (0, 0, 0). */
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/*  Calculate intersection point. */
@@ -125,35 +170,42 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const glm::vec3 & camer
 	/* Shoot rays and integrate based on BRDF sampling. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	// Only cast against light sources for direct light
-	for (unsigned int i = 0; i < emissiveRenderGroups.size(); ++i) {
-		glm::vec3 surfPos = emissiveRenderGroups[i]->primitives[i]->GetRandomPositionOnSurface();//GetCenter();// 
-		glm::vec3 reflectionDirection = glm::normalize(surfPos - intersectionPoint);// = Math::RandomHemishpereSampleDirection(hitNormal);
-		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
-		Ray reflectedRay(intersectionPoint, reflectionDirection);
-		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
+	//for (unsigned int i = 0; i < emissiveRenderGroups.size(); ++i) {
+	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
+		//glm::vec3 surfPos = emissiveRenderGroups[i]->GetRandomPositionOnSurface();//GetCenter();// 
+		glm::vec3 reflectionDirection = Math::RandomHemishpereSampleDirection(hitNormal); //glm::normalize(surfPos - intersectionPoint);// = Math::RandomHemishpereSampleDirection(hitNormal);
+		/*std::vector<Photon const*> closestPhotons;
+		std::vector<Photon const*> photons = photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+		photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(photons, intersectionPoint, 1, closestPhotons);
+		photons = photonMap->GetDirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+		photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(photons, intersectionPoint, 1, closestPhotons);
+		for (unsigned int pIdx = 0; pIdx < closestPhotons.size(); ++pIdx) {
+			glm::vec3 reflectionDirection = -closestPhotons[pIdx]->direction;
+			*/assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
+			Ray reflectedRay(intersectionPoint, reflectionDirection);
+			const glm::vec3 incomingRadiance = TraceRayUsingPhotonMap(reflectedRay, bouncesPerHit, depth - 1);		
+			colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
+		//}	
 	}
 	// Add indirect light from photons
-	const auto & allIndirPhotons = photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
+	/*const auto & allIndirPhotons = photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);
 	std::vector<Photon const*> closestIndirPhotons;
 	photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allIndirPhotons, intersectionPoint, 10, closestIndirPhotons);
-	const float rayFactor = std::max(0.0f, glm::dot(ray.from, cameraPlaneNormal));
 	float photonDistance;
 	for (const Photon * ip : closestIndirPhotons) {
-		//photonDistance = glm::distance(intersectionPoint, ip->position);
-		//colorAccumulator += 0.01f*rayFactor*ip->color;// / photonDistance;
-	}
-
+		photonDistance = glm::distance(intersectionPoint, ip->position);
+	    colorAccumulator +=  0.001f*ip->color / photonDistance;
+	}*/
 	return (1.0f / (float)bouncesPerHit) *colorAccumulator;
 }
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
-					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
+					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance, bool cullBackFace) const {
 	float closestInterectionDistance = FLT_MAX;
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		for (unsigned int j = 0; j < renderGroups[i].primitives.size(); ++j) {
-			/* Check if the reversedRay intersects with anything. */
-			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance);
+			/* Check if the ray intersects with anything. */
+			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance, cullBackFace);
 			if (intersects) {
 				assert(intersectionDistance > FLT_EPSILON);
 				if (intersectionDistance < closestInterectionDistance) {

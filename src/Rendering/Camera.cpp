@@ -88,8 +88,9 @@ void Camera::Render(const Scene & scene, const RenderingMode RENDERING_MODE, con
 						colorAccumulator += rayFactor * scene.TraceRay(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 						break;
 					case RenderingMode::MONTE_CARLO_USING_PHOTON_MAP:
+						//colorAccumulator += rayFactor * scene.CastShadowRays(ray);
 						/* Trace a ray through the scene. */
-						colorAccumulator += rayFactor * scene.TraceRayUsingPhotonMap(ray, cameraPlaneNormal, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
+						colorAccumulator += rayFactor * scene.TraceRayUsingPhotonMap(ray, RAY_MAX_BOUNCE, RAY_MAX_DEPTH);
 						break;
 					case RenderingMode::VISUALIZE_PHOTON_MAP:
 						/* Shoot a ray through the scene and sample using the photon map. */
