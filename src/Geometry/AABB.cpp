@@ -19,3 +19,10 @@ bool AABB::IsPointInsideAABB(const glm::vec3 & p) const {
 }
 
 glm::vec3 AABB::GetCenter() const { return 0.5f * (minimum + maximum); }
+
+bool AABB::RayIntersection(const Ray & ray) {
+	// Using the fast ray AABB overlap test using ray slopes as described by M. Eisemann et al.
+	// http://www.cg.cs.tu-bs.de/media/publications/fast-rayaxis-aligned-bounding-box-overlap-tests-using-ray-slopes.pdf
+
+	return true;
+}

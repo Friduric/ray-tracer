@@ -62,14 +62,14 @@ glm::vec3 Scene::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const g
 	// Check all light sources
 	for (RenderGroup* lightSource : emissiveRenderGroups) {
 		glm::vec3 lightSurfPos = lightSource->GetRandomPositionOnSurface();
-		ray.dir = glm::normalize(lightSurfPos - ray.from);
+		ray.direction = glm::normalize(lightSurfPos - ray.from);
 		// Cast ray towards light source
 		if (RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
 			// Only add color if we did hit a light source	
 			if (renderGroups[intersectionRenderGroupIdx].material->IsEmissive()) {
 				Primitive* lightPrim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
-				const float intersectionRadianceFactor = glm::dot(-ray.dir, lightPrim->GetNormal(lightSurfPos));
-				colorAccumulator +=  material.CalculateDiffuseLighting(-ray.dir, incomingDirection,
+				const float intersectionRadianceFactor = glm::dot(-ray.direction, lightPrim->GetNormal(lightSurfPos));
+				colorAccumulator +=  material.CalculateDiffuseLighting(-ray.direction, incomingDirection,
 																	   prim.GetNormal(ray.from),
 																	   lightSource->material->GetEmissionColor()*intersectionRadianceFactor);
 			}
@@ -93,7 +93,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/*  Calculate intersection point. */
-	glm::vec3 intersectionPoint = ray.from + ray.dir * intersectionDistance;
+	glm::vec3 intersectionPoint = ray.from + ray.direction * intersectionDistance;
 
 	/* Retrieve primitive and material information for the intersected object. */
 	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
@@ -101,13 +101,13 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 	Material* hitMaterial = intersectionRenderGroup.material;
 	if (hitMaterial->IsEmissive()) {
 		// We could also add emission color to the end result. Returning it here speeds up rendering.
-		const float intersectionRadianceFactor = glm::dot(-ray.dir, intersectionPrimitive->GetNormal(intersectionPoint));
+		const float intersectionRadianceFactor = glm::dot(-ray.direction, intersectionPrimitive->GetNormal(intersectionPoint));
 		return intersectionRadianceFactor * intersectionRenderGroup.material->GetEmissionColor();
 	}
 
 	/* Calculate normal. */
 	glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
-
+	
 	/* Shoot rays and integrate based on BRDF sampling. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
@@ -115,7 +115,7 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, bouncesPerHit, depth - 1);
-		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
 	}
 	return (1.0f / (float)bouncesPerHit) * colorAccumulator;
 }
@@ -129,13 +129,13 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/*  Calculate intersection point. */
-	glm::vec3 intersectionPoint = ray.from + ray.dir * intersectionDistance;
+	glm::vec3 intersectionPoint = ray.from + ray.direction * intersectionDistance;
 
 	// Calculate the direct light at the current pos and return
 	// if we should not trace this ray any further.
 	float r = (float)std::rand() / (float)RAND_MAX;
 	if (depth == 0 ||  r > 0.75f) { 
-		return CalculateDirectIlluminationAtPos(intersectionPoint, ray.dir,
+		return CalculateDirectIlluminationAtPos(intersectionPoint, ray.direction,
 												*renderGroups[intersectionRenderGroupIndex].primitives[intersectionPrimitiveIndex], 
 												*renderGroups[intersectionRenderGroupIndex].material);
 	}
@@ -149,7 +149,7 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 	Material* hitMaterial = intersectionRenderGroup.material;
 	if (hitMaterial->IsEmissive()) {
 		// We could also add emission color to the end result. Returning it here speeds up rendering.
-		const float intersectionRadianceFactor = glm::dot(-ray.dir, intersectionPrimitive->GetNormal(intersectionPoint));
+		const float intersectionRadianceFactor = glm::dot(-ray.direction, intersectionPrimitive->GetNormal(intersectionPoint));
 		return intersectionRadianceFactor * intersectionRenderGroup.material->GetEmissionColor();
 	}
 
@@ -159,6 +159,7 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 	/* Shoot rays and integrate based on BRDF sampling. */
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	// Only cast against light sources for direct light
+
 	//for (unsigned int i = 0; i < emissiveRenderGroups.size(); ++i) {
 	for (unsigned int i = 0; i < bouncesPerHit; ++i) {
 		//glm::vec3 surfPos = emissiveRenderGroups[i]->GetRandomPositionOnSurface();//GetCenter();// 
@@ -173,7 +174,7 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 			*/assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 			Ray reflectedRay(intersectionPoint, reflectionDirection);
 			const glm::vec3 incomingRadiance = TraceRayUsingPhotonMap(reflectedRay, bouncesPerHit, depth - 1);		
-			colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.dir, -ray.dir, hitNormal, incomingRadiance);
+			colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
 		//}	
 	}
 	// Add indirect light from photons
@@ -213,13 +214,13 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 bool Scene::RefractionRayCast(const Ray & ray, const unsigned int renderGroupIndex,
 							  const glm::vec3 & normal,
 							  const glm::vec3 & intersectionPoint,
-							  const Material const * materialFrom,
-							  const Material const * materialTo) const {
+							  Material const * const materialFrom,
+							  Material const * const materialTo) const {
 	// See https://en.wikipedia.org/wiki/Schlick%27s_approximation for more information.
 	float n1 = materialFrom->refractiveIndex;
 	float n2 = materialTo->refractiveIndex;
 	float R0 = glm::pow((n1 - n2) / (n1 + n2), 2.0f);
-	float alpha = glm::dot(normal, -ray.dir);
+	float alpha = glm::dot(normal, -ray.direction);
 	float RO = R0 + (1 - R0) * glm::pow((1 - alpha), 5.0f);
 
 }

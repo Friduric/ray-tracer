@@ -47,7 +47,7 @@ public:
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color, using photon map.
 	/// </summary>
-	glm::vec3 TraceRayUsingPhotonMap(const Ray & ray, 
+	glm::vec3 TraceRayUsingPhotonMap(const Ray & ray,
 									 const unsigned int BOUNCES_PER_HIT = 1,
 									 const unsigned int MAX_DEPTH = 5) const;
 
@@ -82,8 +82,8 @@ public:
 	bool RefractionRayCast(const Ray & ray, const unsigned int intersectionRenderGroupIndex,
 						   const glm::vec3 & normal,
 						   const glm::vec3 & intersectionPoint,
-						   const Material const * materialFrom,
-						   const Material const * materialTo) const;
+						   const Material * const materialFrom,
+						   const Material * const materialTo) const;
 
 	/// <summary> 
 	/// Generates a photon map that can be used during rendering.

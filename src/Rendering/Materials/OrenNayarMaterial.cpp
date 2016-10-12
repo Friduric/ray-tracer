@@ -4,18 +4,14 @@
 #include <algorithm>
 #include <iostream>
 
-OrenNayarMaterial::OrenNayarMaterial(glm::vec3 _surfaceColor, glm::vec3 _emissionColor,
-									 float _roughness, float _albedo) :
-	surfaceColor(_surfaceColor), emissionColor(_emissionColor),
-	roughness(_roughness), albedo(_albedo) {}
 
-bool OrenNayarMaterial::IsEmissive() const {
-	return (emissionColor.r + emissionColor.g + emissionColor.b) > 3.0f * FLT_EPSILON;
-}
+OrenNayarMaterial::OrenNayarMaterial(glm::vec3 color, float _roughness, float _emissivity,
+									 float _reflectivity, float _transparency,
+									 float _refractiveIndex) :
+	surfaceColor(color), roughness(_roughness),
+	Material(_refractiveIndex, _transparency, _emissivity, _reflectivity) {}
 
 glm::vec3 OrenNayarMaterial::GetSurfaceColor() const { return surfaceColor; }
-
-glm::vec3 OrenNayarMaterial::GetEmissionColor() const { return emissionColor; }
 
 glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirection,
 													  const glm::vec3 & outDirection,
@@ -39,7 +35,6 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 
 	float gamma = glm::dot(-inDirection, outDirection);
 
-	const float reflectivity = albedo / glm::pi<float>();
 	const float oren = A + B * std::max(0.0f, gamma) * sin(alphaInclination) * tan(betaInclination);
 
 	return reflectivity * oren * (incomingRadiance * surfaceColor);

@@ -2,6 +2,8 @@
 
 #include <glm.hpp>
 
+#include "Ray.h"
+
 /// <summary> Describes an axis aligned bounding box. </summary>
 class AABB {
 public:
@@ -22,4 +24,7 @@ public:
 
 	/// <summary> Returns the center of the AABB. </summary>
 	glm::vec3 GetCenter() const;
+
+	/// <summary> Returns true if a given ray intersects this AABB. </summary>
+	bool RayIntersection(const Ray & ray);
 };
