@@ -54,21 +54,26 @@ void Scene::Initialize() {
 
 glm::vec3 Scene::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection, const Primitive & prim, const Material & material) const {
 	glm::vec3 colorAccumulator = { 0,0,0 };
-	// If there are now shadow photons then we assume its lit by all sources
-	if (photonMap != NULL) {
-		if (photonMap->GetShadowPhotonsInOctreeNodeOfPosition(pos).size() == 0) {
-			for (RenderGroup* lightSource : emissiveRenderGroups) {
-				/*glm::vec3 surfPos = lightSource->GetRandomPositionOnSurface();
-				Primitive* lightPrim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
-				const float intersectionRadianceFactor = glm::dot(-ray.direction, lightPrim->GetNormal(lightSurfPos));
-				colorAccumulator += material.CalculateDiffuseLighting(-ray.direction, incomingDirection,
-																	  prim.GetNormal(ray.from),
-																	  lightSource->material->GetEmissionColor()*intersectionRadianceFactor);*/
+	
+	if (photonMap != NULL && false) {
+		Octree::OctreeNode* node = photonMap->GetOctreeNodeOfPosition(pos);
+		std::vector<Photon const*> directPhotons = node->directPhotons;
+		std::vector<Photon const*> indirectPhotons = node->indirectPhotons;
+		std::vector<Photon const*> shadowPhotons = node->shadowPhotons;
+		// If there are no shadow photons and several directPhotons then we approximate light with photons
+		if (shadowPhotons.size() == 0 && directPhotons.size() > photonMap->minPhotonsPerNode) {
+			std::vector<Photon const*> photonsWithinRadius;
+			glm::vec3 corner = node->axisAlignedBoundingBox.maximum;
+			float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter(), corner);
+			photonMap->GetPhotonsInOctreeNodeOfPositionWithinRadius(directPhotons, pos, radius, photonsWithinRadius);
+			for (Photon const* dp : directPhotons) {
+				float distance = glm::distance(pos, dp->position);
+				float weight = std::max(0.0f, 1.0f - distance/radius);
+				colorAccumulator += weight * dp->color;
 			}
 		}
-		// If there are no direct or indirect photons we assume its complete black
-		if (photonMap->GetDirectPhotonsInOctreeNodeOfPosition(pos).size() +
-			photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(pos).size() == 0) {
+		// If there are no direct photons we assume its not lit by any light
+		if (directPhotons.size()) {
 			return glm::vec3(0, 0, 0);
 		}
 	}

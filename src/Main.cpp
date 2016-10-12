@@ -30,14 +30,14 @@ int main()
 	using cui = const unsigned int;
 
 	/* Settings. Adjust these to alter rendering. */
-	auto RENDERING_MODE = RenderingMode::MONTE_CARLO;
+	auto RENDERING_MODE = RenderingMode::MONTE_CARLO_USING_PHOTON_MAP;
 	cui PIXELS_W = 200;
 	cui PIXELS_H = 200;
-	cui RAYS_PER_PIXEL = 8;
+	cui RAYS_PER_PIXEL = 128;
 	cui MAX_RAY_DEPTH = 2;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
-	cui MAX_PHOTONS_PER_NODE = 10;
+	cui MIN_PHOTONS_PER_NODE = 10;
 	cui PHOTON_MAP_DEPTH = 5;
 
 	/* Initialize. */
@@ -69,7 +69,7 @@ int main()
 	scene.Initialize();
 
 	/* Generate PhotonMap. */
-	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
+	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
 
 	/* Render scene. */
 	c.Render(scene, RENDERING_MODE, RAYS_PER_PIXEL, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
@@ -108,7 +108,7 @@ int main()
 	out << setw(COL_WIDTH) << left << "Bounces per hit:" << BOUNCES_PER_HIT << endl;
 	out << setw(COL_WIDTH) << left << "Render time:" << took << " seconds." << endl;
 	out << setw(COL_WIDTH) << left << "Photons per light source:" << PHOTONS_PER_LIGHT_SOURCE << endl;
-	out << setw(COL_WIDTH) << left << "Max photons per node:" << MAX_PHOTONS_PER_NODE << endl;
+	out << setw(COL_WIDTH) << left << "Max photons per node:" << MIN_PHOTONS_PER_NODE << endl;
 	out << setw(COL_WIDTH) << left << "Photon map depth:" << PHOTON_MAP_DEPTH << endl;
 	out.close();
 

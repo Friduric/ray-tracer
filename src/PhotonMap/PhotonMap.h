@@ -5,6 +5,9 @@ class PhotonMap
 {
 public:
 	
+	unsigned int minPhotonsPerNode;
+	unsigned int maxPhotonsPerNode;
+
 	/// <summary> 
 	/// Shoots all photons in the scene and saves them in a Octree.
 	/// </summary>
@@ -14,16 +17,30 @@ public:
 	/// <param name='MINIMUM_NODE_BOX_DIMENSION'> The minimum width, height and depth of a nodes box size. </param>
 	/// <param name='MAX_DEPTH'> The amount of times each photon will bounce at most. </param>
 	PhotonMap(const class Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
-			  const unsigned int MAX_PHOTONS_PER_NODE,
+			  const unsigned int MIN_PHOTONS_PER_NODE,
 			  const unsigned int MAX_DEPTH);
 
 	~PhotonMap();
 
 	/// <summary> 
+	/// Returns photons located within radius around the given world position.
+	/// Photons are stored in closestPhotons.
+	/// </summary>
+	/// <param name='photons'> The photons in the node. </param>
+	/// <param name='pos'> The position to search around. </param>
+	/// <param name='radius'> The radius to search with. </param>
+	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
+	void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon const*> photons, const glm::vec3 & pos,
+															const float radius, std::vector<Photon const*> & photonsInRadius) const;
+
+	/// <summary> 
 	/// Returns N closest photons located around the given world position.
 	/// Photons are stored in closestPhotons.
 	/// </summary>
+	/// <param name='photons'> The photons in the node. </param>
 	/// <param name='pos'> The position to search around. </param>
+	/// <param name='N'> The amount of photons to retrieve. </param>
+	/// <param name='closestPhotons'> Found photons are added to this vector. </param>
 	void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
 															 const int N, std::vector<Photon const*> & closestPhotons) const;
 
@@ -31,9 +48,7 @@ public:
 	/// Returns all photons located at the given world position.
 	/// </summary>
 	/// <param name='pos'> The position to search around. </param>
-	std::vector<Photon const*> & GetDirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
-	std::vector<Photon const*> & GetIndirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
-	std::vector<Photon const*> & GetShadowPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const;
+	Octree::OctreeNode * PhotonMap::GetOctreeNodeOfPosition(const glm::vec3 & pos) const;
 
 private:
 

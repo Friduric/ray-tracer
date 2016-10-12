@@ -8,8 +8,10 @@
 #include "../Scene/Scene.h"
 
 PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
-					 const unsigned int MAX_PHOTONS_PER_NODE,
-					 const unsigned int MAX_DEPTH) {
+					 const unsigned int MIN_PHOTONS_PER_NODE,
+					 const unsigned int MAX_DEPTH) :
+	minPhotonsPerNode(MIN_PHOTONS_PER_NODE),
+	maxPhotonsPerNode(std::max(0, (int)MIN_PHOTONS_PER_NODE * 8 - 1)) {
 
 	// Initialize.
 	std::cout << "Creating the photon map ..." << std::endl;
@@ -82,12 +84,21 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 	}
 
 	// Create octree
-	octree = new Octree(directPhotons, indirectPhotons, shadowPhotons, MAX_PHOTONS_PER_NODE, scene.axisAlignedBoundingBox);
+	octree = new Octree(directPhotons, indirectPhotons, shadowPhotons, MIN_PHOTONS_PER_NODE, scene.axisAlignedBoundingBox);
 }
 
 PhotonMap::~PhotonMap()
 {
 	delete octree;
+}
+
+void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon const*> photons, const glm::vec3 & pos,
+														 const float radius, std::vector<Photon const*> & photonsInRadius) const {
+	for (Photon const* p : photons) {
+		if (glm::distance(p->position, pos) <= radius) {
+			photonsInRadius.push_back(p);
+		}		
+	}
 }
 
 void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
@@ -98,22 +109,13 @@ void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon cons
 	}
 	int cappedN = std::min((int)photons.size(), N);
 	std::vector<int> sortedIdxs = sortIndexes(distances);
-	closestPhotons.clear();
 	for (int i = 0; i < cappedN; ++i) {
 		closestPhotons.push_back(photons[i]);
 	}
 }
 
-std::vector<Photon const*> & PhotonMap::GetDirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const {
-	return octree->GetNodeClosestToPosition(pos)->directPhotons;
-}
-
-std::vector<Photon const*> & PhotonMap::GetIndirectPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const {
-	return octree->GetNodeClosestToPosition(pos)->indirectPhotons;
-}
-
-std::vector<Photon const*> & PhotonMap::GetShadowPhotonsInOctreeNodeOfPosition(const glm::vec3 & pos) const {
-	return octree->GetNodeClosestToPosition(pos)->shadowPhotons;
+Octree::OctreeNode * PhotonMap::GetOctreeNodeOfPosition(const glm::vec3 & pos) const {
+	return octree->GetNodeClosestToPosition(pos);
 }
 
 std::vector<int> PhotonMap::sortIndexes(const std::vector<float>& v) const

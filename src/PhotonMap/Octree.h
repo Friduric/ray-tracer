@@ -5,6 +5,8 @@
 
 class Octree {
 
+public:
+
 	class OctreeNode {
 	public:
 		/// <summary> 
@@ -43,7 +45,6 @@ class Octree {
 		bool IsLeaf() const;
 	};
 
-public:
 	/// <summary> 
 	/// Sets up the octree with all /DataType/s.
 	/// </summary>
