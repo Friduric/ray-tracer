@@ -160,6 +160,9 @@
     <ClCompile Include="src\PhotonMap\Photon.cpp" />
     <ClCompile Include="src\PhotonMap\PhotonMap.cpp" />
     <ClCompile Include="src\Rendering\Materials\OrenNayarMaterial.cpp" />
+    <ClCompile Include="src\Rendering\Renderers\MonteCarloRenderer.cpp" />
+    <ClCompile Include="src\Rendering\Renderers\PhotonMapRenderer.cpp" />
+    <ClCompile Include="src\Rendering\Renderers\PhotonMapVisualizer.cpp" />
     <ClCompile Include="src\Rendering\RenderGroup.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Geometry\Sphere.cpp" />
@@ -178,6 +181,10 @@
     <ClInclude Include="src\PhotonMap\PhotonMap.h" />
     <ClInclude Include="src\Rendering\Materials\OrenNayarMaterial.h" />
     <ClInclude Include="src\PhotonMap\Photon.h" />
+    <ClInclude Include="src\Rendering\Renderers\MonteCarloRenderer.h" />
+    <ClInclude Include="src\Rendering\Renderers\PhotonMapRenderer.h" />
+    <ClInclude Include="src\Rendering\Renderers\PhotonMapVisualizer.h" />
+    <ClInclude Include="src\Rendering\Renderers\Renderer.h" />
     <ClInclude Include="src\Rendering\RenderGroup.h" />
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\Geometry\Sphere.h" />
