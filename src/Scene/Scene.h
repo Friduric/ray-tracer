@@ -31,10 +31,11 @@ public:
 	~Scene();
 
 	/// <summary> 
-	/// Casts rays towards all lightsources from the intersectionPoint.
-	/// Returns a color.
+	/// Casts rays towards all lightsources from the intersectionPoint pos at
+	/// the Primitive prim and calculate the direct illumination at the 
+	/// Primitive prim at with Material material.
 	/// </summary>
-	glm::vec3 Scene::CastShadowRays(const Ray & ray) const;
+	glm::vec3 Scene::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection, const Primitive & prim, const Material & material) const;
 
 	/// <summary> 
 	/// Traces a ray through the scene and returns a color.

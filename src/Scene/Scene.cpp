@@ -52,46 +52,31 @@ void Scene::Initialize() {
 	axisAlignedBoundingBox = AABB(minimumPosition, maximumPosition);
 }
 
-glm::vec3 Scene::CastShadowRays(const Ray & ray) const {
-	glm::vec3 surfPos;
-	unsigned int intersectionRenderGroupIdx, intersectionPrimitiveIdx;
-	float intersectionDistance;
-	glm::vec3 incomingDirection = ray.dir;
-	Ray rayTowardsLight;
-	Primitive* prim;
-	Material* material;
-	// Cast ray into the scene
-	if (RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
-		prim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
-		material = renderGroups[intersectionRenderGroupIdx].material;
-		surfPos = ray.from + ray.dir * intersectionDistance;
-		rayTowardsLight.from = surfPos + 0.001f*prim->GetNormal(surfPos);
-	}
-	else {
-		// Nothing was hit return 0 color
-		return glm::vec3(0, 0, 0);
-	}
-
+glm::vec3 Scene::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection, const Primitive & prim, const Material & material) const {
+	Ray ray;
+	ray.from = pos + 0.01f * prim.GetNormal(pos); // + 0.01 normal to not cast from inside the object
 	glm::vec3 colorAccumulator = { 0,0,0 };
+	unsigned int intersectionRenderGroupIdx;
+	unsigned int intersectionPrimitiveIdx;
+	float intersectionDistance;
 	// Check all light sources
 	for (RenderGroup* lightSource : emissiveRenderGroups) {
 		glm::vec3 lightSurfPos = lightSource->GetRandomPositionOnSurface();
-		
-		rayTowardsLight.dir = glm::normalize(lightSurfPos - rayTowardsLight.from);
+		ray.dir = glm::normalize(lightSurfPos - ray.from);
 		// Cast ray towards light source
-		if (RayCast(rayTowardsLight, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
+		if (RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
 			// Only add color if we did hit a light source	
 			if (renderGroups[intersectionRenderGroupIdx].material->IsEmissive()) {
 				Primitive* lightPrim = renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
-				const float intersectionRadianceFactor = glm::dot(-rayTowardsLight.dir, lightPrim->GetNormal(lightSurfPos));
-				colorAccumulator += material->CalculateDiffuseLighting(incomingDirection, ray.dir,
-																	   prim->GetNormal(rayTowardsLight.from),
+				const float intersectionRadianceFactor = glm::dot(-ray.dir, lightPrim->GetNormal(lightSurfPos));
+				colorAccumulator +=  material.CalculateDiffuseLighting(-ray.dir, incomingDirection,
+																	   prim.GetNormal(ray.from),
 																	   lightSource->material->GetEmissionColor()*intersectionRadianceFactor);
 			}
 		}
 	}
 
-	return (1.0f / (float)emissiveRenderGroups.size()) *colorAccumulator;
+	return (1.0f / (float)emissiveRenderGroups.size()) * colorAccumulator;
 }
 
 glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
@@ -136,14 +121,6 @@ glm::vec3 Scene::TraceRay(const Ray & ray, const unsigned int bouncesPerHit, con
 }
 
 glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int bouncesPerHit, const unsigned int depth) const {
-	float r = (float)std::rand() / (float)RAND_MAX;
-	if (depth == 0 ||  r > 0.75f) { 
-		return CastShadowRays(ray);// glm::vec3(0, 0, 0);
-	}
-
-	assert(depth > 0);
-	assert(bouncesPerHit > 0);
-
 	unsigned int intersectionPrimitiveIndex, intersectionRenderGroupIndex;
 	float intersectionDistance;
 	bool intersectionFound = RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
@@ -153,6 +130,18 @@ glm::vec3 Scene::TraceRayUsingPhotonMap(const Ray & ray, const unsigned int boun
 
 	/*  Calculate intersection point. */
 	glm::vec3 intersectionPoint = ray.from + ray.dir * intersectionDistance;
+
+	// Calculate the direct light at the current pos and return
+	// if we should not trace this ray any further.
+	float r = (float)std::rand() / (float)RAND_MAX;
+	if (depth == 0 ||  r > 0.75f) { 
+		return CalculateDirectIlluminationAtPos(intersectionPoint, ray.dir, 
+												*renderGroups[intersectionRenderGroupIndex].primitives[intersectionPrimitiveIndex], 
+												*renderGroups[intersectionRenderGroupIndex].material);
+	}
+
+	assert(depth > 0);
+	assert(bouncesPerHit > 0);
 
 	/* Retrieve primitive and material information for the intersected object. */
 	const auto & intersectionRenderGroup = renderGroups[intersectionRenderGroupIndex];
