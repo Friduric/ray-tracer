@@ -37,6 +37,9 @@ std::string CurrentDateTime() {
 int main()
 {
 	using cui = const unsigned int;
+	enum RendererType {
+		MONTE_CARLO, PHOTON_MAP, PHOTON_MAP_VISUALIZATION
+	};
 
 	// --------------------------------------
 	// Settings.
@@ -49,7 +52,7 @@ int main()
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
 	cui MIN_PHOTONS_PER_NODE = 10;
 	cui PHOTON_MAP_DEPTH = 5;
-	using TheRenderer = MonteCarloRenderer;
+	RendererType RENDERER_TYPE = RendererType::MONTE_CARLO;
 
 	// --------------------------------------
 	// Create the scene.
@@ -83,17 +86,25 @@ int main()
 	Camera camera(PIXELS_W, PIXELS_H);
 
 	// --------------------------------------
-	// Generate PhotonMap.
-	// --------------------------------------
-	// TODO: Move this to the renderers.
-	scene.GeneratePhotonMap(PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
-
-
-	// --------------------------------------
 	// Render scene.
 	// --------------------------------------
-	TheRenderer renderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
-	camera.Render(scene, renderer, RAYS_PER_PIXEL, glm::vec3(-7, 0, 0));
+	Renderer * renderer = nullptr;
+	switch (RENDERER_TYPE) {
+	case RendererType::MONTE_CARLO:
+		renderer = new MonteCarloRenderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
+		break;
+	case RendererType::PHOTON_MAP:
+		renderer = new PhotonMapRenderer(scene, /* ... add parameters here ... */);
+		break;
+	case RendererType::PHOTON_MAP_VISUALIZATION:
+		renderer = new PhotonMapVisualizer(scene, /* ... add parameters here ... */);
+		break;
+	}
+	if (renderer == nullptr) {
+		std::cerr << "Failed to initialize renderer." << std::endl;
+		return;
+	}
+	camera.Render(scene, *renderer, RAYS_PER_PIXEL, glm::vec3(-7, 0, 0));
 
 	// --------------------------------------
 	// Finalize.
@@ -116,7 +127,7 @@ int main()
 
 	const unsigned int COL_WIDTH = 30;
 
-	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderer.RENDERER_NAME << endl;
+	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderer->RENDERER_NAME << endl;
 	out << setw(COL_WIDTH) << left << "Dimensions:" << PIXELS_W << "x" << PIXELS_H << " pixels. " << endl;
 	out << setw(COL_WIDTH) << left << "Rays per pixel:" << RAYS_PER_PIXEL << endl;
 	out << setw(COL_WIDTH) << left << "Max ray depth:" << MAX_RAY_DEPTH << endl;
