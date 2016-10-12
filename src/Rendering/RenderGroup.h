@@ -12,5 +12,6 @@ public:
 	Material* material;
 	std::vector<Primitive*> primitives;
 	std::vector<std::vector<Photon>> photons;
+	glm::vec3 GetRandomPositionOnSurface();
 	RenderGroup(Material*);
 };
