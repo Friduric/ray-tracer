@@ -74,9 +74,9 @@ int main()
 	SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.5f, glm::vec3(1, 1, 1), 1.0f);
 	//SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1.0f, 0.35f, 0.55f));
 
-   // --------------------------------------
-   // Initialize camera and time keeping.
-   // --------------------------------------
+	// --------------------------------------
+	// Initialize camera and time keeping.
+	// --------------------------------------
 	scene.Initialize();
 	auto startTime = std::chrono::high_resolution_clock::now();
 	std::cout << "Starting..." << std::endl;

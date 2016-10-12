@@ -10,12 +10,16 @@
 
 class Camera {
 public:
-	size_t width, height;
+	/// <summary> The width of the camera in pixels. </summary>
+	unsigned int width;
+
+	/// <summary> The height of the camera in pixels. </summary>
+	unsigned int height;
 
 	/// <summary> Constructs an image. </summary>
 	/// <param name="width"> The width of the image in pixels. </param>
 	/// <param name="height"> The height of the image in pixels. </param>
-	Camera(const int width = 1000, const int height = 1000);
+	Camera(const unsigned int width = 1000, const unsigned int height = 1000);
 
 	/// <summary>
 	/// Renders the image by setting the color of each pixel according to Monte Carlo 
