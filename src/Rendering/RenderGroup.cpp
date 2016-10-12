@@ -5,4 +5,4 @@ glm::vec3 RenderGroup::GetRandomPositionOnSurface() {
 	return primitive->GetRandomPositionOnSurface();
 }
 
-RenderGroup::RenderGroup(Material* mat) : material(mat) {}
+RenderGroup::RenderGroup(Material * mat) : material(mat) {}

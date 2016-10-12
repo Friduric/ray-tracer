@@ -22,7 +22,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	// If the ray doesn't intersect, simply return (0, 0, 0).
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
-	//  Calculate intersection point.
+	// Calculate intersection point.
 	glm::vec3 intersectionPoint = ray.from + ray.direction * intersectionDistance;
 
 	// Retrieve primitive and material information for the intersected object. 

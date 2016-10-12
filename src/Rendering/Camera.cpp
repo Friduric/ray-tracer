@@ -11,7 +11,8 @@
 
 #define __LOG_ITERATIONS // Define if we should log rendering progress.
 
-Camera::Camera(const int _width, const int _height) : width(_width), height(_height) {
+Camera::Camera(const unsigned int _width, const unsigned int _height) :
+	width(_width), height(_height) {
 	pixels.assign(width, std::vector<Pixel>(height));
 	discretizedPixels.assign(width, std::vector<glm::u8vec3>(height));
 }
