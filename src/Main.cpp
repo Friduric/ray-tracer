@@ -49,12 +49,12 @@ int main()
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
 	cui MIN_PHOTONS_PER_NODE = 10;
 	cui PHOTON_MAP_DEPTH = 5;
-	Scene scene;
-	MonteCarloRenderer renderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
+	using TheRenderer = MonteCarloRenderer;
 
 	// --------------------------------------
 	// Create the scene.
 	// --------------------------------------
+	Scene scene;
 	std::cout << "Creating the scene..." << std::endl;
 
 	SceneObjectFactory::AddRoom(scene, false);
@@ -92,6 +92,7 @@ int main()
 	// --------------------------------------
 	// Render scene.
 	// --------------------------------------
+	TheRenderer renderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
 	camera.Render(scene, renderer, RAYS_PER_PIXEL, glm::vec3(-7, 0, 0));
 
 	// --------------------------------------

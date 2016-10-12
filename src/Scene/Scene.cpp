@@ -26,14 +26,14 @@ Scene::~Scene() {
 }
 
 void Scene::Initialize() {
-	/* Add emissive materials. */
+	// Add emissive materials.
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		if (renderGroups[i].material->IsEmissive()) {
 			emissiveRenderGroups.push_back(&renderGroups[i]);
 		}
 	}
 
-	/* Calculate the bounding box of the scene. */
+	// Calculate the bounding box of the scene.
 	glm::vec3 minimumPosition = glm::vec3(FLT_MAX);
 	glm::vec3 maximumPosition = glm::vec3(-FLT_MAX);
 	for (const auto & rg : renderGroups) {
@@ -54,10 +54,13 @@ void Scene::Initialize() {
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
 					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance, bool cullBackFace) const {
+
 	float closestInterectionDistance = FLT_MAX;
+
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		for (unsigned int j = 0; j < renderGroups[i].primitives.size(); ++j) {
-			/* Check if the ray intersects with anything. */
+
+			// Check if the ray intersects with anything.
 			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance, cullBackFace);
 			if (intersects) {
 				assert(intersectionDistance > FLT_EPSILON);
@@ -69,6 +72,7 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 			}
 		}
 	}
+
 	intersectionDistance = closestInterectionDistance;
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
 }
