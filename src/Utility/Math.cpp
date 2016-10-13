@@ -9,9 +9,9 @@
 
 using namespace std;
 
-float Math::BilinearInterpolation(const float dy, const float dz,
-								  const float x1, const float x2,
-								  const float x3, const float x4) {
+float Utility::Math::BilinearInterpolation(const float dy, const float dz,
+										   const float x1, const float x2,
+										   const float x3, const float x4) {
 	assert(dy >= 0 && dy <= 1 + FLT_EPSILON);
 	assert(dz >= 0 && dz <= 1 + FLT_EPSILON);
 	const float idy = 1 - dy;
@@ -24,7 +24,7 @@ float Math::BilinearInterpolation(const float dy, const float dz,
 	return a3 * x1 + a4 * x2 + a1 * x3 + a2 * x4;
 }
 
-glm::vec3 Math::NonParallellVector(const glm::vec3 & v) {
+glm::vec3 Utility::Math::NonParallellVector(const glm::vec3 & v) {
 	if (abs(v.x) < FLT_EPSILON) {
 		return glm::vec3(1, 0, 0);
 	}
@@ -40,7 +40,7 @@ glm::vec3 Math::NonParallellVector(const glm::vec3 & v) {
 	}
 }
 
-glm::vec3 Math::RandomHemishpereSampleDirection(const glm::vec3 & n) {
+glm::vec3 Utility::Math::RandomHemishpereSampleDirection(const glm::vec3 & n) {
 	// Samples uniform angles.
 	float incl = (rand() / static_cast<float>(RAND_MAX)) * glm::half_pi<float>();
 	float azim = (rand() / static_cast<float>(RAND_MAX)) * glm::two_pi<float>();
@@ -51,7 +51,7 @@ glm::vec3 Math::RandomHemishpereSampleDirection(const glm::vec3 & n) {
 	return glm::normalize(rotate(inclVector, azim, n));
 }
 
-glm::vec3 Math::CosineWeightedHemisphereSampleDirection(const glm::vec3 & n) {
+glm::vec3 Utility::Math::CosineWeightedHemisphereSampleDirection(const glm::vec3 & n) {
 	// See https://pathtracing.wordpress.com/2011/03/03/cosine-weighted-hemisphere/.
 	// Samples cosine weighted positions.
 	float r1 = rand() / static_cast<float>(RAND_MAX);
@@ -81,10 +81,10 @@ glm::vec3 Math::CosineWeightedHemisphereSampleDirection(const glm::vec3 & n) {
 	return glm::normalize(xs * x + ys * y + zs * z);
 }
 
-Math::NormalDistributionGenerator::NormalDistributionGenerator(float _min, float _max) :
+Utility::Math::NormalDistributionGenerator::NormalDistributionGenerator(float _min, float _max) :
 	min(_min), max(_max), distribution(0.5f * (_min + _max), (1.0f / 6.0f) * (_max - _min)) { }
 
-float Math::NormalDistributionGenerator::GetRandomFloat() {
+float Utility::Math::NormalDistributionGenerator::GetRandomFloat() {
 	float v = distribution(generator);
 	if (v < min - FLT_EPSILON) { return min; }
 	if (v > max + FLT_EPSILON) { return max; }
