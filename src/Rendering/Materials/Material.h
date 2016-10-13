@@ -7,15 +7,15 @@ class Material {
 public:
 	float refractiveIndex, reflectivity, transparency, emissivity, specularity;
 
-	bool IsEmissive() { return emissivity > FLT_EPSILON; };
-	bool IsTransparent() { return transparency > FLT_EPSILON; }
-	bool IsSpecular() { return specularity > FLT_EPSILON; }
-	virtual glm::vec3 GetEmissionColor() { return emissivity * GetSurfaceColor(); }
+	bool IsEmissive() const { return emissivity > FLT_EPSILON; };
+	bool IsTransparent() const { return transparency > FLT_EPSILON; }
+	bool IsSpecular() const { return specularity > FLT_EPSILON; }
+	virtual glm::vec3 GetEmissionColor() const { return emissivity * GetSurfaceColor(); }
 	virtual glm::vec3 GetSurfaceColor() const = 0;
 
 	/// <summary> 
 	/// Calculates the diffuse lighting given by this material. 
-	/// In other words calculates the outgoing radiance. 
+	/// In other words calculates the outgoing radiance given the incoming radiance. 
 	/// </summary>
 	/// <param name='inDirection'> The incoming direction of the light.</param>
 	/// <param name='outDirection'> The outgoing direction of the light.</param>
