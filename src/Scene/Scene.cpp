@@ -25,8 +25,14 @@ Scene::~Scene() {
 	delete photonMap;
 }
 
+Primitive & Scene::GetPrimitive(unsigned int renderGroupIndex, unsigned int primitiveIndex) {
+	assert(renderGroupIndex < renderGroups.size());
+	assert(primitiveIndex < renderGroups[renderGroupIndex].size());
+	return *(renderGroups[renderGroupIndex].primitives[primitiveIndex]);
+}
+
 void Scene::Initialize() {
-	// Add emissive materials.
+	// Pre-store all emissive materials in a separate vector.
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		if (renderGroups[i].material->IsEmissive()) {
 			emissiveRenderGroups.push_back(&renderGroups[i]);
@@ -57,10 +63,13 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 
 	float closestInterectionDistance = FLT_MAX;
 
+	// Check if the ray intersects with any enabled primitive in the scene.
+	// TODO: Use the octree to speed up performance by ray casting on AABBs at first hand.
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
+		if (!renderGroups[i].enabled) {
+			continue;
+		}
 		for (unsigned int j = 0; j < renderGroups[i].primitives.size(); ++j) {
-
-			// Check if the ray intersects with anything.
 			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance, cullBackFace);
 			if (intersects) {
 				assert(intersectionDistance > FLT_EPSILON);

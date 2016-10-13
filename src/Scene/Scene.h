@@ -30,6 +30,9 @@ public:
 	Scene();
 	~Scene();
 
+	/// <summary> Returns a primitive given it's render group index and primitive index. </summary>
+	Primitive & GetPrimitive(unsigned int renderGroupIndex, unsigned int primitiveIndex);
+
 	/// <summary> 
 	/// Casts a ray through the scene. Returns true if there was an intersection.
 	/// </summary>

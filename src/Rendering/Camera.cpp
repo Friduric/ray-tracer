@@ -62,6 +62,7 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 			colorAccumulator = glm::vec3(0, 0, 0);
 			for (float c = 0; c < INV_WIDTH; c += COLUMN_PIXEL_STEP) {
 				for (float r = 0; r < INV_HEIGHT; r += ROW_PIXEL_STEP) {
+
 					// Calculate camera plane ray position using stratified sampling.
 					const float ylerp = y * INV_HEIGHT + c + rand(gen) * COLUMN_PIXEL_STEP;
 					const float zlerp = z * INV_HEIGHT + r + rand(gen) * ROW_PIXEL_STEP;
