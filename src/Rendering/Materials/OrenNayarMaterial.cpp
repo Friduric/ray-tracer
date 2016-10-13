@@ -39,5 +39,5 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 	}
 	oren += A;
 
-	return glm::one_over_pi<float>() * reflectivity * oren * (incomingRadiance * surfaceColor);
+	return glm::one_over_pi<float>() * oren * (incomingRadiance * surfaceColor);
 }
