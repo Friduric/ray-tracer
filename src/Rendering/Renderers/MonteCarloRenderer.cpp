@@ -18,21 +18,10 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
 
-	// Disable previous render group if it's convex (we cannot hit it, so no point in doing intersection checks).
-	bool reEnableRenderGroup = false;
-	if (previousConvexIntersectionRenderGroup != nullptr && previousConvexIntersectionRenderGroup->enabled) {
-		reEnableRenderGroup = true; // Always re-enable it. New rays can still hit it.
-		previousConvexIntersectionRenderGroup->enabled = false;
-	}
-
 	// See if our current ray hits anything in the scene.
 	float intersectionDistance;
 	unsigned int intersectionPrimitiveIndex, intersectionRenderGroupIndex;
 	const bool intersectionFound = scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
-	if (reEnableRenderGroup) {
-		previousConvexIntersectionRenderGroup->enabled = true;
-	}
-	previousConvexIntersectionRenderGroup = nullptr;
 
 	// If the ray doesn't intersect, simply return (0, 0, 0).
 	if (!intersectionFound) {
@@ -44,9 +33,6 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 
 	// Retrieve primitive information for the intersected object. 
 	auto & intersectionRenderGroup = scene.renderGroups[intersectionRenderGroupIndex];
-	if (intersectionRenderGroup.convex) {
-		previousConvexIntersectionRenderGroup = &intersectionRenderGroup;
-	}
 	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 
 	// Calculate normal.
@@ -54,24 +40,42 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 
 	// Retrieve the intersected surface's material.
 	const Material * const hitMaterial = intersectionRenderGroup.material;
-	if (hitMaterial->IsEmissive()) {
-		if (DEPTH == 0) {
-			return hitMaterial->GetEmissionColor() * 0.0f;
-		}
-		else {
-			return hitMaterial->GetEmissionColor();
+
+	glm::vec3 colorAccumulator = { 0,0,0 };
+
+	const float lights = static_cast<float>(scene.emissiveRenderGroups.size());
+	if (DEPTH == 0) {
+
+		// Send a shadow ray toward all light sources to check for light visibility.
+		for (RenderGroup * lightSource : scene.emissiveRenderGroups) {
+			glm::vec3 randomLightSurfacePosition = lightSource->GetRandomPositionOnSurface();
+			Ray shadowRay(intersectionPoint, glm::normalize(randomLightSurfacePosition - intersectionPoint));
+
+			// Cast a shadow ray towards the light source.
+			if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance, false)) {
+				const auto & renderGroup = scene.renderGroups[intersectionRenderGroupIndex];
+				if (&renderGroup == lightSource) {
+
+					// We hit the light. Add it's contribution to the color accumulator.
+					Primitive * lightPrimitive = renderGroup.primitives[intersectionPrimitiveIndex];
+					glm::vec3 lightNormal = lightPrimitive->GetNormal(shadowRay.from + intersectionDistance * shadowRay.direction);
+					const float intersectionRadianceFactor = glm::max(0.0f, glm::dot(-shadowRay.direction, lightNormal));
+					colorAccumulator += intersectionRadianceFactor * lightSource->material->GetEmissionColor();
+				}
+			}
 		}
 	}
-	// return glm::vec3(0);
 
-	// Shoot refracted and reflective rays if the material is transparent.
+	// Calculate direct light contribution.
+	colorAccumulator *= (1.0f / lights);
+
 	if (hitMaterial->IsTransparent()) {
+		// Shoot a refracted ray if the material is transparent.
 		float n1 = 1.0f;
 		float n2 = hitMaterial->refractiveIndex;
 
 		glm::vec3 offset = hitNormal * 0.000001f;
 		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
-		Ray reflectedRay(intersectionPoint, glm::reflect(-ray.direction, hitNormal));
 
 		// Find out if the ray "exits" the render group anywhere.
 		bool hit = scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
@@ -82,29 +86,34 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(intersectionPoint);
 
 			refractedRay.from = refractedIntersectionPoint;
-			refractedRay.direction = glm::refract(-refractedRay.direction, refractedHitNormal, n2 / n1);
+			refractedRay.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
 		}
 		else {
 			// "Flat surface". Just keep on tracing.
 		}
 
-		// Calculate resulting ray contributions.
-		float tf = hitMaterial->transparency;
-		glm::vec3 refractedRayContribution = TraceRay(refractedRay, DEPTH + 1);
-		glm::vec3 reflectedRayContribution = tf < 1.0f ? TraceRay(reflectedRay, DEPTH + 1) : glm::vec3(0);
-		return refractedRayContribution * tf + reflectedRayContribution * (1.0f - tf);
+		colorAccumulator += hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
 	}
 
-	// Shoot rays and integrate based on BRDF. 
-	glm::vec3 colorAccumulator = { 0,0,0 };
+	if (hitMaterial->IsReflective()) {
+		// Shoot a reflective ray if the material is reflective.
+		glm::vec3 offset = hitNormal * 0.000001f;
+		Ray reflectedRay(intersectionPoint + offset, glm::reflect(ray.direction, hitNormal));
+		const auto incomingRadiance = hitMaterial->reflectivity * TraceRay(reflectedRay, DEPTH + 1);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
+	}
+
+	// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting. 
 	for (unsigned int i = 0; i < BOUNCES_PER_HIT; ++i) {
 		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal); // glm::reflect(-ray.direction, hitNormal); // 
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		const Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, DEPTH + 1);
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
-		// colorAccumulator += glm::dot(-ray.direction, intersectionPrimitive->GetNormal(intersectionPoint)) * hitMaterial->GetEmissionColor();
 	}
+
+	// Add emission.
+	colorAccumulator += glm::dot(-ray.direction, intersectionPrimitive->GetNormal(intersectionPoint)) * hitMaterial->GetEmissionColor();
 
 	// Return result.
 	return (1.0f / (float)BOUNCES_PER_HIT) * colorAccumulator;

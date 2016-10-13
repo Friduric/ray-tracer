@@ -34,8 +34,8 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 												*renderGroup.material);
 	}
 
-	assert(depth > 0);
-	assert(bouncesPerHit > 0);
+	assert(DEPTH > 0);
+	assert(BOUNCES_PER_HIT > 0);
 
 	/* Retrieve primitive and material information for the intersected object. */
 	const auto & intersectionPrimitive = renderGroup.primitives[intersectionPrimitiveIndex];

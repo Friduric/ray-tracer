@@ -34,8 +34,7 @@ std::string CurrentDateTime() {
 	return date + "___" + time;
 }
 
-int main()
-{
+int main() {
 	using cui = const unsigned int;
 	enum RendererType {
 		MONTE_CARLO, PHOTON_MAP, PHOTON_MAP_VISUALIZATION
@@ -44,10 +43,10 @@ int main()
 	// --------------------------------------
 	// Settings.
 	// --------------------------------------
-	cui PIXELS_W = 200;
-	cui PIXELS_H = 200;
+	cui PIXELS_W = 400;
+	cui PIXELS_H = 400;
 	cui RAYS_PER_PIXEL = 512;
-	cui MAX_RAY_DEPTH = 5;
+	cui MAX_RAY_DEPTH = 4;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
 	cui MIN_PHOTONS_PER_NODE = 10;
@@ -68,8 +67,8 @@ int main()
 	SceneObjectFactory::AddSphere(scene, 5, -3, 1.5f, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
 	SceneObjectFactory::AddSphere(scene, 6, 0, -0.5f, 1.25f, glm::vec3(0.0f, 1.0f, 0.0f));
 	// SceneObjectFactory::AddSphere(scene, 5, 3, -2, 1.25f, glm::vec3(0.0f, 0.0f, 1.0f));
-	SceneObjectFactory::AddTransparentSphere(scene, 5, 3, -2, 1.25f, glm::vec3(1.0f, 1.0f, 1.0f), 1.52f, 0.01f); // Glass.
-	SceneObjectFactory::AddTransparentSphere(scene, 3, 1.5, -1, 1.00f, glm::vec3(0.0f, 1.0f, 0.0f), 2.52f, 1.0f); // "Diamond".
+	SceneObjectFactory::AddTransparentSphere(scene, 5, 3, -2, 1.25f, glm::vec3(1.0f, 1.0f, 1.0f), 1.52f, 0.001f, 0.99f); // Mirror.
+	SceneObjectFactory::AddTransparentSphere(scene, 3, -3, 3, 1.00f, glm::vec3(0.5f, 1.0f, 1.0f), 2.52f, 0.97f, 0.15f); // "Diamond".
 	// SceneObjectFactory::AddTetrahedron(scene, 7, 0, 3, glm::vec3(1.0f, 1.0f, 1.0f));
 
 	// Lights.

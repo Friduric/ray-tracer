@@ -10,7 +10,7 @@ glm::vec3 LambertianMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirec
 													   const glm::vec3 & outDirection,
 													   const glm::vec3 & normal,
 													   const glm::vec3 & incomingRadiance) const {
-	return reflectivity * glm::max(0.0f, glm::dot(-inDirection, normal)) * (incomingRadiance * surfaceColor);
+	return glm::max(0.0f, glm::dot(-inDirection, normal)) * (incomingRadiance * surfaceColor);
 }
 
 

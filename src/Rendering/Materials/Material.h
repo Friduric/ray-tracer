@@ -10,6 +10,7 @@ public:
 	bool IsEmissive() const { return emissivity > FLT_EPSILON; };
 	bool IsTransparent() const { return transparency > FLT_EPSILON; }
 	bool IsSpecular() const { return specularity > FLT_EPSILON; }
+	bool IsReflective() const { return reflectivity > FLT_EPSILON; }
 	virtual glm::vec3 GetEmissionColor() const { return emissivity * GetSurfaceColor(); }
 	virtual glm::vec3 GetSurfaceColor() const = 0;
 
