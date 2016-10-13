@@ -33,6 +33,8 @@ public:
 	/// <summary> Returns a primitive given it's render group index and primitive index. </summary>
 	Primitive & GetPrimitive(unsigned int renderGroupIndex, unsigned int primitiveIndex);
 
+	void RecalculateAABB();
+
 	/// <summary> 
 	/// Casts a ray through the scene. Returns true if there was an intersection.
 	/// </summary>
@@ -52,6 +54,24 @@ public:
 				 float & intersectionDistance, bool cullBackFace = true) const;
 
 	/// <summary> 
+	/// Casts a ray through a given render group. Returns true if there was an intersection.
+	/// </summary>
+	/// <param name='ray'> The ray which we cast. </param>
+	/// <param name='renderGroupIndex'> 
+	/// The intersection render group index which we ray cast at.
+	/// All other render groups are ignored!
+	/// </param>
+	/// <param name='intersectionPrimitiveIndex'> 
+	/// OUT: The intersection primitive index if there was an intersection.
+	/// </param>
+	/// <param name='intersectionPoint'> 
+	/// OUT: The intersection point distance if there was an intersection.
+	/// </param>
+	bool RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex,
+							unsigned int & intersectionPrimitiveIndex,
+							float & intersectionDistance, bool cullBackFace = false) const;
+
+	/// <summary> 
 	/// Casts a refractive ray through the scene. Returns true if there was an intersection.
 	/// </summary>
 	/// <param name='ray'> The ray which hit a surface which we are now tunneling through. </param>
@@ -59,12 +79,16 @@ public:
 	/// The intersection render group index which we intersected. </param>
 	/// <param name='normal'> The normal to the surface which we intersected. </param>
 	/// <param name='intersectionPoint'> The point which the ray intersected at. </param>
-	/// <param name='materialFrom'> The material which we are coming from. </param>
-	/// <param name='materialTo'> The material which we are leaving. </param>
-	bool RefractionRayCast(const Ray & ray, const unsigned int intersectionRenderGroupIndex,
-						   const glm::vec3 & normal,
+	/// <param name='materialFrom'> 
+	/// The material which we are coming from. If nullptr the material is considered to be air. 
+	/// </param>
+	/// <param name='materialTo'> 
+	/// The material which we are leaving. If nullptr the material is considered to be air.
+	/// </param>
+	bool RefractionRayCast(const Ray & incomingRay, const unsigned int intersectionRenderGroupIndex,
+						   const glm::vec3 & intersectionPointNormal,
 						   const glm::vec3 & intersectionPoint,
-						   const Material * const materialFrom,
-						   const Material * const materialTo) const;
+						   const Material * const materialFrom = nullptr,
+						   const Material * const materialTo = nullptr) const;
 
 };

@@ -31,6 +31,24 @@ Primitive & Scene::GetPrimitive(unsigned int renderGroupIndex, unsigned int prim
 	return *(renderGroups[renderGroupIndex].primitives[primitiveIndex]);
 }
 
+void Scene::RecalculateAABB() {
+	glm::vec3 minimum = glm::vec3(FLT_MAX);
+	glm::vec3 maximum = glm::vec3(-FLT_MAX);
+	for (const auto & rg : renderGroups) {
+		const auto & aabb = rg.axisAlignedBoundingBox;
+		const auto & min = aabb.minimum;
+		const auto & max = aabb.maximum;
+		minimum.x = glm::min<float>(min.x, minimum.x);
+		minimum.y = glm::min<float>(min.y, minimum.y);
+		minimum.z = glm::min<float>(min.z, minimum.z);
+		maximum.x = glm::max<float>(max.x, maximum.x);
+		maximum.y = glm::max<float>(max.y, maximum.y);
+		maximum.z = glm::max<float>(max.z, maximum.z);
+	}
+	axisAlignedBoundingBox.minimum = minimum;
+	axisAlignedBoundingBox.maximum = maximum;
+}
+
 void Scene::Initialize() {
 	// Pre-store all emissive materials in a separate vector.
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
@@ -39,23 +57,7 @@ void Scene::Initialize() {
 		}
 	}
 
-	// Calculate the bounding box of the scene.
-	glm::vec3 minimumPosition = glm::vec3(FLT_MAX);
-	glm::vec3 maximumPosition = glm::vec3(-FLT_MAX);
-	for (const auto & rg : renderGroups) {
-		for (const auto & p : rg.primitives) {
-			const auto & aabb = p->GetAxisAlignedBoundingBox();
-			const auto & min = aabb.minimum;
-			const auto & max = aabb.maximum;
-			minimumPosition.x = glm::min<float>(min.x, minimumPosition.x);
-			minimumPosition.y = glm::min<float>(min.y, minimumPosition.y);
-			minimumPosition.z = glm::min<float>(min.z, minimumPosition.z);
-			maximumPosition.x = glm::max<float>(max.x, maximumPosition.x);
-			maximumPosition.y = glm::max<float>(max.y, maximumPosition.y);
-			maximumPosition.z = glm::max<float>(max.z, maximumPosition.z);
-		}
-	}
-	axisAlignedBoundingBox = AABB(minimumPosition, maximumPosition);
+	RecalculateAABB();
 }
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
@@ -70,6 +72,9 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 			continue;
 		}
 		for (unsigned int j = 0; j < renderGroups[i].primitives.size(); ++j) {
+			if (!renderGroups[i].primitives[j]->enabled) {
+				continue;
+			}
 			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance, cullBackFace);
 			if (intersects) {
 				assert(intersectionDistance > FLT_EPSILON);
@@ -86,17 +91,40 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
 }
 
+bool Scene::RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex, unsigned int & intersectionPrimitiveIndex, float & intersectionDistance, bool cullBackFace) const {
+	float closestInterectionDistance = FLT_MAX;
 
-bool Scene::RefractionRayCast(const Ray & ray, const unsigned int renderGroupIndex,
-							  const glm::vec3 & normal,
+	const auto & renderGroup = renderGroups[renderGroupIndex];
+
+	for (unsigned int j = 0; j < renderGroup.primitives.size(); ++j) {
+		if (!renderGroup.primitives[j]->enabled) {
+			continue;
+		}
+		bool intersects = renderGroup.primitives[j]->RayIntersection(ray, intersectionDistance, cullBackFace);
+		if (intersects) {
+			assert(intersectionDistance > FLT_EPSILON);
+			if (intersectionDistance < closestInterectionDistance) {
+				intersectionPrimitiveIndex = j;
+				closestInterectionDistance = intersectionDistance;
+			}
+		}
+	}
+
+	intersectionDistance = closestInterectionDistance;
+	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
+}
+
+bool Scene::RefractionRayCast(const Ray & incomingRay, const unsigned int renderGroupIndex,
+							  const glm::vec3 & intersectionPointNormal,
 							  const glm::vec3 & intersectionPoint,
 							  Material const * const materialFrom,
 							  Material const * const materialTo) const {
 	// See https://en.wikipedia.org/wiki/Schlick%27s_approximation for more information.
-	float n1 = materialFrom->refractiveIndex;
-	float n2 = materialTo->refractiveIndex;
+	float n1 = materialFrom == nullptr ? 1.0f : materialFrom->refractiveIndex;
+	float n2 = materialTo == nullptr ? 1.0f : materialTo->refractiveIndex;
 	float R0 = glm::pow((n1 - n2) / (n1 + n2), 2.0f);
-	float alpha = glm::dot(normal, -ray.direction);
+	float alpha = glm::dot(intersectionPointNormal, incomingRay.direction);
 	float RO = R0 + (1 - R0) * glm::pow((1 - alpha), 5.0f);
+
 
 }
