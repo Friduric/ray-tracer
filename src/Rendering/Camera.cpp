@@ -44,14 +44,15 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 	const glm::vec3 CAMERA_PLANE_NORMAL = -glm::normalize(glm::cross(c1 - c2, c1 - c4));
 
 	// Initialize ray components.
-	Ray ray;
 	glm::vec3 colorAccumulator;
 
 #ifdef __LOG_ITERATIONS
 	long long ctr = 0;
 #endif // __LOG_ITERATIONS
-	for (unsigned int y = 0; y < width; ++y) {
-		for (unsigned int z = 0; z < height; ++z) {
+	// #pragma omp parallel for
+	for (int y = 0; y < width; ++y) {
+		Ray ray;
+		for (int z = 0; z < height; ++z) {
 #ifdef __LOG_ITERATIONS
 			if (++ctr % 10000 == 0) {
 				std::cout << ctr << "/" << width * height << " pixels." << std::endl;
@@ -60,11 +61,11 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 
 			// Shoot a bunch of rays through the pixel (y, z), and accumulate colors.
 			colorAccumulator = glm::vec3(0, 0, 0);
-			for (float c = 0; c < INV_WIDTH; c += COLUMN_PIXEL_STEP) {
-				for (float r = 0; r < INV_HEIGHT; r += ROW_PIXEL_STEP) {
+			for (float c = 0; c < INV_WIDTH - FLT_EPSILON; c += COLUMN_PIXEL_STEP) {
+				for (float r = 0; r < INV_HEIGHT - FLT_EPSILON; r += ROW_PIXEL_STEP) {
 
 					// Calculate camera plane ray position using stratified sampling.
-					const float ylerp = y * INV_HEIGHT + c + rand(gen) * COLUMN_PIXEL_STEP;
+					const float ylerp = y * INV_WIDTH + c + rand(gen) * COLUMN_PIXEL_STEP;
 					const float zlerp = z * INV_HEIGHT + r + rand(gen) * ROW_PIXEL_STEP;
 					const float nx = Utility::Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
 					const float ny = Utility::Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);

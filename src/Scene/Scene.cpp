@@ -27,7 +27,7 @@ Scene::~Scene() {
 
 Primitive & Scene::GetPrimitive(unsigned int renderGroupIndex, unsigned int primitiveIndex) {
 	assert(renderGroupIndex < renderGroups.size());
-	assert(primitiveIndex < renderGroups[renderGroupIndex].size());
+	assert(primitiveIndex < renderGroups[renderGroupIndex].primitives.size());
 	return *(renderGroups[renderGroupIndex].primitives[primitiveIndex]);
 }
 
