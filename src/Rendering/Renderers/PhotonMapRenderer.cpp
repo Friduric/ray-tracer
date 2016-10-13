@@ -8,23 +8,23 @@ glm::vec3 PhotonMapRenderer::GetPixelColor(const Ray & ray) {
 	return TraceRay(ray);
 }
 
-PhotonMapRenderer::PhotonMapRenderer(const Scene & _SCENE, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT,
+PhotonMapRenderer::PhotonMapRenderer(Scene & _scene, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT,
 									 const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MIN_PHOTONS_PER_NODE, const unsigned int MAX_PHOTON_DEPTH) :
-	SCENE(_SCENE), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Photon Map Renderer") { 
-	photonMap = new PhotonMap(_SCENE, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, MAX_PHOTON_DEPTH);
+	scene(_scene), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Photon Map Renderer") {
+	photonMap = new PhotonMap(_scene, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, MAX_PHOTON_DEPTH);
 }
 
 glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
 	unsigned int intersectionPrimitiveIndex, intersectionRenderGroupIndex;
 	float intersectionDistance;
-	bool intersectionFound = SCENE.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
+	bool intersectionFound = scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
 
 	/* If the ray doesn't intersect, simply return (0, 0, 0). */
 	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
 
 	/*  Calculate intersection point. */
 	glm::vec3 intersectionPoint = ray.from + ray.direction * intersectionDistance;
-	RenderGroup renderGroup = SCENE.renderGroups[intersectionRenderGroupIndex];
+	RenderGroup renderGroup = scene.renderGroups[intersectionRenderGroupIndex];
 	// Calculate the direct light at the current pos and return
 	// if we should not trace this ray any further.
 	float r = (float)std::rand() / (float)RAND_MAX;
@@ -113,13 +113,13 @@ glm::vec3 PhotonMapRenderer::CalculateDirectIlluminationAtPos(const glm::vec3 & 
 	unsigned int intersectionPrimitiveIdx;
 	float intersectionDistance;
 	// Check all light sources
-	for (RenderGroup* lightSource : SCENE.emissiveRenderGroups) {
+	for (RenderGroup* lightSource : scene.emissiveRenderGroups) {
 		glm::vec3 lightSurfPos = lightSource->GetRandomPositionOnSurface();
 		ray.direction = glm::normalize(lightSurfPos - ray.from);
 		// Cast ray towards light source
-		if (SCENE.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
+		if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
 			// Only add color if we did hit the light source we casted towards
-			const auto & renderGroup = SCENE.renderGroups[intersectionRenderGroupIdx];
+			const auto & renderGroup = scene.renderGroups[intersectionRenderGroupIdx];
 			if (&renderGroup == lightSource) {
 				Primitive* lightPrim = renderGroup.primitives[intersectionPrimitiveIdx];
 				glm::vec3 lightNormal = lightPrim->GetNormal(ray.from + intersectionDistance * ray.direction);
@@ -131,5 +131,5 @@ glm::vec3 PhotonMapRenderer::CalculateDirectIlluminationAtPos(const glm::vec3 & 
 		}
 	}
 
-	return (1.0f / (float)SCENE.emissiveRenderGroups.size()) * colorAccumulator;
+	return (1.0f / (float)scene.emissiveRenderGroups.size()) * colorAccumulator;
 }

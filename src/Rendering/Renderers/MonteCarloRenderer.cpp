@@ -6,8 +6,8 @@ glm::vec3 MonteCarloRenderer::GetPixelColor(const Ray & ray) {
 	return TraceRay(ray);
 }
 
-MonteCarloRenderer::MonteCarloRenderer(const Scene & _SCENE, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT) :
-	SCENE(_SCENE), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Monte Carlo Renderer") { }
+MonteCarloRenderer::MonteCarloRenderer(Scene & _scene, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT) :
+	scene(_scene), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Monte Carlo Renderer") { }
 
 glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
 	if (DEPTH == MAX_DEPTH) { return glm::vec3(0, 0, 0); }
@@ -15,30 +15,49 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	assert(DEPTH > 0);
 	assert(BOUNCES_PER_HIT > 0);
 
-	unsigned int intersectionPrimitiveIndex, intersectionRenderGroupIndex;
+	// Disable previous render group if it's convex (we cannot hit it, so no point in doing intersection checks).
+	bool reEnableRenderGroup = false;
+	if (previousConvexIntersectionRenderGroup != nullptr && previousConvexIntersectionRenderGroup->enabled) {
+		reEnableRenderGroup = true; // Always re-enable it. New rays can still hit it.
+		previousConvexIntersectionRenderGroup->enabled = false;
+	}
+
+	// See if our current ray hits anything in the scene.
 	float intersectionDistance;
-	bool intersectionFound = SCENE.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
+	unsigned int intersectionPrimitiveIndex, intersectionRenderGroupIndex;
+	const bool intersectionFound = scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
+	if (reEnableRenderGroup) {
+		previousConvexIntersectionRenderGroup->enabled = true;
+	}
+	previousConvexIntersectionRenderGroup = nullptr;
 
 	// If the ray doesn't intersect, simply return (0, 0, 0).
-	if (!intersectionFound) { return glm::vec3(0, 0, 0); }
+	if (!intersectionFound) {
+		return glm::vec3(0, 0, 0);
+	}
 
 	// Calculate intersection point.
-	glm::vec3 intersectionPoint = ray.from + ray.direction * intersectionDistance;
+	const glm::vec3 intersectionPoint = ray.from + ray.direction * intersectionDistance;
 
-	// Retrieve primitive and material information for the intersected object. 
-	const auto & intersectionRenderGroup = SCENE.renderGroups[intersectionRenderGroupIndex];
+	// Retrieve primitive information for the intersected object. 
+	auto & intersectionRenderGroup = scene.renderGroups[intersectionRenderGroupIndex];
+	if (intersectionRenderGroup.convex) {
+		previousConvexIntersectionRenderGroup = &intersectionRenderGroup;
+	}
 	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
-	Material* hitMaterial = intersectionRenderGroup.material;
 
 	// Calculate normal.
-	glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
+	const glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
 
-	// Shoot rays and integrate based on BRDF sampling. 
+	// Retrieve the intersected surface's material.
+	const Material * hitMaterial = intersectionRenderGroup.material;
+
+	// Shoot rays and integrate based on BRDF. 
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	for (unsigned int i = 0; i < BOUNCES_PER_HIT; ++i) {
-		glm::vec3 reflectionDirection = Math::RandomHemishpereSampleDirection(hitNormal);
+		const glm::vec3 reflectionDirection = Math::RandomHemishpereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
-		Ray reflectedRay(intersectionPoint, reflectionDirection);
+		const Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, DEPTH + 1);
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
 		colorAccumulator += glm::dot(-ray.direction, intersectionPrimitive->GetNormal(intersectionPoint)) * hitMaterial->GetEmissionColor();
