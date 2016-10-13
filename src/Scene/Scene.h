@@ -71,24 +71,6 @@ public:
 							unsigned int & intersectionPrimitiveIndex,
 							float & intersectionDistance, bool cullBackFace = false) const;
 
-	/// <summary> 
-	/// Casts a refractive ray through the scene. Returns true if there was an intersection.
-	/// </summary>
-	/// <param name='ray'> The ray which hit a surface which we are now tunneling through. </param>
-	/// <param name='intersectionRenderGroupIndex'> 
-	/// The intersection render group index which we intersected. </param>
-	/// <param name='normal'> The normal to the surface which we intersected. </param>
-	/// <param name='intersectionPoint'> The point which the ray intersected at. </param>
-	/// <param name='materialFrom'> 
-	/// The material which we are coming from. If nullptr the material is considered to be air. 
-	/// </param>
-	/// <param name='materialTo'> 
-	/// The material which we are leaving. If nullptr the material is considered to be air.
-	/// </param>
-	bool RefractionRayCast(const Ray & incomingRay, const unsigned int intersectionRenderGroupIndex,
-						   const glm::vec3 & intersectionPointNormal,
-						   const glm::vec3 & intersectionPoint,
-						   const Material * const materialFrom = nullptr,
-						   const Material * const materialTo = nullptr) const;
+
 
 };

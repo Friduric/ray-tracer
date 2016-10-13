@@ -75,7 +75,7 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 			if (!renderGroups[i].primitives[j]->enabled) {
 				continue;
 			}
-			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance, cullBackFace);
+			bool intersects = renderGroups[i].primitives[j]->RayIntersection(ray, intersectionDistance);
 			if (intersects) {
 				assert(intersectionDistance > FLT_EPSILON);
 				if (intersectionDistance < closestInterectionDistance) {
@@ -100,7 +100,7 @@ bool Scene::RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex, u
 		if (!renderGroup.primitives[j]->enabled) {
 			continue;
 		}
-		bool intersects = renderGroup.primitives[j]->RayIntersection(ray, intersectionDistance, cullBackFace);
+		bool intersects = renderGroup.primitives[j]->RayIntersection(ray, intersectionDistance);
 		if (intersects) {
 			assert(intersectionDistance > FLT_EPSILON);
 			if (intersectionDistance < closestInterectionDistance) {
@@ -112,19 +112,4 @@ bool Scene::RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex, u
 
 	intersectionDistance = closestInterectionDistance;
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
-}
-
-bool Scene::RefractionRayCast(const Ray & incomingRay, const unsigned int renderGroupIndex,
-							  const glm::vec3 & intersectionPointNormal,
-							  const glm::vec3 & intersectionPoint,
-							  Material const * const materialFrom,
-							  Material const * const materialTo) const {
-	// See https://en.wikipedia.org/wiki/Schlick%27s_approximation for more information.
-	float n1 = materialFrom == nullptr ? 1.0f : materialFrom->refractiveIndex;
-	float n2 = materialTo == nullptr ? 1.0f : materialTo->refractiveIndex;
-	float R0 = glm::pow((n1 - n2) / (n1 + n2), 2.0f);
-	float alpha = glm::dot(intersectionPointNormal, incomingRay.direction);
-	float RO = R0 + (1 - R0) * glm::pow((1 - alpha), 5.0f);
-
-
 }
