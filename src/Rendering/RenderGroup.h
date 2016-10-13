@@ -9,9 +9,11 @@
 
 class RenderGroup {
 public:
+	bool enabled = true;
+	bool convex = true;
 	Material* material;
 	std::vector<Primitive*> primitives;
 	std::vector<std::vector<Photon>> photons;
-	glm::vec3 GetRandomPositionOnSurface();
 	RenderGroup(Material*);
+	glm::vec3 GetRandomPositionOnSurface();
 };
