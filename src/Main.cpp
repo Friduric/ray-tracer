@@ -44,9 +44,9 @@ int main()
 	// --------------------------------------
 	// Settings.
 	// --------------------------------------
-	cui PIXELS_W = 200;
-	cui PIXELS_H = 200;
-	cui RAYS_PER_PIXEL = 256;
+	cui PIXELS_W = 800;
+	cui PIXELS_H = 800;
+	cui RAYS_PER_PIXEL = 16;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
@@ -127,15 +127,19 @@ int main()
 
 	const unsigned int COL_WIDTH = 30;
 
+	out << "-- RENDERING SETTINGS --" << endl;
 	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderer->RENDERER_NAME << endl;
 	out << setw(COL_WIDTH) << left << "Dimensions:" << PIXELS_W << "x" << PIXELS_H << " pixels. " << endl;
 	out << setw(COL_WIDTH) << left << "Rays per pixel:" << RAYS_PER_PIXEL << endl;
 	out << setw(COL_WIDTH) << left << "Max ray depth:" << MAX_RAY_DEPTH << endl;
 	out << setw(COL_WIDTH) << left << "Bounces per hit:" << BOUNCES_PER_HIT << endl;
-	out << setw(COL_WIDTH) << left << "Render time:" << took << " seconds." << endl;
+	out << endl << "-- PHOTON MAP SETTINGS --" << endl;
 	out << setw(COL_WIDTH) << left << "Photons per light source:" << PHOTONS_PER_LIGHT_SOURCE << endl;
 	out << setw(COL_WIDTH) << left << "Max photons per node:" << MIN_PHOTONS_PER_NODE << endl;
 	out << setw(COL_WIDTH) << left << "Photon map depth:" << PHOTON_MAP_DEPTH << endl;
+	out << endl << "-- RENDERING STATISTICS --" << endl;
+	out << setw(COL_WIDTH) << left << "Total time:" << took << " seconds." << endl;
+	out << setw(COL_WIDTH) << left << "Time per pixel ray:" << took / (double)(RAYS_PER_PIXEL * PIXELS_W * PIXELS_H) << " seconds." << endl;
 	out.close();
 
 	// --------------------------------------
