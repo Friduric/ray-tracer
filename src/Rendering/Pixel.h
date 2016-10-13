@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 #include <glm.hpp>
 
 #include "../Geometry/Ray.h"

@@ -4,9 +4,7 @@
 #include "../Geometry/AABB.h"
 
 class Octree {
-
 public:
-
 	class OctreeNode {
 	public:
 		/// <summary> 
@@ -69,7 +67,6 @@ public:
 	OctreeNode* GetNodeClosestToPosition(const glm::vec3 & pos) const;
 
 private:
-
 	/// <summary> 
 	/// Deletes all nodes recursively.
 	/// </summary>
