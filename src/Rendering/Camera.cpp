@@ -84,15 +84,18 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 		const auto now = std::chrono::high_resolution_clock::now();
 		const double step = (double)std::chrono::duration_cast<std::chrono::milliseconds>(now - before).count();
 		timeSinceLastLog += step * 0.001;
-		const double elapsedTime = (double)std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime).count();
-		const double percentageDone = 100.0 * (y / (double)width);
-		const double percentageLeft = (100.0 - percentageDone);
-		const double estimatedTimeLeft = (elapsedTime / percentageDone) * percentageLeft * 0.001;
+		auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime).count();
+		const double percentageDone = 100 * (y / (double)width);
+		const double percentageLeft = (100 - percentageDone);
+		long long estimatedTimeLeft = (long long)llround((elapsedTime / percentageDone) * percentageLeft * 0.001);
+		long long secs = estimatedTimeLeft % 60;
+		long long mins = (estimatedTimeLeft / 60) % 60;
+		long long hours = ((estimatedTimeLeft / 60) / 60);
 		if (timeSinceLastLog > __LOG_TIME_INTERVAL) {
 			timeSinceLastLog = 0.0;
 			std::cout << std::setprecision(1) << std::fixed;
 			std::cout << "Rendered " << percentageDone << "%. ";
-			std::cout << "Time left is now " << estimatedTimeLeft << " seconds." << std::endl;
+			std::cout << "Time left is " << hours << " h., " << mins << "m. and " << secs << "s." << std::endl;
 		}
 	}
 
