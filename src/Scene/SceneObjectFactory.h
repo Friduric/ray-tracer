@@ -18,6 +18,11 @@ namespace SceneObjectFactory {
 	void AddSphere(Scene & scene, float x = 0, float y = 0, float z = 0, float radius = 0,
 				   glm::vec3 surfaceColor = glm::vec3(1, 0, 0));
 
+	/// <summary> Creates a transparent sphere at position x, y, z and radius and adds it to the scene. </summary>
+	void AddTransparentSphere(Scene & scene, float x = 0, float y = 0, float z = 0, float radius = 0,
+							  glm::vec3 surfaceColor = glm::vec3(1, 0, 0), float refractiveIndex = 0.90f,
+							  float transparency = 0.5f);
+
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
 	void AddEmissiveSphere(Scene & scene, float x = 0, float y = 0, float z = 0,
 						   float radius = 1.0f, glm::vec3 surfaceColor = glm::vec3(1, 1, 1),
