@@ -13,6 +13,7 @@
 
 PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 					 const unsigned int MIN_PHOTONS_PER_NODE,
+					 const unsigned int MIN_DIMENSION_SIZE_OF_NODE,
 					 const unsigned int MAX_DEPTH) :
 	minPhotonsPerNode(MIN_PHOTONS_PER_NODE), maxPhotonsPerNode(std::max(0, (int)MIN_PHOTONS_PER_NODE * 8 - 1)) {
 
@@ -40,12 +41,13 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			for (unsigned int k = 0; k < MAX_DEPTH; ++k) {
 				if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
 					// Save photon in the octree.
+					const float intersectionRadianceFactor = glm::dot(ray.direction, normal);
 					glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.direction;
 					Primitive * prim = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
 					Material * material = scene.renderGroups[intersectionRenderGroupIdx].material;
-					glm::vec3 intersectionNormal = prim->GetNormal(intersectionPosition);
-					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
-					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
+					normal = prim->GetNormal(intersectionPosition);
+					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(normal);
+					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, normal, photonRadiance * intersectionRadianceFactor);
 					// Indirect photon if not on first cast
 					if (k > 0) {
 						indirectPhotons.push_back(Photon(intersectionPosition, ray.direction, photonRadiance));
@@ -86,14 +88,14 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 		}
 	}
 
-	octree = new Octree(directPhotons, indirectPhotons, shadowPhotons, MIN_PHOTONS_PER_NODE, scene.axisAlignedBoundingBox);
+	octree = new Octree(directPhotons, indirectPhotons, shadowPhotons, MIN_PHOTONS_PER_NODE, MIN_DIMENSION_SIZE_OF_NODE, scene.axisAlignedBoundingBox);
 }
 
 PhotonMap::~PhotonMap() {
 	delete octree;
 }
 
-void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon const*> photons, const glm::vec3 & pos,
+void PhotonMap::GetPhotonsAtPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 															 const float radius, std::vector<Photon const*> & photonsInRadius) const {
 	for (Photon const* p : photons) {
 		if (glm::distance(p->position, pos) <= radius) {
@@ -102,7 +104,7 @@ void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon 
 	}
 }
 
-void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
+void PhotonMap::GetNClosestPhotonsOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 														 const int N, std::vector<Photon const*> & closestPhotons) const {
 	std::vector<float> distances;
 	for (Photon const* p : photons) {
@@ -115,7 +117,59 @@ void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon cons
 	}
 }
 
+void PhotonMap::AddPhotonsFromAdjacentNodes(std::vector<Photon const*> & adjacentPhotons, Octree::OctreeNode* node,
+											const glm::vec3 & intersectionPoint, float radius) const {
+	Octree::OctreeNode* adjacentXNode = NULL;
+	Octree::OctreeNode* adjacentYNode = NULL;
+	Octree::OctreeNode* adjacentZNode = NULL;
+	Octree::OctreeNode* adjacentCornerNode = NULL;
+	glm::vec3 radiusCorner(radius, radius, radius);
+	AABB aabb = node->axisAlignedBoundingBox;
+	glm::vec3 upperRadiusCorner = intersectionPoint + radiusCorner;
+	glm::vec3 lowerRadiusCorner = intersectionPoint - radiusCorner;
+	// X max side
+	if (upperRadiusCorner.x > aabb.maximum.x) {
+		adjacentXNode = GetOctreeNodeOfPosition(glm::vec3(upperRadiusCorner.x, intersectionPoint.y, intersectionPoint.z));
+	}else if (lowerRadiusCorner.x < aabb.minimum.x) {
+		adjacentXNode = GetOctreeNodeOfPosition(glm::vec3(lowerRadiusCorner.x, intersectionPoint.y, intersectionPoint.z));
+	}
+	// Y side
+	if (upperRadiusCorner.y > aabb.maximum.y) {
+		adjacentYNode = GetOctreeNodeOfPosition(glm::vec3(intersectionPoint.x, upperRadiusCorner.y, intersectionPoint.z));
+	}else if (lowerRadiusCorner.y < aabb.minimum.y) {
+		adjacentYNode = GetOctreeNodeOfPosition(glm::vec3(intersectionPoint.x, lowerRadiusCorner.y, intersectionPoint.z));
+	}
+	// Z side
+	if (upperRadiusCorner.z > aabb.maximum.z) {
+		adjacentZNode = GetOctreeNodeOfPosition(glm::vec3(intersectionPoint.x, intersectionPoint.y, upperRadiusCorner.z));
+	}else if (lowerRadiusCorner.z < aabb.minimum.z) {
+		adjacentZNode = GetOctreeNodeOfPosition(glm::vec3(intersectionPoint.x, intersectionPoint.y, lowerRadiusCorner.z));
+	}
+	// Corner
+	if (glm::length(upperRadiusCorner) > glm::length(aabb.maximum)) {
+		adjacentCornerNode = GetOctreeNodeOfPosition(upperRadiusCorner);
+	}else if (glm::length(lowerRadiusCorner) < glm::length(aabb.minimum)) {
+		adjacentCornerNode = GetOctreeNodeOfPosition(lowerRadiusCorner);
+	}
+
+	// Add all nodes and make sure we dont add any node twice
+	if (adjacentXNode != NULL && adjacentXNode != node) {
+		adjacentPhotons.insert(adjacentPhotons.end(), adjacentXNode->directPhotons.begin(), adjacentXNode->directPhotons.end());
+	}
+	if (adjacentYNode != NULL && adjacentYNode != node && adjacentYNode != adjacentXNode) {
+		adjacentPhotons.insert(adjacentPhotons.end(), adjacentYNode->directPhotons.begin(), adjacentYNode->directPhotons.end());
+	}
+	if (adjacentZNode != NULL && adjacentZNode != node && adjacentZNode != adjacentXNode && adjacentZNode != adjacentYNode) {
+		adjacentPhotons.insert(adjacentPhotons.end(), adjacentZNode->directPhotons.begin(), adjacentZNode->directPhotons.end());
+	}
+	if (adjacentCornerNode != NULL && adjacentCornerNode != node && adjacentCornerNode != adjacentXNode && adjacentCornerNode != adjacentYNode && 
+		adjacentCornerNode != adjacentZNode) {
+		adjacentPhotons.insert(adjacentPhotons.end(), adjacentCornerNode->directPhotons.begin(), adjacentCornerNode->directPhotons.end());
+	}
+}
+
 Octree::OctreeNode * PhotonMap::GetOctreeNodeOfPosition(const glm::vec3 & pos) const {
 	return octree->GetNodeClosestToPosition(pos);
 }
+
 

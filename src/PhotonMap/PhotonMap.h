@@ -18,31 +18,43 @@ public:
 	/// <param name='MAX_DEPTH'> The number of bounces each photon will make (at most). </param>
 	PhotonMap(const class Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 			  const unsigned int MIN_PHOTONS_PER_NODE,
+			  const unsigned int MIN_DIMENSION_SIZE_OF_NODE,
 			  const unsigned int MAX_DEPTH);
 
 	~PhotonMap();
 
 	/// <summary> 
 	/// Returns photons located within a given radius around a given world position.
-	/// The photons are stored in the vector /photons/.
+	/// The photons are added to the vector photonsInRadius.
 	/// </summary>
 	/// <param name='photons'> The photons in the node. </param>
 	/// <param name='pos'> The position to search around. </param>
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
-	void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon const*> photons, const glm::vec3 & pos,
-																 const float radius, std::vector<Photon const*> & photonsInRadius) const;
+	void PhotonMap::GetPhotonsAtPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
+													 const float radius, std::vector<Photon const*> & photonsInRadius) const;
 
 	/// <summary> 
-	/// Returns N closest photons located around a given world position.
-	/// The photons are stored in the vector /photons/.
+	/// Finds N closest photons located around a given world position.
+	/// The photons are added to the vector closestPhotons.
 	/// </summary>
 	/// <param name='photons'> The photons in the node. </param>
 	/// <param name='pos'> The position to search around. </param>
 	/// <param name='N'> The amount of photons to retrieve. </param>
 	/// <param name='closestPhotons'> Found photons are added to this vector. </param>
-	void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
-															 const int N, std::vector<Photon const*> & closestPhotons) const;
+	void PhotonMap::GetNClosestPhotonsOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
+												 const int N, std::vector<Photon const*> & closestPhotons) const;
+
+	/// <summary> 
+	/// Finds all photons in adjacent nodes within a radius r from intersectionpoint.
+	/// The photons are added to the vector adjacentPhotons.
+	/// </summary>
+	/// <param name='adjacentPhotons'> Found photons are added to this vector. </param>
+	/// <param name='node'> The node to search around. </param>
+	/// <param name='intersectionPoint'> The position in the node. </param>
+	/// <param name='radius'> The radius. </param>
+	void PhotonMap::AddPhotonsFromAdjacentNodes(std::vector<Photon const*> & adjacentPhotons, Octree::OctreeNode* node,
+												const glm::vec3 & intersectionPoint, const float radius) const;
 
 	/// <summary> 
 	/// Returns the octree node which contains a given world position.
