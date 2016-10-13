@@ -40,12 +40,13 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			for (unsigned int k = 0; k < MAX_DEPTH; ++k) {
 				if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
 					// Save photon in the octree.
+					const float intersectionRadianceFactor = glm::dot(ray.direction, normal);
 					glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.direction;
 					Primitive * prim = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
 					Material * material = scene.renderGroups[intersectionRenderGroupIdx].material;
-					glm::vec3 intersectionNormal = prim->GetNormal(intersectionPosition);
-					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
-					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
+					normal = prim->GetNormal(intersectionPosition);
+					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(normal);
+					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, normal, photonRadiance * intersectionRadianceFactor);
 					// Indirect photon if not on first cast
 					if (k > 0) {
 						indirectPhotons.push_back(Photon(intersectionPosition, ray.direction, photonRadiance));
@@ -93,7 +94,7 @@ PhotonMap::~PhotonMap() {
 	delete octree;
 }
 
-void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon const*> photons, const glm::vec3 & pos,
+void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 															 const float radius, std::vector<Photon const*> & photonsInRadius) const {
 	for (Photon const* p : photons) {
 		if (glm::distance(p->position, pos) <= radius) {
@@ -102,7 +103,7 @@ void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon 
 	}
 }
 
-void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon const*> photons, const glm::vec3 & pos,
+void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 														 const int N, std::vector<Photon const*> & closestPhotons) const {
 	std::vector<float> distances;
 	for (Photon const* p : photons) {
