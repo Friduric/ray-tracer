@@ -6,7 +6,7 @@ glm::vec3 PhotonMapVisualizer::GetPixelColor(const Ray & ray) {
 
 PhotonMapVisualizer::PhotonMapVisualizer(Scene & _scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 										 const unsigned int MIN_PHOTONS_PER_NODE, const unsigned int MAX_PHOTON_DEPTH) :
-	scene(_scene), Renderer("Photon Map Visualizer") {
+	Renderer("Photon Map Visualizer", _scene) {
 	photonMap = new PhotonMap(_scene, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, MAX_PHOTON_DEPTH);
 }
 

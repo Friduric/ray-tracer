@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 #include "Renderer.h"
 #include "../../Scene/Scene.h"
@@ -11,6 +10,5 @@ public:
 						const unsigned int MIN_PHOTONS_PER_NODE = 50, const unsigned int MAX_PHOTON_DEPTH = 3);
 private:
 	glm::vec3 TraceRay(const Ray & ray, const unsigned int DEPTH = 0);
-	Scene & scene;
 	PhotonMap* photonMap;
 };

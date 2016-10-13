@@ -72,9 +72,6 @@
     <ClCompile Include="src\Rendering\Renderers\PhotonMapVisualizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rendering\Renderers\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utility\Rendering.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

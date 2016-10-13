@@ -10,7 +10,7 @@ glm::vec3 PhotonMapRenderer::GetPixelColor(const Ray & ray) {
 
 PhotonMapRenderer::PhotonMapRenderer(Scene & _scene, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT,
 									 const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MIN_PHOTONS_PER_NODE, const unsigned int MAX_PHOTON_DEPTH) :
-	scene(_scene), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Photon Map Renderer") {
+	MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Photon Map Renderer", _scene) {
 	photonMap = new PhotonMap(_scene, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, MAX_PHOTON_DEPTH);
 }
 
@@ -56,7 +56,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	//for (unsigned int i = 0; i < emissiveRenderGroups.size(); ++i) {
 	for (unsigned int i = 0; i < BOUNCES_PER_HIT; ++i) {
 		//glm::vec3 surfPos = emissiveRenderGroups[i]->GetRandomPositionOnSurface();//GetCenter();// 
-		glm::vec3 reflectionDirection = Math::RandomHemishpereSampleDirection(hitNormal);
+		glm::vec3 reflectionDirection = Utility::Math::RandomHemishpereSampleDirection(hitNormal);
 		//glm::normalize(surfPos - intersectionPoint);// = Math::RandomHemishpereSampleDirection(hitNormal);
 		/*std::vector<Photon const*> closestPhotons;
 		std::vector<Photon const*> photons = photonMap->GetIndirectPhotonsInOctreeNodeOfPosition(intersectionPoint);

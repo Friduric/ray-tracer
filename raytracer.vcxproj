@@ -163,7 +163,6 @@
     <ClCompile Include="src\Rendering\Renderers\MonteCarloRenderer.cpp" />
     <ClCompile Include="src\Rendering\Renderers\PhotonMapRenderer.cpp" />
     <ClCompile Include="src\Rendering\Renderers\PhotonMapVisualizer.cpp" />
-    <ClCompile Include="src\Rendering\Renderers\Renderer.cpp" />
     <ClCompile Include="src\Rendering\RenderGroup.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Geometry\Sphere.cpp" />

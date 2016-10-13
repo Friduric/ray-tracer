@@ -11,7 +11,6 @@ public:
 	MonteCarloRenderer(Scene & scene, const unsigned int MAX_DEPTH = 5, const unsigned int BOUNCES_PER_HIT = 1);
 private:
 	const unsigned int MAX_DEPTH, BOUNCES_PER_HIT;
-	Scene & scene;
 
 	// Reused to skip checking intersections against unneccessary render groups.
 	RenderGroup * previousConvexIntersectionRenderGroup = nullptr;

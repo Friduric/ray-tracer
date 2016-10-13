@@ -7,7 +7,7 @@ glm::vec3 MonteCarloRenderer::GetPixelColor(const Ray & ray) {
 }
 
 MonteCarloRenderer::MonteCarloRenderer(Scene & _scene, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT) :
-	scene(_scene), MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Monte Carlo Renderer") { }
+	MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Monte Carlo Renderer", _scene) { }
 
 glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
 	if (DEPTH == MAX_DEPTH) { return glm::vec3(0, 0, 0); }
@@ -52,10 +52,39 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	// Retrieve the intersected surface's material.
 	const Material * const hitMaterial = intersectionRenderGroup.material;
 
+	glm::vec3 refractedRayContribution = glm::vec3(0);
+	glm::vec3 reflectedRayContribution = glm::vec3(0);
+
+	// Shoot refracted and reflective rays if the material is transparent.
+	if (hitMaterial->IsTransparent()) {
+		float n1 = 1.0f;
+		float n2 = hitMaterial->refractiveIndex;
+
+		glm::vec3 offset = hitNormal * 0.000001f;
+		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
+		Ray reflectedRay(intersectionPoint, glm::reflect(-ray.direction, hitNormal));
+
+		// Find out if the ray "exits" the render group anywhere.
+		bool hit = scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
+		if (hit) {
+
+			const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
+
+			const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
+			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(intersectionPoint);
+
+			refractedRay.from = refractedIntersectionPoint;
+			refractedRay.direction = glm::refract(refractedRay.direction, refractedHitNormal, n2 / n1);
+		}
+		else {
+
+		}
+	}
+
 	// Shoot rays and integrate based on BRDF. 
 	glm::vec3 colorAccumulator = { 0,0,0 };
 	for (unsigned int i = 0; i < BOUNCES_PER_HIT; ++i) {
-		const glm::vec3 reflectionDirection = Math::RandomHemishpereSampleDirection(hitNormal);
+		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		const Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, DEPTH + 1);
@@ -64,5 +93,5 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	}
 
 	// Return result.
-	return (1.0f / (float)BOUNCES_PER_HIT) * colorAccumulator;
+	return refractedRayContribution + reflectedRayContribution + (1.0f / (float)BOUNCES_PER_HIT) * colorAccumulator;
 }
