@@ -30,7 +30,7 @@ public:
 	/// <param name='pos'> The position to search around. </param>
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
-	void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
+	void PhotonMap::GetPhotonsAtPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 																 const float radius, std::vector<Photon const*> & photonsInRadius) const;
 
 	/// <summary> 
@@ -41,7 +41,7 @@ public:
 	/// <param name='pos'> The position to search around. </param>
 	/// <param name='N'> The amount of photons to retrieve. </param>
 	/// <param name='closestPhotons'> Found photons are added to this vector. </param>
-	void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
+	void PhotonMap::GetNClosestPhotonsOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 															 const int N, std::vector<Photon const*> & closestPhotons) const;
 
 	/// <summary> 

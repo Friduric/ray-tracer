@@ -94,7 +94,7 @@ PhotonMap::~PhotonMap() {
 	delete octree;
 }
 
-void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
+void PhotonMap::GetPhotonsAtPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 															 const float radius, std::vector<Photon const*> & photonsInRadius) const {
 	for (Photon const* p : photons) {
 		if (glm::distance(p->position, pos) <= radius) {
@@ -103,7 +103,7 @@ void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(const std::vector<P
 	}
 }
 
-void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
+void PhotonMap::GetNClosestPhotonsOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
 														 const int N, std::vector<Photon const*> & closestPhotons) const {
 	std::vector<float> distances;
 	for (Photon const* p : photons) {
@@ -119,4 +119,5 @@ void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(const std::vector<Photo
 Octree::OctreeNode * PhotonMap::GetOctreeNodeOfPosition(const glm::vec3 & pos) const {
 	return octree->GetNodeClosestToPosition(pos);
 }
+
 

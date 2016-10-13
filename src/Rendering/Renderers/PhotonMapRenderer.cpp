@@ -87,23 +87,27 @@ glm::vec3 PhotonMapRenderer::CalculateDirectIlluminationAtPos(const glm::vec3 & 
 	glm::vec3 colorAccumulator = { 0,0,0 };
 
 	Octree::OctreeNode* node = photonMap->GetOctreeNodeOfPosition(pos);
-	std::vector<Photon const*> directPhotons = node->directPhotons;
-	std::vector<Photon const*> indirectPhotons = node->indirectPhotons;
-	std::vector<Photon const*> shadowPhotons = node->shadowPhotons;
+	std::vector<Photon const*>* directPhotons = &node->directPhotons;
+	std::vector<Photon const*>* shadowPhotons = &node->shadowPhotons;
 	// If there are no shadow photons and several directPhotons then we approximate light with photons
-	if (shadowPhotons.size() == 0 && directPhotons.size() > photonMap->minPhotonsPerNode) {
-		std::vector<Photon const*> photonsWithinRadius;
-		glm::vec3 corner = node->axisAlignedBoundingBox.maximum;
-		float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter(), corner);
-		photonMap->GetPhotonsInOctreeNodeOfPositionWithinRadius(directPhotons, pos, radius, photonsWithinRadius);
-		for (Photon const* dp : directPhotons) {
+	std::vector<Photon const*> photonsWithinRadius;
+	photonMap->GetNClosestPhotonsOfPosition(*directPhotons, pos, 1, photonsWithinRadius);
+	//glm::vec3 corner = node->axisAlignedBoundingBox.maximum;
+	//float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter(), corner)*0.2f;
+	//photonMap->GetPhotonsInOctreeNodeOfPositionWithinRadius(*directPhotons, pos, radius, photonsWithinRadius);
+	if (shadowPhotons->size() == 0 && photonsWithinRadius.size() > 0){// photonMap->maxPhotonsPerNode*0.0f) {
+		return photonsWithinRadius[0]->color;
+		
+		/*for (Photon const* dp : photonsWithinRadius) {
 			float distance = glm::distance(pos, dp->position);
 			float weight = std::max(0.0f, 1.0f - distance / radius);
 			colorAccumulator += weight * dp->color;
 		}
+		colorAccumulator /= photonsWithinRadius.size();
+		return colorAccumulator;*/
 	}
 	// If there are no direct photons we assume its not lit by any light
-	if (directPhotons.size()) {
+	if (directPhotons->size() == 0) {
 		return glm::vec3(0, 0, 0);
 	}
 
