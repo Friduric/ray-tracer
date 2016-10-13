@@ -9,6 +9,7 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 			   const std::vector<Photon> & _indirectPhotons,
 			   const std::vector<Photon> & _shadowPhotons,
 			   const unsigned int maxPhotonsPerNode,
+			   const unsigned int minDimensionSizeOfNode,
 			   const AABB & aabb) : root(new OctreeNode(aabb)) {
 	// Add all photons to the root	
 
@@ -29,7 +30,6 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 	float nodeXMin, nodeYMin, nodeZMin;
 	float nodeXMax, nodeYMax, nodeZMax;
 
-
 	int counter = 0;
 	// While there are nodes left in the queue divide into 8 subnodes.
 	while (!nodeQueue.empty()) {
@@ -39,16 +39,22 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 		nodeHeight = currentNode->axisAlignedBoundingBox.maximum.y - currentNode->axisAlignedBoundingBox.minimum.y;
 		nodeDepth = currentNode->axisAlignedBoundingBox.maximum.z - currentNode->axisAlignedBoundingBox.minimum.z;
 
-		// If the amount of photons in the node is larger than/equal to maxPhotonsPerNode,
-		// and if all sides of the node box is larger than maxSizeOfNodeBox,
-		// then split the node into 8 new nodes.
+		// If the amount of photons in the node is less than maxPhotonsPerNode*8,
+		// then dont split the node into 8 new nodes.
 		unsigned int currentTotalPhotons = currentNode->directPhotons.size() + currentNode->indirectPhotons.size() + currentNode->shadowPhotons.size();
 		if (currentTotalPhotons < maxPhotonsPerNode*8) {
 			continue;
 		}
+		
 		nodeXHalf = 0.5f * nodeWidth;
 		nodeYHalf = 0.5f * nodeHeight;
 		nodeZHalf = 0.5f * nodeDepth;
+		// If the node will become smaller on any side than min size of node then dont split
+		if (minDimensionSizeOfNode > nodeXHalf ||
+			minDimensionSizeOfNode > nodeYHalf ||
+			minDimensionSizeOfNode > nodeZHalf) {
+			continue;
+		}
 		unsigned int idxCounter = 0;
 		for (unsigned int xIdx = 0; xIdx < 2; ++xIdx) {
 			nodeXMin = currentNode->axisAlignedBoundingBox.minimum.x + nodeXHalf*xIdx;
