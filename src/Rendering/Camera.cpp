@@ -5,11 +5,12 @@
 #include <random>
 #include <algorithm>
 #include <chrono>
+#include <iomanip>
 
 #include "../Geometry/Ray.h"
 #include "../Utility/Math.h"
 
-#define __LOG_ITERATIONS // Define if we should log rendering progress.
+#define __LOG_TIME_INTERVAL 3 // In seconds. 
 
 Camera::Camera(const unsigned int _width, const unsigned int _height) :
 	width(_width), height(_height) {
@@ -21,7 +22,7 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 					const glm::vec3 eye, const glm::vec3 c1, const glm::vec3 c2,
 					const glm::vec3 c3, const glm::vec3 c4) {
 
-	std::cout << "Rendering the scene ..." << std::endl;
+	std::cout << std::endl << "Rendering the scene ..." << std::endl;
 	const auto startTime = std::chrono::high_resolution_clock::now();
 
 	// Initalize the random engine.
@@ -43,24 +44,18 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 	// Camera plane normal.
 	const glm::vec3 CAMERA_PLANE_NORMAL = -glm::normalize(glm::cross(c1 - c2, c1 - c4));
 
-	// Initialize ray components.
-	glm::vec3 colorAccumulator;
+	double timeSinceLastLog = 0.0;
+	// Shoot multiple rays through every pixel.
+	for (unsigned int y = 0; y < width; ++y) {
+		const auto before = std::chrono::high_resolution_clock::now();
 
-#ifdef __LOG_ITERATIONS
-	long long ctr = 0;
-#endif // __LOG_ITERATIONS
-	// #pragma omp parallel for
-	for (int y = 0; y < width; ++y) {
-		Ray ray;
-		for (int z = 0; z < height; ++z) {
-#ifdef __LOG_ITERATIONS
-			if (++ctr % 10000 == 0) {
-				std::cout << ctr << "/" << width * height << " pixels." << std::endl;
-			}
-#endif // __LOG_ITERATIONS	
+		// OMP doesn't allow unsigned int in for parallelized for loop.
+#pragma omp parallel for // Parallelize using OMP.
+		for (int z = 0; z < static_cast<int>(height); ++z) {
 
 			// Shoot a bunch of rays through the pixel (y, z), and accumulate colors.
-			colorAccumulator = glm::vec3(0, 0, 0);
+			Ray ray;
+			glm::vec3 colorAccumulator = colorAccumulator = glm::vec3(0, 0, 0);
 			for (float c = 0; c < INV_WIDTH - FLT_EPSILON; c += COLUMN_PIXEL_STEP) {
 				for (float r = 0; r < INV_HEIGHT - FLT_EPSILON; r += ROW_PIXEL_STEP) {
 
@@ -80,14 +75,30 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 					colorAccumulator += rayFactor * renderer.GetPixelColor(ray);
 				}
 			}
-			// Set pixel color dependent on ray trace.
+
+			// Set pixel color dependent on the traced ray.
 			pixels[y][z].color = INV_RAYS_PER_PIXEL * colorAccumulator;
+		}
+
+		// Estimate time left.
+		const auto now = std::chrono::high_resolution_clock::now();
+		const double step = (double)std::chrono::duration_cast<std::chrono::milliseconds>(now - before).count();
+		timeSinceLastLog += step * 0.001;
+		const double elapsedTime = (double)std::chrono::duration_cast<std::chrono::milliseconds>(now - startTime).count();
+		const double percentageDone = 100.0 * (y / (double)width);
+		const double percentageLeft = (100.0 - percentageDone);
+		const double estimatedTimeLeft = (elapsedTime / percentageDone) * percentageLeft * 0.001;
+		if (timeSinceLastLog > __LOG_TIME_INTERVAL) {
+			timeSinceLastLog = 0.0;
+			std::cout << std::setprecision(1) << std::fixed;
+			std::cout << "Rendered " << percentageDone << "%. ";
+			std::cout << "Time left is now " << estimatedTimeLeft << " seconds." << std::endl;
 		}
 	}
 
 	const auto endTime = std::chrono::high_resolution_clock::now();
 	const auto took = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-	std::cout << "Rendering finished and took: " << (took / 1000.0) << " seconds." << std::endl;
+	std::cout << "Rendering finished and took: " << (took / 1000.0) << " seconds." << std::endl << std::endl;
 
 	// Create the final discretized image. Should always be done immediately after the rendering step.
 	CreateImage();

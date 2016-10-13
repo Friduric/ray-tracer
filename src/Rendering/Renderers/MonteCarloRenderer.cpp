@@ -8,8 +8,8 @@ glm::vec3 MonteCarloRenderer::GetPixelColor(const Ray & ray) {
 	return TraceRay(ray);
 }
 
-MonteCarloRenderer::MonteCarloRenderer(Scene & _scene, const unsigned int _MAX_DEPTH, const unsigned int _BOUNCES_PER_HIT) :
-	MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Monte Carlo Renderer", _scene) { }
+MonteCarloRenderer::MonteCarloRenderer(Scene & _scene, const unsigned int _MAX_DEPTH) :
+	MAX_DEPTH(_MAX_DEPTH), Renderer("Monte Carlo Renderer", _scene) { }
 
 glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
 	if (DEPTH == MAX_DEPTH) {
@@ -103,18 +103,20 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
 	}
 
-	// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting. 
-	for (unsigned int i = 0; i < BOUNCES_PER_HIT; ++i) {
-		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal); // glm::reflect(-ray.direction, hitNormal); // 
+	if (hitMaterial->reflectivity < 1.0f - FLT_EPSILON && hitMaterial->transparency < 1.0f - FLT_EPSILON) {
+		float rf = 1.0f - hitMaterial->reflectivity;
+		float tf = 1.0f - hitMaterial->transparency;
+
+		// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting. 
+		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		const Ray reflectedRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(reflectedRay, DEPTH + 1);
-		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
+		colorAccumulator += rf * tf * hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
 	}
-
 	// Add emission.
 	colorAccumulator += glm::dot(-ray.direction, intersectionPrimitive->GetNormal(intersectionPoint)) * hitMaterial->GetEmissionColor();
 
 	// Return result.
-	return (1.0f / (float)BOUNCES_PER_HIT) * colorAccumulator;
+	return colorAccumulator;
 }

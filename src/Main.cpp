@@ -45,7 +45,7 @@ int main() {
 	// --------------------------------------
 	cui PIXELS_W = 400;
 	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 512;
+	cui RAYS_PER_PIXEL = 32;
 	cui MAX_RAY_DEPTH = 4;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
@@ -80,9 +80,9 @@ int main() {
 	// --------------------------------------
 	// Initialize camera and time keeping.
 	// --------------------------------------
+	std::cout << "Initializing the camera and the scene..." << std::endl;
 	scene.Initialize();
 	auto startTime = std::chrono::high_resolution_clock::now();
-	std::cout << "Starting..." << std::endl;
 	Camera camera(PIXELS_W, PIXELS_H);
 
 	// --------------------------------------
@@ -91,7 +91,7 @@ int main() {
 	Renderer * renderer = nullptr;
 	switch (RENDERER_TYPE) {
 	case RendererType::MONTE_CARLO:
-		renderer = new MonteCarloRenderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT);
+		renderer = new MonteCarloRenderer(scene, MAX_RAY_DEPTH);
 		break;
 	case RendererType::PHOTON_MAP:
 		renderer = new PhotonMapRenderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, PHOTON_MAP_DEPTH);
