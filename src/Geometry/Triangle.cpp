@@ -53,11 +53,7 @@ const AABB & Triangle::GetAxisAlignedBoundingBox() const {
 }
 
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
-bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance, bool cullBackFace) const {
-	if (cullBackFace && glm::dot(ray.direction, normal) > -FLT_EPSILON) {
-		return false; // The ray direction and normal are in the same direction (behind).
-	}
-
+bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	// Calculate intersection using barycentric coordinates. This gives a equation system
 	// which we can solve using Cramer's rule.
 	const glm::vec3 E1 = vertices[1] - vertices[0];

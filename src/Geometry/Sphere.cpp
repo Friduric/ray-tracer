@@ -18,18 +18,14 @@ glm::vec3 Sphere::GetCenter() const { return center; }
 
 glm::vec3 Sphere::GetRandomPositionOnSurface() const {
 	int direction = (rand() & 1) == 0 ? -1 : 1;
-	return center + radius * Math::CosineWeightedHemisphereSampleDirection(glm::vec3(0, 0, direction));
+	return center + radius * Utility::Math::CosineWeightedHemisphereSampleDirection(glm::vec3(0, 0, direction));
 }
 
 const AABB & Sphere::GetAxisAlignedBoundingBox() const {
 	return axisAlignedBoundingBox;
 }
 
-bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance, bool cullBackFace) const {
-	if (cullBackFace && dot(ray.direction, GetNormal(ray.from)) > -FLT_EPSILON) {
-		return false; // The ray direction and normal are in the same direction (behind).
-	}
-
+bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 	const vec3 m = ray.from - center;
 	float b = glm::dot(m, ray.direction);
 	float c = glm::dot(m, m) - radius * radius;

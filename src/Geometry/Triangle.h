@@ -27,7 +27,7 @@ public:
 	/// <param name='intersectionPoint'> 
 	/// OUT: The distance to the intersection point (if there is an intersection). 
 	/// </param>
-	bool RayIntersection(const Ray& ray, float & intersectionDistance, bool cullBackFace = true) const override;
+	bool RayIntersection(const Ray& ray, float & intersectionDistance) const override;
 private:
 	AABB axisAlignedBoundingBox;
 };
