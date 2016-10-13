@@ -2,6 +2,8 @@
 
 #include "../../includes/glm/gtx/norm.hpp"
 
+#define __BACK_FACE_CULLING false
+
 // Default constructor.
 Triangle::Triangle(glm::vec3 _v1, glm::vec3 _v2, glm::vec3 _v3, glm::vec3 _normal) :
 	vertices{ _v1, _v2, _v3 }, normal(_normal) {
@@ -54,6 +56,12 @@ const AABB & Triangle::GetAxisAlignedBoundingBox() const {
 
 // Implementation using the Möller-Trumbore (MT) ray intersection algorithm.
 bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) const {
+#if __BACK_FACE_CULLING
+	if (dot(ray.direction, GetNormal(ray.from)) > -FLT_EPSILON) {
+		return false;
+	}
+#endif // __BACK_FACE_CULLING
+
 	// Calculate intersection using barycentric coordinates. This gives a equation system
 	// which we can solve using Cramer's rule.
 	const glm::vec3 E1 = vertices[1] - vertices[0];
@@ -62,17 +70,24 @@ bool Triangle::RayIntersection(const Ray & ray, float & intersectionDistance) co
 	const glm::vec3 T = ray.from - vertices[0];
 
 	const float inv_den = 1.0f / glm::dot(E1, P);
+	if (abs(inv_den) < FLT_EPSILON) {
+		return false;
+	}
+
 	float u = inv_den * glm::dot(T, P);
-	if (u < -FLT_EPSILON || u > 1.0f + FLT_EPSILON) {
+	if (u < 0.0f || u > 1.0f) {
 		return false; // Didn't hit.
 	}
 
 	const glm::vec3 Q = glm::cross(T, E1);
 	const float v = inv_den * glm::dot(ray.direction, Q);
-	if (v < -FLT_EPSILON || u + v > 1.0f + FLT_EPSILON) {
+	if (v < 0.0f || u + v > 1.0f) {
 		return false; // Didn't hit.
 	}
 
 	intersectionDistance = inv_den * glm::dot(E2, Q);
+	if (intersectionDistance < FLT_EPSILON) {
+		return false;
+	}
 	return intersectionDistance > FLT_EPSILON;
 }

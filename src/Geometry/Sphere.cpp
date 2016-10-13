@@ -3,6 +3,8 @@
 #include <iostream>
 #include "../Utility/Math.h"
 
+#define __BACK_FACE_CULLING false
+
 using namespace glm;
 
 Sphere::Sphere(vec3 _center, float _radius) :
@@ -26,6 +28,11 @@ const AABB & Sphere::GetAxisAlignedBoundingBox() const {
 }
 
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
+#if __BACK_FACE_CULLING
+	if (dot(ray.direction, GetNormal(ray.from)) > -FLT_EPSILON) {
+		return false;
+	}
+#endif // __BACK_FACE_CULLING
 	const vec3 m = ray.from - center;
 	float b = glm::dot(m, ray.direction);
 	float c = glm::dot(m, m) - radius * radius;
