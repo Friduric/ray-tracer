@@ -1,17 +1,20 @@
+#include "PhotonMap.h"
+
 #include <iostream>
 #include <random>
 #include <numeric>
 #include <algorithm>
+
 #include "../../includes/glm/gtx/norm.hpp"
-#include "PhotonMap.h"
+
 #include "../Utility/Math.h"
+#include "../Utility/Other.h"
 #include "../Scene/Scene.h"
 
 PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 					 const unsigned int MIN_PHOTONS_PER_NODE,
 					 const unsigned int MAX_DEPTH) :
-	minPhotonsPerNode(MIN_PHOTONS_PER_NODE),
-	maxPhotonsPerNode(std::max(0, (int)MIN_PHOTONS_PER_NODE * 8 - 1)) {
+	minPhotonsPerNode(MIN_PHOTONS_PER_NODE), maxPhotonsPerNode(std::max(0, (int)MIN_PHOTONS_PER_NODE * 8 - 1)) {
 
 	// Initialize.
 	std::cout << "Creating the photon map ..." << std::endl;
@@ -29,7 +32,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			// Shoot photon in a random direction. 
 			ray.from = prim->GetRandomPositionOnSurface();
 			glm::vec3 normal = prim->GetNormal(ray.from);
-			ray.direction = Math::CosineWeightedHemisphereSampleDirection(normal);
+			ray.direction = Utility::Math::CosineWeightedHemisphereSampleDirection(normal);
 			glm::vec3 photonRadiance = lightSource->material->GetEmissionColor();
 
 			unsigned int intersectionRenderGroupIdx, intersectionPrimitiveIdx;
@@ -41,7 +44,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					Primitive * prim = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
 					Material * material = scene.renderGroups[intersectionRenderGroupIdx].material;
 					glm::vec3 intersectionNormal = prim->GetNormal(intersectionPosition);
-					glm::vec3 rayReflection = Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
+					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
 					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
 					// Indirect photon if not on first cast
 					if (k > 0) {
@@ -83,21 +86,19 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 		}
 	}
 
-	// Create octree
 	octree = new Octree(directPhotons, indirectPhotons, shadowPhotons, MIN_PHOTONS_PER_NODE, scene.axisAlignedBoundingBox);
 }
 
-PhotonMap::~PhotonMap()
-{
+PhotonMap::~PhotonMap() {
 	delete octree;
 }
 
 void PhotonMap::GetPhotonsInOctreeNodeOfPositionWithinRadius(std::vector<Photon const*> photons, const glm::vec3 & pos,
-														 const float radius, std::vector<Photon const*> & photonsInRadius) const {
+															 const float radius, std::vector<Photon const*> & photonsInRadius) const {
 	for (Photon const* p : photons) {
 		if (glm::distance(p->position, pos) <= radius) {
 			photonsInRadius.push_back(p);
-		}		
+		}
 	}
 }
 
@@ -108,7 +109,7 @@ void PhotonMap::GetNClosestPhotonsInOctreeNodeOfPosition(std::vector<Photon cons
 		distances.push_back(glm::distance2(p->position, pos));
 	}
 	int cappedN = std::min((int)photons.size(), N);
-	std::vector<int> sortedIdxs = sortIndexes(distances);
+	std::vector<int> sortedIdxs = Utility::Math::GetSortedIndices(distances);
 	for (int i = 0; i < cappedN; ++i) {
 		closestPhotons.push_back(photons[i]);
 	}
@@ -118,14 +119,3 @@ Octree::OctreeNode * PhotonMap::GetOctreeNodeOfPosition(const glm::vec3 & pos) c
 	return octree->GetNodeClosestToPosition(pos);
 }
 
-std::vector<int> PhotonMap::sortIndexes(const std::vector<float>& v) const
-{
-	// initialize original index locations
-	std::vector<int> idx(v.size());
-	std::iota(idx.begin(), idx.end(), 0);
-
-	// sort indexes based on comparing values in v
-	std::sort(idx.begin(), idx.end(),
-			  [&v](size_t i1, size_t i2) {return v[i1] < v[i2]; });
-	return idx;
-}

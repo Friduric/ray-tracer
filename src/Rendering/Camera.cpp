@@ -66,9 +66,9 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 					// Calculate camera plane ray position using stratified sampling.
 					const float ylerp = y * INV_HEIGHT + c + rand(gen) * COLUMN_PIXEL_STEP;
 					const float zlerp = z * INV_HEIGHT + r + rand(gen) * ROW_PIXEL_STEP;
-					const float nx = Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
-					const float ny = Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
-					const float nz = Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
+					const float nx = Utility::Math::BilinearInterpolation(ylerp, zlerp, c1.x, c2.x, c3.x, c4.x);
+					const float ny = Utility::Math::BilinearInterpolation(ylerp, zlerp, c1.y, c2.y, c3.y, c4.y);
+					const float nz = Utility::Math::BilinearInterpolation(ylerp, zlerp, c1.z, c2.z, c3.z, c4.z);
 
 					// Create ray.
 					ray.from = glm::vec3(nx, ny, nz);
