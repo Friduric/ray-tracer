@@ -46,8 +46,8 @@ int main()
 	// --------------------------------------
 	cui PIXELS_W = 200;
 	cui PIXELS_H = 200;
-	cui RAYS_PER_PIXEL = 128;
-	cui MAX_RAY_DEPTH = 2;
+	cui RAYS_PER_PIXEL = 256;
+	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
 	cui MIN_PHOTONS_PER_NODE = 10;
@@ -74,7 +74,7 @@ int main()
 	// Lights.
 	SceneObjectFactory::Add2DQuad(scene, glm::vec2(1.5f, -1), glm::vec2(3.5f, 1), 3.96f,
 								  glm::vec3(0, 0, -1), glm::vec3(1, 1, 1), 1.0f);
-	SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.5f, glm::vec3(1, 1, 1), 1.0f);
+	//SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.5f, glm::vec3(1, 1, 1), 1.0f);
 	//SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(1, 1, 1), glm::vec3(1.0f, 0.35f, 0.55f));
 
 	// --------------------------------------
