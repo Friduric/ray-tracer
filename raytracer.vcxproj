@@ -163,6 +163,7 @@
     <ClCompile Include="src\Rendering\Renderers\MonteCarloRenderer.cpp" />
     <ClCompile Include="src\Rendering\Renderers\PhotonMapRenderer.cpp" />
     <ClCompile Include="src\Rendering\Renderers\PhotonMapVisualizer.cpp" />
+    <ClCompile Include="src\Rendering\Renderers\Renderer.cpp" />
     <ClCompile Include="src\Rendering\RenderGroup.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\Geometry\Sphere.cpp" />
@@ -172,6 +173,8 @@
     <ClCompile Include="src\Rendering\Materials\LambertianMaterial.cpp" />
     <ClCompile Include="src\Scene\SceneObjectFactory.cpp" />
     <ClCompile Include="src\Utility\Math.cpp" />
+    <ClCompile Include="src\Utility\Other.cpp" />
+    <ClCompile Include="src\Utility\Rendering.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Geometry\AABB.h" />
@@ -195,6 +198,8 @@
     <ClInclude Include="src\Rendering\Materials\Material.h" />
     <ClInclude Include="src\Scene\SceneObjectFactory.h" />
     <ClInclude Include="src\Utility\Math.h" />
+    <ClInclude Include="src\Utility\Other.h" />
+    <ClInclude Include="src\Utility\Rendering.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
