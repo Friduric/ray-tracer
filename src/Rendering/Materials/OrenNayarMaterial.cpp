@@ -31,9 +31,13 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 	const float alpha = std::max(alphaInclination, betaInclination);
 	const float beta = std::min(alphaInclination, betaInclination);
 
-	float gamma = glm::dot(-inDirection, outDirection);
+	const float gamma = glm::dot(-inDirection, outDirection);
 
-	const float oren = A + B * std::max(0.0f, gamma) * sin(alphaInclination) * tan(betaInclination);
+	float oren = B * std::max(0.0f, gamma);
+	if (abs(oren) > FLT_EPSILON) {
+		oren *= sin(alphaInclination) * tan(betaInclination);
+	}
+	oren += A;
 
-	return reflectivity * oren * (incomingRadiance * surfaceColor);
+	return glm::one_over_pi<float>() * reflectivity * oren * (incomingRadiance * surfaceColor);
 }

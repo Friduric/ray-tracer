@@ -13,7 +13,7 @@ private:
 	const unsigned int MAX_DEPTH, BOUNCES_PER_HIT;
 	Scene & scene;
 
-	// Reused to skip checking intersections again unneccessary render groups.
+	// Reused to skip checking intersections against unneccessary render groups.
 	RenderGroup * previousConvexIntersectionRenderGroup = nullptr;
 
 	/// <summary> Traces a ray through the scene. </summary>

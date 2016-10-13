@@ -50,7 +50,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	const glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
 
 	// Retrieve the intersected surface's material.
-	const Material * hitMaterial = intersectionRenderGroup.material;
+	const Material * const hitMaterial = intersectionRenderGroup.material;
 
 	// Shoot rays and integrate based on BRDF. 
 	glm::vec3 colorAccumulator = { 0,0,0 };
