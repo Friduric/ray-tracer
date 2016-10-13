@@ -54,6 +54,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 	ceiling.primitives.push_back(new Triangle(cv2, cv5, cv6, ceilingNormal));
 	ceiling.primitives.push_back(new Triangle(cv3, cv4, cv5, ceilingNormal));
 
+	ceiling.RecalculateAABB();
+
 	renderGroups.push_back(ceiling);
 
 	// -------------------
@@ -74,6 +76,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 	floor.primitives.push_back(new Triangle(fv2, fv5, fv6, floorNormal));
 	floor.primitives.push_back(new Triangle(fv3, fv4, fv5, floorNormal));
 
+	floor.RecalculateAABB();
+
 	renderGroups.push_back(floor);
 
 	// -------------------
@@ -88,6 +92,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 		wall1.primitives.push_back(new Triangle(fv1, cv1, cv2, w1Normal));
 		wall1.primitives.push_back(new Triangle(fv2, fv1, cv2, w1Normal));
 
+		wall1.RecalculateAABB();
+
 		renderGroups.push_back(wall1);
 	}
 
@@ -101,6 +107,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 	wall2.primitives.push_back(new Triangle(fv2, cv2, cv3, w2Normal));
 	wall2.primitives.push_back(new Triangle(fv3, fv2, cv3, w2Normal));
 
+	wall2.RecalculateAABB();
+
 	renderGroups.push_back(wall2);
 
 	// -------------------
@@ -112,6 +120,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 
 	wall3.primitives.push_back(new Triangle(fv3, cv3, cv4, w3Normal));
 	wall3.primitives.push_back(new Triangle(fv4, fv3, cv4, w3Normal));
+
+	wall3.RecalculateAABB();
 
 	renderGroups.push_back(wall3);
 
@@ -125,6 +135,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 	wall4.primitives.push_back(new Triangle(fv4, cv4, cv5, w4Normal));
 	wall4.primitives.push_back(new Triangle(fv5, fv4, cv5, w4Normal));
 
+	wall4.RecalculateAABB();
+
 	renderGroups.push_back(wall4);
 
 	// -------------------
@@ -136,6 +148,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 
 	wall5.primitives.push_back(new Triangle(fv5, cv5, cv6, w5Normal));
 	wall5.primitives.push_back(new Triangle(fv6, fv5, cv6, w5Normal));
+
+	wall5.RecalculateAABB();
 
 	renderGroups.push_back(wall5);
 
@@ -150,6 +164,8 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 
 		wall6.primitives.push_back(new Triangle(fv6, cv6, cv1, w6Normal));
 		wall6.primitives.push_back(new Triangle(fv1, fv6, cv1, w6Normal));
+
+		wall6.RecalculateAABB();
 
 		renderGroups.push_back(wall6);
 	}
@@ -167,6 +183,7 @@ void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, flo
 	// Render group + primitive.
 	RenderGroup sphereGroup(sphereMaterial);
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
+	sphereGroup.RecalculateAABB();
 	renderGroups.push_back(sphereGroup);
 }
 
@@ -182,6 +199,7 @@ void SceneObjectFactory::AddTriangle(Scene & scene, glm::vec3 p1, glm::vec3 p2, 
 	// Render group + primitive.
 	RenderGroup triangleGroup(sphereMaterial);
 	triangleGroup.primitives.push_back(new Triangle(p1, p2, p3, normal));
+	triangleGroup.RecalculateAABB();
 	renderGroups.push_back(triangleGroup);
 }
 
@@ -204,6 +222,7 @@ void SceneObjectFactory::Add2DQuad(Scene & scene, glm::vec2 corner1, glm::vec2 c
 
 	triangleGroup.primitives.push_back(new Triangle(c1, c2, c3, normal));
 	triangleGroup.primitives.push_back(new Triangle(c3, c4, c1, normal));
+	triangleGroup.RecalculateAABB();
 	renderGroups.push_back(triangleGroup);
 }
 
@@ -219,6 +238,7 @@ void SceneObjectFactory::AddSphere(Scene & scene, float x, float y, float z,
 	// Render group + primitive.
 	RenderGroup sphereGroup(sphereMaterial);
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
+	sphereGroup.RecalculateAABB();
 	renderGroups.push_back(sphereGroup);
 }
 
@@ -251,6 +271,8 @@ void SceneObjectFactory::AddTetrahedron(Scene & scene, float x, float y, float z
 	tetrahedronGroup.primitives.push_back(new Triangle(v2, v4, v1, n3));
 	tetrahedronGroup.primitives.push_back(new Triangle(v3, v4, v2, n4));
 
+	tetrahedronGroup.RecalculateAABB();
+
 	renderGroups.push_back(tetrahedronGroup);
 }
 
@@ -267,5 +289,6 @@ void SceneObjectFactory::AddEmissiveSphere(Scene & scene, float x, float y, floa
 	// Render group + primitive.
 	RenderGroup sphereGroup(sphereMaterial);
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
+	sphereGroup.RecalculateAABB();
 	renderGroups.push_back(sphereGroup);
 }

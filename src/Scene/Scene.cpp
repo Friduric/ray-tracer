@@ -63,8 +63,8 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 
 	float closestInterectionDistance = FLT_MAX;
 
-	// Check if the ray intersects with any enabled primitive in the scene.
-	// TODO: Use the octree to speed up performance by ray casting on AABBs at first hand.
+	// Check if the ray intersects with any enabled render group in the scene.
+	// TODO: Use the octree to speed up performance by firstly ray casting on AABBs.
 	for (unsigned int i = 0; i < renderGroups.size(); ++i) {
 		if (!renderGroups[i].enabled) {
 			continue;
