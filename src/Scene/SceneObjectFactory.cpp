@@ -49,7 +49,9 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 	glm::vec3 cv6(0.0, -6.0, 5.0);
 	glm::vec3 ceilingNormal(0.0, 0.0, -1.0);
 
-	ceiling.primitives.push_back(new Triangle(cv1, cv2, cv6, ceilingNormal));
+	if (addBackWalls) {
+		ceiling.primitives.push_back(new Triangle(cv1, cv2, cv6, ceilingNormal));
+	}
 	ceiling.primitives.push_back(new Triangle(cv2, cv3, cv5, ceilingNormal));
 	ceiling.primitives.push_back(new Triangle(cv2, cv5, cv6, ceilingNormal));
 	ceiling.primitives.push_back(new Triangle(cv3, cv4, cv5, ceilingNormal));
@@ -71,7 +73,9 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 	glm::vec3 fv6(0.0, -6.0, -5.0);
 	glm::vec3 floorNormal(0.0, 0.0, 1.0);
 
-	floor.primitives.push_back(new Triangle(fv1, fv2, fv6, floorNormal));
+	if (addBackWalls) {
+		floor.primitives.push_back(new Triangle(fv1, fv2, fv6, floorNormal));
+	}
 	floor.primitives.push_back(new Triangle(fv2, fv3, fv5, floorNormal));
 	floor.primitives.push_back(new Triangle(fv2, fv5, fv6, floorNormal));
 	floor.primitives.push_back(new Triangle(fv3, fv4, fv5, floorNormal));

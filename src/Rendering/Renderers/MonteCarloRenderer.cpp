@@ -35,42 +35,73 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	auto & intersectionRenderGroup = scene.renderGroups[intersectionRenderGroupIndex];
 	const auto & intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 
-	// Calculate normal.
+	// Calculate hit normal.
 	const glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
+	if (glm::dot(-ray.direction, hitNormal) < 0.0f) {
+		return glm::vec3(0, 0, 0);
+	}
 
 	// Retrieve the intersected surface's material.
 	const Material * const hitMaterial = intersectionRenderGroup.material;
 
-	glm::vec3 colorAccumulator = { 0,0,0 };
+	// -------------------------------
+	// Emissive lighting.
+	// -------------------------------
+	if (hitMaterial->IsEmissive()) {
+		return hitMaterial->GetSurfaceColor();
+	}
 
-	const float lights = static_cast<float>(scene.emissiveRenderGroups.size());
-	if (DEPTH == 0) {
+	glm::vec3 colorAccumulator = { 0,0,0 };
+	const float rf = 1.0f - hitMaterial->reflectivity;
+	const float tf = 1.0f - hitMaterial->transparency;
+	// -------------------------------
+	// Direct diffuse lighting.
+	// -------------------------------
+	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
 
 		// Send a shadow ray toward all light sources to check for light visibility.
 		for (RenderGroup * lightSource : scene.emissiveRenderGroups) {
 			glm::vec3 randomLightSurfacePosition = lightSource->GetRandomPositionOnSurface();
-			Ray shadowRay(intersectionPoint, glm::normalize(randomLightSurfacePosition - intersectionPoint));
+			glm::vec3 shadowRayDirection = glm::normalize(randomLightSurfacePosition - intersectionPoint);
+			if (glm::dot(shadowRayDirection, hitNormal) < 0.0f) {
+				continue;
+			}
+			Ray shadowRay(intersectionPoint, shadowRayDirection);
 
 			// Cast a shadow ray towards the light source.
-			if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance, false)) {
-				const auto & renderGroup = scene.renderGroups[intersectionRenderGroupIndex];
+			unsigned int shadowRayGroupIndex, shadowRayPrimitiveIndex;
+			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance, false)) {
+				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];
 				if (&renderGroup == lightSource) {
-
 					// We hit the light. Add it's contribution to the color accumulator.
-					Primitive * lightPrimitive = renderGroup.primitives[intersectionPrimitiveIndex];
+					Primitive * lightPrimitive = renderGroup.primitives[shadowRayPrimitiveIndex];
 					glm::vec3 lightNormal = lightPrimitive->GetNormal(shadowRay.from + intersectionDistance * shadowRay.direction);
-					const float intersectionRadianceFactor = glm::max(0.0f, glm::dot(-shadowRay.direction, lightNormal));
-					colorAccumulator += intersectionRadianceFactor * lightSource->material->GetEmissionColor();
+					const float lightFactor = glm::max(0.0f, glm::dot(-shadowRay.direction, lightNormal));
+					glm::vec3 radiance = lightFactor * lightSource->material->GetEmissionColor();
+					colorAccumulator += hitMaterial->CalculateDiffuseLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 				}
 			}
 		}
 	}
 
-	// Calculate direct light contribution.
-	colorAccumulator *= (1.0f / lights);
+	// -------------------------------
+	// Indirect lighting.
+	// -------------------------------
+	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
+		// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting. 
+		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal);
+		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
+		const Ray diffuseRay(intersectionPoint, reflectionDirection);
+		const auto incomingRadiance = TraceRay(diffuseRay, DEPTH + 1);
+		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-diffuseRay.direction, -ray.direction, hitNormal, incomingRadiance);
+	}
 
+	colorAccumulator *= rf * tf;
+
+	// -------------------------------
+	// Refracted lighting.
+	// -------------------------------
 	if (hitMaterial->IsTransparent()) {
-		// Shoot a refracted ray if the material is transparent.
 		float n1 = 1.0f;
 		float n2 = hitMaterial->refractiveIndex;
 
@@ -95,27 +126,15 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 		colorAccumulator += hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
 	}
 
+	// -------------------------------
+	// Reflective lighting.
+	// -------------------------------
 	if (hitMaterial->IsReflective()) {
 		// Shoot a reflective ray if the material is reflective.
-		glm::vec3 offset = hitNormal * 0.000001f;
-		Ray reflectedRay(intersectionPoint + offset, glm::reflect(ray.direction, hitNormal));
-		const auto incomingRadiance = hitMaterial->reflectivity * TraceRay(reflectedRay, DEPTH + 1);
-		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
-	}
-
-	if (hitMaterial->reflectivity < 1.0f - FLT_EPSILON && hitMaterial->transparency < 1.0f - FLT_EPSILON) {
-		float rf = 1.0f - hitMaterial->reflectivity;
-		float tf = 1.0f - hitMaterial->transparency;
-
-		// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting. 
-		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal);
-		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
-		const Ray reflectedRay(intersectionPoint, reflectionDirection);
+		Ray reflectedRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
 		const auto incomingRadiance = TraceRay(reflectedRay, DEPTH + 1);
-		colorAccumulator += rf * tf * hitMaterial->CalculateDiffuseLighting(-reflectedRay.direction, -ray.direction, hitNormal, incomingRadiance);
+		colorAccumulator += hitMaterial->reflectivity * incomingRadiance;
 	}
-	// Add emission.
-	colorAccumulator += glm::dot(-ray.direction, intersectionPrimitive->GetNormal(intersectionPoint)) * hitMaterial->GetEmissionColor();
 
 	// Return result.
 	return colorAccumulator;
