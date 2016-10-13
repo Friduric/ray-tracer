@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "../Utility/Math.h"
+#include "../../includes/glm/gtx/intersect.hpp"
 
 #define __BACK_FACE_CULLING false
 
@@ -29,7 +30,7 @@ const AABB & Sphere::GetAxisAlignedBoundingBox() const {
 
 bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) const {
 #if __BACK_FACE_CULLING
-	if (dot(ray.direction, GetNormal(ray.from)) > -FLT_EPSILON) {
+	if (dot(-ray.direction, GetNormal(ray.from)) < FLT_EPSILON) {
 		return false;
 	}
 #endif // __BACK_FACE_CULLING
