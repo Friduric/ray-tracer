@@ -64,7 +64,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 						float shadowIntersectionDistance;
 						Primitive * shadowPrim = prim;
 						// While we hit a surface keep casting and add shadow photons
-						while (true) {
+						/*while (true) {
 							if (scene.RayCast(shadowRay, shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx, shadowIntersectionDistance)) {
 								shadowPrim = scene.renderGroups[shadowIntersectionRenderGroupIdx].primitives[shadowIntersectionPrimitiveIdx];
 								shadowIntersectionPosition = shadowRay.from + shadowIntersectionDistance* shadowRay.direction;
@@ -75,7 +75,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 							}
 							// Setup next ray based on previous, direction is same all the time
 							shadowRay.from = shadowIntersectionPosition - 0.1f * shadowPrim->GetNormal(shadowIntersectionPosition);
-						}
+						}*/
 					}
 
 					ray.from = intersectionPosition;
@@ -129,6 +129,8 @@ void PhotonMap::AddPhotonsFromAdjacentNodes(std::vector<Photon const*> & adjacen
 		for (int y = -1; y <= 1; ++y) {
 			for (int z = -1; z <= 1; ++z) {
 				adjacentNode = GetOctreeNodeOfPosition(glm::vec3(intersectionPoint.x + x*radius, intersectionPoint.y + y*radius, intersectionPoint.z + z*radius));
+				// If the adjacentnode is the same as our main node then check if
+
 				// Make sure we don't add the same node again
 				bool alreadyAdded = false;
 				for (Octree::OctreeNode* alreadyAddedNode : adjacentNodes) {
