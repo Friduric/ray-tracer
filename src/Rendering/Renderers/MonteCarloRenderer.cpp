@@ -48,7 +48,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	// Emissive lighting.
 	// -------------------------------
 	if (hitMaterial->IsEmissive()) {
-		return hitMaterial->GetSurfaceColor();
+		return hitMaterial->GetEmissionColor();
 	}
 
 	glm::vec3 colorAccumulator = { 0,0,0 };
@@ -79,10 +79,13 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 					const float lightFactor = glm::max(0.0f, glm::dot(-shadowRay.direction, lightNormal));
 					glm::vec3 radiance = lightFactor * lightSource->material->GetEmissionColor();
 					colorAccumulator += hitMaterial->CalculateDiffuseLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
+
 				}
 			}
 		}
 	}
+
+	colorAccumulator *= (1.0f / glm::max<float>(1.0f, (float)scene.emissiveRenderGroups.size()));
 
 	// -------------------------------
 	// Indirect lighting.
