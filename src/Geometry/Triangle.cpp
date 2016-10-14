@@ -6,6 +6,7 @@
 #include "../../includes/glm/gtx/intersect.hpp"
 
 #define __BACK_FACE_CULLING false
+#define __TRIANGLE_SAMPLE_REJECTION false
 
 // Default constructor.
 Triangle::Triangle(glm::vec3 _v1, glm::vec3 _v2, glm::vec3 _v3, glm::vec3 _normal) :
@@ -39,6 +40,7 @@ glm::vec3 Triangle::GetCenter() const {
 }
 
 glm::vec3 Triangle::GetRandomPositionOnSurface() const {
+#if __TRIANGLE_SAMPLE_REJECTION
 	glm::vec3 v;
 	float quadArea = glm::length(glm::cross(vertices[0] - vertices[1], vertices[0] - vertices[2]));
 	float a1, a2, a3;
@@ -51,6 +53,9 @@ glm::vec3 Triangle::GetRandomPositionOnSurface() const {
 		v = vertices[0] + rand1 * (vertices[1] - vertices[0]) + rand2 * (vertices[2] - vertices[0]);
 	} while (glm::length(a1 + a2 + a3 - quadArea) > FLT_EPSILON);
 	return v;
+#else
+	return vertices[0] + rand() / (float)RAND_MAX * (vertices[1] - vertices[0]) + rand() / (float)RAND_MAX * (vertices[2] - vertices[0]);
+#endif
 }
 
 const AABB & Triangle::GetAxisAlignedBoundingBox() const {
