@@ -10,13 +10,13 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 
 	// Colors.
 	const glm::vec3 whiteColor(1.0, 1.0, 1.0);
-	const glm::vec3 redColor(1.0, 0.0, 0.0);
-	const glm::vec3 cyanColor(0.0, 1.0, 1.0);
-	const glm::vec3 blueColor(0.0, 0.0, 1.0);
-	const glm::vec3 greenColor(0.0, 1.0, 0.0);
-	const glm::vec3 yellowColor(1.0, 1.0, 0.0);
-	const glm::vec3 orangeColor(1.0, 0.25, 0.0);
-	const glm::vec3 purpleColor(1.0, 0.0, 1.0);
+	const glm::vec3 redColor(1.0, 0.05f, 0.05f);
+	const glm::vec3 cyanColor(0.05f, 1.0, 1.0);
+	const glm::vec3 blueColor(0.05f, 0.05f, 1.0);
+	const glm::vec3 greenColor(0.05f, 1.0, 0.05f);
+	const glm::vec3 yellowColor(1.0, 1.0, 0.05f);
+	const glm::vec3 orangeColor(1.0, 0.25, 0.05f);
+	const glm::vec3 purpleColor(1.0, 0.05f, 1.0);
 
 	// Materials.
 	const auto whiteMaterial = new LambertianMaterial(whiteColor);

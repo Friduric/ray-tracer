@@ -17,27 +17,28 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 													  const glm::vec3 & outDirection,
 													  const glm::vec3 & normal,
 													  const glm::vec3 & incomingRadiance) const {
-
+	assert(glm::length(inDirection) < 1.0f + FLT_EPSILON && glm::length(inDirection) > 1.0f - FLT_EPSILON);
+	assert(glm::length(outDirection) < 1.0f + FLT_EPSILON && glm::length(outDirection) > 1.0f - FLT_EPSILON);
 	// See https://en.wikipedia.org/wiki/Oren-Nayar_reflectance_model for more information.
 
-	const float roughnessSquared = roughness * roughness;
+	const float indot = glm::dot(-inDirection, normal);
+	if (indot < FLT_EPSILON) {
+		return glm::vec3(0);
+	}
 
-	const float A = 1 - 0.5f * roughnessSquared / (roughnessSquared + 0.57f);
-	const float B = 0.45f * roughnessSquared / (roughnessSquared + 0.09f);
+	const float sigma2 = roughness * roughness;
 
-	const float alphaInclination = acos(glm::dot(normal, -inDirection));
-	const float betaInclination = acos(glm::dot(normal, outDirection));
+	const float A = 1 - 0.5f * sigma2 / (sigma2 + 0.57f);
+	const float B = 0.45f * sigma2 / (sigma2 + 0.09f);
+
+	const float alphaInclination = acos(indot);
+	const float betaInclination = acos(glm::dot(outDirection, normal));
 
 	const float alpha = std::max(alphaInclination, betaInclination);
 	const float beta = std::min(alphaInclination, betaInclination);
 
-	const float gamma = glm::dot(-inDirection, outDirection);
+	const float C = glm::max<float>(0.0f, glm::dot(-inDirection, outDirection));
+	const float D = (C > FLT_EPSILON) ? B * C * sin(alpha) * tan(beta) : 0.0f;
 
-	float oren = B * std::max(0.0f, gamma);
-	if (abs(oren) > FLT_EPSILON) {
-		oren *= sin(alphaInclination) * tan(betaInclination);
-	}
-	oren += A;
-
-	return glm::one_over_pi<float>() * oren * (incomingRadiance * surfaceColor);
+	return glm::min<float>((A + D) * glm::max(0.0f, indot), 1.0f) * (incomingRadiance * surfaceColor);
 }
