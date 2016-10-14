@@ -4,14 +4,20 @@ A Monte Carlo ray tracer implementation using photon mapping.
 Currently supports:
 - Intransparent materials using Oren-Nayar and Lambertian BRDFs.
 - Photon mapping to increase performance and approximate indirect lighting.
+- Transparent and reflective materials.
 
 TODO: 
-- Transparent materials.
 - Shadow photons.
-- Caustics mapping.
+- Caustics by photon mapping.
 - kd-tree instead of octree.
 
 ## Sample images
+<p align="center">
+This is the third image that was rendered by this ray tracer after about 7 days of coding:
+</p>
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/first_refraction_test.png" width="400" height="400">
+</p>
 <p align="center">
 This is the second image that was rendered by this ray tracer after about 4 days of coding:
 </p>
