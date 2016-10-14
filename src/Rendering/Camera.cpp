@@ -56,8 +56,8 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 			// Shoot a bunch of rays through the pixel (y, z), and accumulate colors.
 			Ray ray;
 			glm::vec3 colorAccumulator = colorAccumulator = glm::vec3(0, 0, 0);
-			for (float c = 0; c < INV_WIDTH - FLT_EPSILON; c += COLUMN_PIXEL_STEP) {
-				for (float r = 0; r < INV_HEIGHT - FLT_EPSILON; r += ROW_PIXEL_STEP) {
+			for (float c = 0; c < INV_WIDTH - COLUMN_PIXEL_STEP + FLT_EPSILON; c += COLUMN_PIXEL_STEP) {
+				for (float r = 0; r < INV_HEIGHT - ROW_PIXEL_STEP + FLT_EPSILON; r += ROW_PIXEL_STEP) {
 
 					// Calculate camera plane ray position using stratified sampling.
 					const float ylerp = y * INV_WIDTH + c + rand(gen) * COLUMN_PIXEL_STEP;
