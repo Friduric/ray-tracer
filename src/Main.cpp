@@ -45,7 +45,7 @@ int main() {
 	// --------------------------------------
 	cui PIXELS_W = 400;
 	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 64;
+	cui RAYS_PER_PIXEL = 80;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
@@ -72,9 +72,9 @@ int main() {
 
 	// SceneObjectFactory::AddSphere(scene, 6, -3.3f, -3.1f, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
 	// SceneObjectFactory::AddOrenNayarSphere(scene, 6, -3.3f, -3.1f, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f), 0.00f);
-	SceneObjectFactory::AddSphere(scene, 6, 0, -0.5f, 1.25f, glm::vec3(0.0f, 1.0f, 0.0f));
-	// SceneObjectFactory::AddOrenNayarSphere(scene, 0, 2, -2.0f, 0.75f, glm::vec3(0.5f, 1.0f, 0.35f), 100.0f);
-	// SceneObjectFactory::AddOrenNayarSphere(scene, 0, -2, -2.0f, 0.75f, glm::vec3(0.5f, 1.0f, 0.35f), 100000.0f);
+	SceneObjectFactory::AddSphere(scene, 6, 0, -0.5f, 1.25f, glm::vec3(0.05f, 1.0f, 0.05f));
+	SceneObjectFactory::AddOrenNayarSphere(scene, 0, 2, -2.0f, 0.75f, glm::vec3(0.5f, 1.0f, 0.35f), 100.0f);
+	SceneObjectFactory::AddOrenNayarSphere(scene, 6, -3.3f, -3.1f, 1.25f, glm::vec3(1.0f, 0.0f, 0.0f), 0.5f);
 	// SceneObjectFactory::AddSphere(scene, 5, 3, -2, 1.25f, glm::vec3(0.0f, 0.0f, 1.0f));
 	SceneObjectFactory::AddTransparentSphere(scene, 5, 3, -2, 1.25f, glm::vec3(1.0f, 1.0f, 1.0f), 1.52f, 0, 1.f); // Mirror.
 	SceneObjectFactory::AddTransparentSphere(scene, 2, 2.80f, 1.75f, 1.5f, glm::vec3(0.5f, 1.0f, 1.0f), 1.135f, 0.00f, 0.97f); // "Mirror".
@@ -159,9 +159,9 @@ int main() {
 	// --------------------------------------
 	std::cout << "Render saved to: " << imageFileName << "." << endl;
 	std::cout << "Info saved to: " << imageFileName << "." << endl;
-	std::cout << "Rendering finished... press any key to exit." << std::endl;
-	std::cout << "\b" << std::flush;
-	std::cin.get();
+	// std::cout << "Rendering finished... press any key to exit." << std::endl;
+	// std::cout << "\b" << std::flush;
+	// std::cin.get();
 
 	return 0;
 }

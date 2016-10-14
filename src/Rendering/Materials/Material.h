@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../../includes/glm/gtc/constants.hpp"
 #include <glm.hpp>
 #include "../../Geometry/Ray.h"
 
