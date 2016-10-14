@@ -264,12 +264,14 @@ void SceneObjectFactory::AddTransparentSphere(Scene & scene, float x, float y, f
 	renderGroups.push_back(sphereGroup);
 }
 
-void SceneObjectFactory::AddTetrahedron(Scene & scene, float x, float y, float z, glm::vec3 surfaceColor) {
+void SceneObjectFactory::AddTetrahedron(Scene & scene, float x, float y, float z, glm::vec3 surfaceColor,
+										float emissivity, float refractiveIndex, float transparency,
+										float reflectivity) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
 	// Material.
-	const auto tetraMaterial = new LambertianMaterial(surfaceColor);
+	const auto tetraMaterial = new LambertianMaterial(surfaceColor, emissivity, reflectivity, transparency, refractiveIndex);
 	materials.push_back(tetraMaterial);
 
 	// Vertices.

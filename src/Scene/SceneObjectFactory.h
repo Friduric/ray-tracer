@@ -12,7 +12,9 @@ namespace SceneObjectFactory {
 
 	/// <summary> Creates a tetrahedron at position x, y, z and adds it to the scene. </summary>
 	void AddTetrahedron(Scene & scene, float x = 0, float y = 0, float z = 0,
-						glm::vec3 surfaceColor = glm::vec3(0, 0, 1));
+						glm::vec3 surfaceColor = glm::vec3(0, 1, 1),
+						float emissivity = 0.0f, float refractiveIndex = 1.52f, float transparency = 0.0f,
+						float reflectivity = 0.0f);
 
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
 	void AddSphere(Scene & scene, float x = 0, float y = 0, float z = 0, float radius = 0,
