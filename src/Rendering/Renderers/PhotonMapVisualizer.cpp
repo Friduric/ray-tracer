@@ -40,15 +40,12 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		std::vector<Photon const*> closestPhotons;
 		//photonMap->GetNClosestPhotonsOfPosition(allDirPhotons, intersectionPoint, 10, closestDirPhotons);
 		photonMap->GetPhotonsAtPositionWithinRadius(allDirPhotons, intersectionPoint, radius, closestPhotons);
-		//radius = glm::distance(allDirPhotons[allDirPhotons.size()-1]->position, intersectionPoint);
 		if (closestPhotons.size() > 0) {
 			for (const Photon * dp : closestPhotons) {
 				float distance = glm::distance(intersectionPoint, dp->position);
 				float weight = std::max(0.0f, 1.0f - distance / radius);
-				//std::cout << dp->color.r << " " << dp->color.g << " " << dp->color.b << std::endl;
 				colorAccumulator += weight*dp->color;
 			}
-			//std::cout << radius << std::endl;
 			colorAccumulator /= radius;
 		}
 		// Indirect photons.
