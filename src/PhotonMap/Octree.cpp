@@ -10,9 +10,14 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 			   const std::vector<Photon> & _shadowPhotons,
 			   const unsigned int maxPhotonsPerNode,
 			   const float minDimensionSizeOfNode,
-			   const AABB & aabb) : root(new OctreeNode(aabb)) {
-	// Add all photons to the root	
-
+			   const AABB & aabb) {
+	// Add all photons to the root
+	float maxSide = std::max(aabb.maximum.x, aabb.maximum.y);
+	maxSide = std::max(maxSide, aabb.maximum.z);
+	float minSide = std::min(aabb.minimum.x, aabb.minimum.y);
+	minSide = std::min(minSide, aabb.minimum.z);
+	AABB rootAABB(minSide, minSide, minSide, maxSide, maxSide, maxSide);
+	root = new OctreeNode(rootAABB);
 	for (unsigned int n = 0; n < _directPhotons.size(); ++n) {
 		root->directPhotons.push_back(&_directPhotons[n]);
 	}
