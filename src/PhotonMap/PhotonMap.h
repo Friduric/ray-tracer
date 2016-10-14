@@ -18,7 +18,7 @@ public:
 	/// <param name='MAX_DEPTH'> The number of bounces each photon will make (at most). </param>
 	PhotonMap(const class Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 			  const unsigned int MIN_PHOTONS_PER_NODE,
-			  const unsigned int MIN_DIMENSION_SIZE_OF_NODE,
+			  const float MIN_DIMENSION_SIZE_OF_NODE,
 			  const unsigned int MAX_DEPTH);
 
 	~PhotonMap();

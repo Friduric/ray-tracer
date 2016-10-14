@@ -9,7 +9,7 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 			   const std::vector<Photon> & _indirectPhotons,
 			   const std::vector<Photon> & _shadowPhotons,
 			   const unsigned int maxPhotonsPerNode,
-			   const unsigned int minDimensionSizeOfNode,
+			   const float minDimensionSizeOfNode,
 			   const AABB & aabb) : root(new OctreeNode(aabb)) {
 	// Add all photons to the root	
 
@@ -65,7 +65,7 @@ Octree::Octree(const std::vector<Photon> & _directPhotons,
 				for (unsigned int zIdx = 0; zIdx < 2; ++zIdx) {
 					nodeZMin = currentNode->axisAlignedBoundingBox.minimum.z + nodeZHalf*zIdx;
 					nodeZMax = nodeZMin + nodeZHalf;
-					// Add new node									
+					// Add new node								
 					OctreeNode* newNode = new OctreeNode();
 					newNode->axisAlignedBoundingBox.minimum.x = nodeXMin;
 					newNode->axisAlignedBoundingBox.maximum.x = nodeXMax;

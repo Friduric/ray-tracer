@@ -54,7 +54,7 @@ public:
 		   const std::vector<Photon> & indirectPhotons,
 		   const std::vector<Photon> & shadowPhotons,
 		   const unsigned int maxPhotonsPerNode, 
-		   const unsigned int minDimensionSizeOfNode,
+		   const float minDimensionSizeOfNode,
 		   const AABB & axisAlignedBoundingBox);
 
 	~Octree();
