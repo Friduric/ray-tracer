@@ -30,7 +30,7 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		Octree::OctreeNode* node = photonMap->GetOctreeNodeOfPosition(intersectionPoint);
 		std::vector<Photon const*> allDirPhotons = node->directPhotons;
 		glm::vec3 corner = node->axisAlignedBoundingBox.maximum;
-		float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter(), corner)*0.2f;
+		float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter().x, corner.x)*0.5f;
 		photonMap->AddPhotonsFromAdjacentNodes(allDirPhotons, node, intersectionPoint,  radius);
 		// No photons found return
 		if (allDirPhotons.size() == 0) {
