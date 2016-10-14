@@ -176,12 +176,12 @@ void SceneObjectFactory::AddRoom(Scene & scene, bool addBackWalls, bool emissive
 }
 
 void SceneObjectFactory::AddOrenNayarSphere(Scene & scene, float x, float y, float z,
-											float radius, glm::vec3 surfaceColor) {
+											float radius, glm::vec3 surfaceColor, float roughness) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
 	// Material.
-	const auto sphereMaterial = new OrenNayarMaterial(surfaceColor);
+	const auto sphereMaterial = new OrenNayarMaterial(surfaceColor, roughness);
 	materials.push_back(sphereMaterial);
 
 	// Render group + primitive.
@@ -306,12 +306,11 @@ void SceneObjectFactory::AddEmissiveSphere(Scene & scene, float x, float y, floa
 	auto & renderGroups = scene.renderGroups;
 
 	// Material.
-	glm::vec3 c(1.0, 1.0, 1.0);
-	const auto sphereMaterial = new LambertianMaterial(c, emissivity);
-	materials.push_back(sphereMaterial);
+	const auto mat = new LambertianMaterial(surfaceColor, emissivity);
+	materials.push_back(mat);
 
 	// Render group + primitive.
-	RenderGroup sphereGroup(sphereMaterial);
+	RenderGroup sphereGroup(mat);
 	sphereGroup.primitives.push_back(new Sphere(glm::vec3(x, y, z), radius));
 	sphereGroup.RecalculateAABB();
 	renderGroups.push_back(sphereGroup);

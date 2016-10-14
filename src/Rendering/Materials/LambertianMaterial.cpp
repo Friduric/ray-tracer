@@ -10,6 +10,8 @@ glm::vec3 LambertianMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirec
 													   const glm::vec3 & outDirection,
 													   const glm::vec3 & normal,
 													   const glm::vec3 & incomingRadiance) const {
+	assert(glm::length(inDirection) < 1.0f + FLT_EPSILON && glm::length(inDirection) > 1.0f - FLT_EPSILON);
+	assert(glm::length(outDirection) < 1.0f + FLT_EPSILON && glm::length(outDirection) > 1.0f - FLT_EPSILON);
 	return glm::max(0.0f, glm::dot(-inDirection, normal)) * (incomingRadiance * surfaceColor);
 }
 

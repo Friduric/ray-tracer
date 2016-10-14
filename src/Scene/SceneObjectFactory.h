@@ -32,7 +32,7 @@ namespace SceneObjectFactory {
 
 	/// <summary> Creates a sphere at position x, y, z and radius and adds it to the scene. </summary>
 	void AddOrenNayarSphere(Scene & scene, float x = 0, float y = 0, float z = 0, float radius = 0,
-							glm::vec3 surfaceColor = glm::vec3(1, 0, 0));
+							glm::vec3 surfaceColor = glm::vec3(1, 0, 0), float roughness = 0.5f);
 
 	/// <summary> Creates a triangle and adds it to the scene. </summary>
 	void AddTriangle(Scene & scene, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec3 normal,
