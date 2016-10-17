@@ -20,7 +20,6 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 
 	// For each light source.
 	for (unsigned int i = 0; i < scene.emissiveRenderGroups.size(); ++i) {
-
 		// Fetch data about current light source. 
 		const auto * lightSource = scene.emissiveRenderGroups[i];
 
@@ -47,13 +46,13 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					// Indirect photon if not on first cast
 					if (k > 0) {
 						KDTreeNode indirectPhotonNode;
-						indirectPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, normal);
+						indirectPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, prim);
 						indirectPhotonsKDTree.insert(indirectPhotonNode);
 					}
 					else {
 						// else direct photon
 						KDTreeNode directPhotonNode;
-						directPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, normal);
+						directPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, prim);
 						directPhotonsKDTree.insert(directPhotonNode);
 						// Add shadow photons
 						Ray shadowRay;
@@ -71,8 +70,8 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 								glm::vec3 shadowNormal = shadowPrim->GetNormal(shadowIntersectionPosition);
 								shadowIntersectionPosition = shadowRay.from + shadowIntersectionDistance* shadowRay.direction;
 								KDTreeNode shadowPhotonNode;
-								shadowPhotonNode.photon = Photon(shadowIntersectionPosition, ray.direction, glm::vec3(0, 0, 0), shadowNormal);
-								shadowPhotonsKDTree.insert(shadowPhotonNode);
+								//shadowPhotonNode.photon = Photon(shadowIntersectionPosition, ray.direction, glm::vec3(0, 0, 0), shadowPrim);
+								//shadowPhotonsKDTree.insert(shadowPhotonNode);
 							}
 							else {
 								break;

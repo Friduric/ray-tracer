@@ -24,7 +24,7 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 	if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 		glm::vec3 intersectionPoint = ray.from + intersectionDistance * ray.direction;
 		glm::vec3 surfaceNormal = scene.renderGroups[intersectionRenderGroupIndex].primitives[intersectionPrimitiveIndex]->GetNormal(intersectionPoint);
-		float radius = 0.35f;
+		float radius = 1.0f;
 		float k = 1.3f; // Weight constant
 		// Add direct illumination photons.	
 		std::vector<PhotonMap::KDTreeNode> directNodes;
@@ -32,8 +32,8 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		for (PhotonMap::KDTreeNode node : directNodes) {
 			float distance = glm::distance(intersectionPoint, node.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance /(k * radius));
-			float normalDistance = glm::distance(node.photon.normal, surfaceNormal);
-			float normalWeight = std::max(0.0f, 1.0f - normalDistance / (SQRT2));
+			float normalDistance = glm::distance(node.photon.prim->GetNormal(intersectionPoint), surfaceNormal);
+			float normalWeight = std::max(0.0f, 1.0f - normalDistance / SQRT2);
 			colorAccumulator += normalWeight*weight*node.photon.color;
 		}
 
@@ -44,8 +44,8 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		for (PhotonMap::KDTreeNode node : indirectNodes) {
 			float distance = glm::distance(intersectionPoint, node.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance / (k * radius));
-			float normalDistance = glm::distance(node.photon.normal, surfaceNormal);
-			float normalWeight = std::max(0.0f, 1.0f - normalDistance / (SQRT2));
+			float normalDistance = glm::distance(node.photon.prim->GetNormal(intersectionPoint), surfaceNormal);
+			float normalWeight = std::max(0.0f, 1.0f - normalDistance / SQRT2);
 			colorAccumulator += normalWeight*weight*node.photon.color;
 		}
 

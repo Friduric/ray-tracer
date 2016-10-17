@@ -1,10 +1,12 @@
 #pragma once
 #include <glm.hpp>
 
+#include "../Geometry/Primitive.h"
+
 class Photon {
 public:
 	Photon();
-	Photon(glm::vec3 position, glm::vec3 direction, glm::vec3 color, glm::vec3 _normal);
+	Photon(glm::vec3 position, glm::vec3 direction, glm::vec3 color, Primitive* prim);
 
 	/// <summary> The direction the photon came from. </summary>
 	glm::vec3 direction;
@@ -16,5 +18,5 @@ public:
 	glm::vec3 color;
 
 	/// <summary> The normal of the surface the photon is on. </summary>
-	glm::vec3 normal;
+	Primitive* prim;
 };
