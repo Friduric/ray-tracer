@@ -50,7 +50,7 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 		const auto before = std::chrono::high_resolution_clock::now();
 
 		// OMP doesn't allow unsigned int in for parallelized for loop.
-#pragma omp parallel for // Parallelize using OMP.
+#pragma omp parallel for schedule(static) // Parallelize using OMP.
 		for (int z = 0; z < static_cast<int>(height); ++z) {
 
 			// Shoot a bunch of rays through the pixel (y, z), and accumulate colors.

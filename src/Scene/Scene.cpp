@@ -61,7 +61,7 @@ void Scene::Initialize() {
 }
 
 bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
-					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance, bool cullBackFace) const {
+					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
 
 	float closestInterectionDistance = FLT_MAX;
 
@@ -91,7 +91,7 @@ bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex
 	return closestInterectionDistance < FLT_MAX - FLT_EPSILON;
 }
 
-bool Scene::RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex, unsigned int & intersectionPrimitiveIndex, float & intersectionDistance, bool cullBackFace) const {
+bool Scene::RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex, unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
 	float closestInterectionDistance = FLT_MAX;
 
 	const auto & renderGroup = renderGroups[renderGroupIndex];

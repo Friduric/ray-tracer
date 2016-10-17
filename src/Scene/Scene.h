@@ -51,7 +51,7 @@ public:
 	bool RayCast(const Ray & ray,
 				 unsigned int & intersectionRenderGroupIndex,
 				 unsigned int & intersectionPrimitiveIndex,
-				 float & intersectionDistance, bool cullBackFace = true) const;
+				 float & intersectionDistance) const;
 
 	/// <summary> 
 	/// Casts a ray through a given render group. Returns true if there was an intersection.
@@ -69,7 +69,7 @@ public:
 	/// </param>
 	bool RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex,
 							unsigned int & intersectionPrimitiveIndex,
-							float & intersectionDistance, bool cullBackFace = false) const;
+							float & intersectionDistance) const;
 
 
 

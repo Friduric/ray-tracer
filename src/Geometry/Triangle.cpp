@@ -40,7 +40,7 @@ glm::vec3 Triangle::GetCenter() const {
 }
 
 glm::vec3 Triangle::GetRandomPositionOnSurface() const {
-#if __TRIANGLE_SAMPLE_REJECTION
+#if __TRIANGLE_SAMPLE_REJECTION // Triangle rejection has "perfect" uniform sampling, but is not as elegant (and requires more work)...
 	glm::vec3 v;
 	float quadArea = glm::length(glm::cross(vertices[0] - vertices[1], vertices[0] - vertices[2]));
 	float a1, a2, a3;
