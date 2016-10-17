@@ -4,7 +4,7 @@
 class Photon {
 public:
 	Photon();
-	Photon(glm::vec3 position, glm::vec3 direction, glm::vec3 color);
+	Photon(glm::vec3 position, glm::vec3 direction, glm::vec3 color, glm::vec3 _normal);
 
 	/// <summary> The direction the photon came from. </summary>
 	glm::vec3 direction;
@@ -14,4 +14,7 @@ public:
 
 	/// <summary> The color of the photon. </summary>
 	glm::vec3 color;
+
+	/// <summary> The normal of the surface the photon is on. </summary>
+	glm::vec3 normal;
 };

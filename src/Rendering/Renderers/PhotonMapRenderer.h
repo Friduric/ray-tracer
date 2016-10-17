@@ -10,6 +10,7 @@ public:
 	glm::vec3 GetPixelColor(const Ray & ray) override;
 private:
 	const unsigned int MAX_DEPTH, BOUNCES_PER_HIT;
+	const float PHOTON_SEARCH_RADIUS = 0.2f;
 	PhotonMap* photonMap;
 
 	/// <summary> Traces a ray through the scene. </summary>

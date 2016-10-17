@@ -23,10 +23,9 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 
 		// Fetch data about current light source. 
 		const auto * lightSource = scene.emissiveRenderGroups[i];
-		const auto * prim = lightSource->primitives[rand() % lightSource->primitives.size()];
 
 		for (unsigned int j = 0; j < PHOTONS_PER_LIGHT_SOURCE; ++j) {
-
+			const auto * prim = lightSource->primitives[rand() % lightSource->primitives.size()];
 			// Shoot photon in a random direction. 
 			ray.from = prim->GetRandomPositionOnSurface();
 			glm::vec3 normal = prim->GetNormal(ray.from);
@@ -48,16 +47,16 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					// Indirect photon if not on first cast
 					if (k > 0) {
 						KDTreeNode indirectPhotonNode;
-						indirectPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance);
+						indirectPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, normal);
 						indirectPhotonsKDTree.insert(indirectPhotonNode);
 					}
 					else {
 						// else direct photon
 						KDTreeNode directPhotonNode;
-						directPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance);
+						directPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, normal);
 						directPhotonsKDTree.insert(directPhotonNode);
 						// Add shadow photons
-						/*Ray shadowRay;
+						Ray shadowRay;
 						glm::vec3 shadowIntersectionPosition = intersectionPosition - 0.01f * prim->GetNormal(intersectionPosition);// Add space from it to not hit itself
 						shadowRay.from = shadowIntersectionPosition;
 						shadowRay.direction = ray.direction;
@@ -66,20 +65,22 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 						Primitive * shadowPrim = prim;
 						// While we hit a surface keep casting and add shadow photons
 						while (true) {
+							// disable the previously hit surface so we dont hit it again
 							if (scene.RayCast(shadowRay, shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx, shadowIntersectionDistance)) {
 								shadowPrim = scene.renderGroups[shadowIntersectionRenderGroupIdx].primitives[shadowIntersectionPrimitiveIdx];
+								glm::vec3 shadowNormal = shadowPrim->GetNormal(shadowIntersectionPosition);
 								shadowIntersectionPosition = shadowRay.from + shadowIntersectionDistance* shadowRay.direction;
 								KDTreeNode shadowPhotonNode;
-								shadowPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance);
+								shadowPhotonNode.photon = Photon(shadowIntersectionPosition, ray.direction, glm::vec3(0, 0, 0), shadowNormal);
 								shadowPhotonsKDTree.insert(shadowPhotonNode);
-								//shadowPhotons.push_back(Photon(shadowIntersectionPosition, shadowRay.direction, glm::vec3(0, 0, 0)));
 							}
 							else {
 								break;
 							}
+							// Enable previously hit surface
 							// Setup next ray based on previous, direction is same all the time
-							shadowRay.from = shadowIntersectionPosition - 0.1f * shadowPrim->GetNormal(shadowIntersectionPosition);
-						}*/
+							shadowRay.from = shadowIntersectionPosition - 0.01f * shadowPrim->GetNormal(shadowIntersectionPosition);
+						}
 					}
 
 					ray.from = intersectionPosition;
@@ -93,24 +94,34 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 	}
 }
 
-PhotonMap::~PhotonMap() {}
+// -------------------------------
+// KDTree functions.
+// -------------------------------
 
+PhotonMap::KDTreeNode refNode;
 void PhotonMap::GetDirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const {
-	KDTreeNode refNode;
 	refNode.photon.position = pos;
 	directPhotonsKDTree.find_within_range(refNode, radius, std::back_insert_iterator<std::vector<KDTreeNode>>(photonsInRadius));
 }
 
 void PhotonMap::GetIndirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const {
-	KDTreeNode refNode;
 	refNode.photon.position = pos;
 	indirectPhotonsKDTree.find_within_range(refNode, radius, std::back_insert_iterator<std::vector<KDTreeNode>>(photonsInRadius));
 }
 
 void PhotonMap::GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const {
-	KDTreeNode refNode;
 	refNode.photon.position = pos;
 	shadowPhotonsKDTree.find_within_range(refNode, radius, std::back_insert_iterator<std::vector<KDTreeNode>>(photonsInRadius));
 }
 
+bool PhotonMap::GetClosestDirectPhotonAtPositionWithinRadius(const glm::vec3 & pos, const float radius, Photon & photon) const {
+	refNode.photon.position = pos;
+	std::pair<KDTree::KDTree<3, KDTreeNode>::const_iterator, float> result = directPhotonsKDTree.find_nearest(refNode, radius);
+	KDTreeNode foundNode = (KDTreeNode)*result.first;
+	if (result.first != directPhotonsKDTree.end()) {
+		photon = foundNode.photon;
+		return true;
+	}
+	return false;
+}
 

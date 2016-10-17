@@ -18,8 +18,6 @@ public:
 	/// <param name='MAX_DEPTH'> The number of bounces each photon will make (at most). </param>
 	PhotonMap(const class Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MAX_DEPTH);
 
-	~PhotonMap();
-
 	/// <summary> 
 	/// Node used in kdTree containing a photon
 	/// and additional functionality to work with
@@ -62,6 +60,15 @@ public:
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
 	void GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const;
+
+	/// <summary> 
+	/// Finds the closest direct photon located within a given radius around a given world position
+	/// and sets photon to the found photon. If no photon is found then false is returned, else true.
+	/// </summary>
+	/// <param name='pos'> The position to search around. </param>
+	/// <param name='radius'> The radius to search with. </param>
+	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
+	bool PhotonMap::GetClosestDirectPhotonAtPositionWithinRadius(const glm::vec3 & pos, const float radius, Photon & photon) const;
 
 private:
 	KDTree::KDTree<3, KDTreeNode> directPhotonsKDTree;
