@@ -12,10 +12,7 @@
 #include "../Utility/Other.h"
 #include "../Scene/Scene.h"
 
-PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
-					 const unsigned int MIN_PHOTONS_PER_NODE,
-					 const float MIN_DIMENSION_SIZE_OF_NODE,
-					 const unsigned int MAX_DEPTH) {
+PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MAX_DEPTH) {
 
 	// Initialize.
 	std::cout << "Creating the photon map ..." << std::endl;

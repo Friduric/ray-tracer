@@ -49,9 +49,7 @@ int main() {
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
-	cui MIN_PHOTONS_PER_NODE = 10;
-	cui PHOTON_MAP_DEPTH = 5;
-	float MIN_DIMENSION_SIZE_OF_NODE = 0.5f;
+	cui PHOTON_MAP_DEPTH = 3;
 	RendererType RENDERER_TYPE = RendererType::MONTE_CARLO;
 
 	// --------------------------------------
@@ -106,10 +104,10 @@ int main() {
 		renderer = new MonteCarloRenderer(scene, MAX_RAY_DEPTH);
 		break;
 	case RendererType::PHOTON_MAP:
-		renderer = new PhotonMapRenderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, MIN_DIMENSION_SIZE_OF_NODE, PHOTON_MAP_DEPTH);
+		renderer = new PhotonMapRenderer(scene, MAX_RAY_DEPTH, BOUNCES_PER_HIT, PHOTONS_PER_LIGHT_SOURCE, PHOTON_MAP_DEPTH);
 		break;
 	case RendererType::PHOTON_MAP_VISUALIZATION:
-		renderer = new PhotonMapVisualizer(scene, PHOTONS_PER_LIGHT_SOURCE, MIN_PHOTONS_PER_NODE, MIN_DIMENSION_SIZE_OF_NODE, PHOTON_MAP_DEPTH);
+		renderer = new PhotonMapVisualizer(scene, PHOTONS_PER_LIGHT_SOURCE, PHOTON_MAP_DEPTH);
 		break;
 	}
 	if (renderer == nullptr) {
@@ -147,7 +145,6 @@ int main() {
 	out << setw(COL_WIDTH) << left << "Bounces per hit:" << BOUNCES_PER_HIT << endl;
 	out << endl << "-- PHOTON MAP SETTINGS --" << endl;
 	out << setw(COL_WIDTH) << left << "Photons per light source:" << PHOTONS_PER_LIGHT_SOURCE << endl;
-	out << setw(COL_WIDTH) << left << "Max photons per node:" << MIN_PHOTONS_PER_NODE << endl;
 	out << setw(COL_WIDTH) << left << "Photon map depth:" << PHOTON_MAP_DEPTH << endl;
 	out << endl << "-- RENDERING STATISTICS --" << endl;
 	out << setw(COL_WIDTH) << left << "Total time:" << took << " seconds." << endl;
