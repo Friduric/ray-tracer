@@ -9,7 +9,7 @@ glm::vec3 PhotonMapVisualizer::GetPixelColor(const Ray & ray) {
 }
 
 PhotonMapVisualizer::PhotonMapVisualizer(Scene & _scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
-										 const unsigned int MIN_PHOTONS_PER_NODE, 
+										 const unsigned int MIN_PHOTONS_PER_NODE,
 										 const float MIN_DIMENSION_SIZE_OF_NODE,
 										 const unsigned int MAX_PHOTON_DEPTH) :
 	Renderer("Photon Map Visualizer", _scene) {
@@ -24,30 +24,23 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 	unsigned int intersectionRenderGroupIndex, intersectionPrimitiveIndex;
 	float intersectionDistance;
 
-	if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {		
+	if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 		glm::vec3 intersectionPoint = ray.from + intersectionDistance * ray.direction;
-		// Add direct illumination photons.
-		Octree::OctreeNode* node = photonMap->GetOctreeNodeOfPosition(intersectionPoint);
-		std::vector<Photon const*> allDirPhotons = node->directPhotons;
-		glm::vec3 corner = node->axisAlignedBoundingBox.maximum;
-		float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter().x, corner.x)*0.5f;
-		photonMap->AddPhotonsFromAdjacentNodes(allDirPhotons, node, intersectionPoint,  radius);
+		float radius = 0.3f;
+		// Add direct illumination photons.	
+		std::vector<PhotonMap::KDTreeNode> directNodes;
+		photonMap->GetDirectPhotonsAtPositionWithinRadius(intersectionPoint, radius, directNodes);
 		// No photons found return
-		if (allDirPhotons.size() == 0) {
+		if (directNodes.size() == 0) {
 			return colorAccumulator;
 		}
-		
-		std::vector<Photon const*> closestPhotons;
-		//photonMap->GetNClosestPhotonsOfPosition(allDirPhotons, intersectionPoint, 10, closestDirPhotons);
-		photonMap->GetPhotonsAtPositionWithinRadius(allDirPhotons, intersectionPoint, radius, closestPhotons);
-		if (closestPhotons.size() > 0) {
-			for (const Photon * dp : closestPhotons) {
-				float distance = glm::distance(intersectionPoint, dp->position);
-				float weight = std::max(0.0f, 1.0f - distance / radius);
-				colorAccumulator += weight*dp->color;
-			}
-			colorAccumulator /= radius;
+		for (PhotonMap::KDTreeNode node : directNodes) {
+			float distance = glm::distance(intersectionPoint, node.photon.position);
+			float weight = std::max(0.0f, 1.0f - distance / radius);
+			colorAccumulator += weight*node.photon.color;
 		}
+		colorAccumulator /= radius;
+
 		// Indirect photons.
 		/*const auto & allIndirPhotons = node->indirectPhotons;
 		std::vector<Photon const*> closestIndirPhotons;

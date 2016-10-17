@@ -87,28 +87,31 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 glm::vec3 PhotonMapRenderer::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection, const Primitive & prim, const Material & material) const {
 	glm::vec3 colorAccumulator = { 0,0,0 };
 
-	Octree::OctreeNode* node = photonMap->GetOctreeNodeOfPosition(pos);
-	std::vector<Photon const*>* directPhotons = &node->directPhotons;
-	std::vector<Photon const*>* shadowPhotons = &node->shadowPhotons;
+	//Octree::OctreeNode* node = photonMap->GetOctreeNodeOfPosition(pos);
+	//std::vector<Photon const*>* directPhotons = &node->directPhotons;
+	//std::vector<Photon const*>* shadowPhotons = &node->shadowPhotons;
 	// If there are no shadow photons and several directPhotons then we approximate light with photons
-	std::vector<Photon const*> photonsWithinRadius;
-	photonMap->GetNClosestPhotonsOfPosition(*directPhotons, pos, 1, photonsWithinRadius);
+	//std::vector<Photon const*> photonsWithinRadius;
+	//photonMap->GetNClosestPhotonsOfPosition(*directPhotons, pos, 1, photonsWithinRadius);
 	//glm::vec3 corner = node->axisAlignedBoundingBox.maximum;
 	//float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter(), corner)*0.2f;
 	//photonMap->GetPhotonsInOctreeNodeOfPositionWithinRadius(*directPhotons, pos, radius, photonsWithinRadius);
-	if (shadowPhotons->size() == 0 && photonsWithinRadius.size() > 0){// photonMap->maxPhotonsPerNode*0.0f) {
-		return photonsWithinRadius[0]->color;
-		
-		/*for (Photon const* dp : photonsWithinRadius) {
-			float distance = glm::distance(pos, dp->position);
+	float radius = 0.5f;
+	std::vector<PhotonMap::KDTreeNode> directNodes;
+	photonMap->GetDirectPhotonsAtPositionWithinRadius(pos, radius, directNodes);
+	std::vector<PhotonMap::KDTreeNode> shadowNodes;
+	photonMap->GetDirectPhotonsAtPositionWithinRadius(pos, radius, shadowNodes);
+	if (shadowNodes.size() == 0 && directNodes.size() > 0){
+		for (PhotonMap::KDTreeNode kdNode : directNodes) {
+			float distance = glm::distance(pos, kdNode.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance / radius);
-			colorAccumulator += weight * dp->color;
+			colorAccumulator += weight * kdNode.photon.color;
 		}
-		colorAccumulator /= photonsWithinRadius.size();
-		return colorAccumulator;*/
+		colorAccumulator /= directNodes.size();
+		return colorAccumulator;
 	}
 	// If there are no direct photons we assume its not lit by any light
-	if (directPhotons->size() == 0) {
+	if (directNodes.size() == 0) {
 		return glm::vec3(0, 0, 0);
 	}
 

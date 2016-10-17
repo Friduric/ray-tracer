@@ -198,6 +198,12 @@
     <ClInclude Include="src\Rendering\Materials\LambertianMaterial.h" />
     <ClInclude Include="src\Rendering\Materials\Material.h" />
     <ClInclude Include="src\Scene\SceneObjectFactory.h" />
+    <ClInclude Include="src\Utility\KDTree\allocator.hpp" />
+    <ClInclude Include="src\Utility\KDTree\function.hpp" />
+    <ClInclude Include="src\Utility\KDTree\iterator.hpp" />
+    <ClInclude Include="src\Utility\KDTree\kdtree.hpp" />
+    <ClInclude Include="src\Utility\KDTree\node.hpp" />
+    <ClInclude Include="src\Utility\KDTree\region.hpp" />
     <ClInclude Include="src\Utility\Math.h" />
     <ClInclude Include="src\Utility\Other.h" />
     <ClInclude Include="src\Utility\Rendering.h" />
