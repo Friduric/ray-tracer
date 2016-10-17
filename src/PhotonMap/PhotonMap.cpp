@@ -14,8 +14,7 @@
 PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE,
 					 const unsigned int MIN_PHOTONS_PER_NODE,
 					 const float MIN_DIMENSION_SIZE_OF_NODE,
-					 const unsigned int MAX_DEPTH) :
-	minPhotonsPerNode(MIN_PHOTONS_PER_NODE), maxPhotonsPerNode(std::max(0, (int)MIN_PHOTONS_PER_NODE * 8 - 1)) {
+					 const unsigned int MAX_DEPTH) {
 
 	// Initialize.
 	std::cout << "Creating the photon map ..." << std::endl;
