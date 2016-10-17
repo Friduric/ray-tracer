@@ -54,7 +54,16 @@ glm::vec3 Triangle::GetRandomPositionOnSurface() const {
 	} while (glm::length(a1 + a2 + a3 - quadArea) > FLT_EPSILON);
 	return v;
 #else
-	return vertices[0] + rand() / (float)RAND_MAX * (vertices[1] - vertices[0]) + rand() / (float)RAND_MAX * (vertices[2] - vertices[0]);
+	glm::vec3 v1 = vertices[1] - vertices[0];
+	glm::vec3 v2 = vertices[2] - vertices[0];
+	glm::vec3 randomRectanglePoint = glm::min((0.4f + rand() / (float)RAND_MAX ),0.7f)* v1 + glm::min((0.4f + rand() / (float)RAND_MAX), 0.7f) * v2;
+	glm::vec3 pointProjectedOnV1V2Line = glm::closestPointOnLine(randomRectanglePoint, v1, v2);
+	// If its further to the random point than to the line point then we're outside the triangle
+	if (glm::length(randomRectanglePoint) > glm::length(pointProjectedOnV1V2Line)) {
+		// Move random point inside triangle
+		randomRectanglePoint += (pointProjectedOnV1V2Line - randomRectanglePoint)*2.0f;
+	}
+	return vertices[0] + randomRectanglePoint;
 #endif
 }
 
