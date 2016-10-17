@@ -1,8 +1,11 @@
 #include "MonteCarloRenderer.h"
 
 #include "../../Utility/Math.h"
+#include "../../includes/glm/gtx/norm.hpp"
 
 #include <iostream>
+
+#define __USE_SPECULAR_LIGHTING true
 
 glm::vec3 MonteCarloRenderer::GetPixelColor(const Ray & ray) {
 	return TraceRay(ray);
@@ -11,12 +14,10 @@ glm::vec3 MonteCarloRenderer::GetPixelColor(const Ray & ray) {
 MonteCarloRenderer::MonteCarloRenderer(Scene & _scene, const unsigned int _MAX_DEPTH) :
 	MAX_DEPTH(_MAX_DEPTH), Renderer("Monte Carlo Renderer", _scene) { }
 
-glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH) {
+glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
 	if (DEPTH == MAX_DEPTH) {
 		return glm::vec3(0);
 	}
-
-	const Ray ray(_ray.from + _ray.direction * FLT_EPSILON, _ray.direction);
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
 	assert(glm::length(ray.direction) > 1.0f - FLT_EPSILON && glm::length(ray.direction) < 1.0f + FLT_EPSILON);
@@ -41,7 +42,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	// Calculate hit normal.
 	const glm::vec3 hitNormal = intersectionPrimitive->GetNormal(intersectionPoint);
 	if (glm::dot(-ray.direction, hitNormal) < FLT_EPSILON) {
-		return glm::vec3(0);
+		return glm::vec3(0); // Back face culling.
 	}
 
 	// Retrieve the intersected surface's material.
@@ -64,30 +65,43 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	const float tf = 1.0f - hitMaterial->transparency;
 
 	// -------------------------------
-	// Direct diffuse lighting.
+	// Direct lighting.
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
-
-		// Send a shadow ray toward all light sources to check for light visibility.
 		for (RenderGroup * lightSource : scene.emissiveRenderGroups) {
+
+			// Create a shadow ray.
 			const glm::vec3 randomLightSurfacePosition = lightSource->GetRandomPositionOnSurface();
 			const glm::vec3 shadowRayDirection = glm::normalize(randomLightSurfacePosition - intersectionPoint);
 			if (glm::dot(shadowRayDirection, hitNormal) < FLT_EPSILON) {
 				continue;
 			}
-			const Ray shadowRay(intersectionPoint, shadowRayDirection);
+			const Ray shadowRay(intersectionPoint + hitNormal * 0.0001f, shadowRayDirection);
 
-			// Cast a shadow ray towards the light source.
+			// Cast the shadow ray towards the light source.
 			unsigned int shadowRayGroupIndex, shadowRayPrimitiveIndex;
-			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance, false)) {
+			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance)) {
 				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];
 				if (&renderGroup == lightSource) {
+
 					// We hit the light. Add it's contribution to the color accumulator.
 					const Primitive * lightPrimitive = renderGroup.primitives[shadowRayPrimitiveIndex];
 					const glm::vec3 lightNormal = lightPrimitive->GetNormal(shadowRay.from + intersectionDistance * shadowRay.direction);
-					const float lightFactor = glm::max(0.0f, glm::dot(-shadowRay.direction, lightNormal));
+					float lightFactor = glm::dot(-shadowRay.direction, lightNormal);
+					if (lightFactor < FLT_EPSILON) {
+						continue;
+					}
+
+					// Direct diffuse lighting.
 					const glm::vec3 radiance = lightFactor * lightSource->material->GetEmissionColor();
-					colorAccumulator += hitMaterial->CalculateDiffuseLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
+					colorAccumulator += rf * tf * hitMaterial->CalculateDiffuseLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
+
+#if __USE_SPECULAR_LIGHTING
+					// Specular lighting.
+					if (hitMaterial->IsSpecular()) {
+						colorAccumulator += rf * tf * hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
+					}
+#endif
 				}
 			}
 		}
@@ -121,7 +135,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 
 		// Find out if the ray "exits" the render group anywhere.
 		bool hit = scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
-		float f = 1.0f;
+		// float f = 1.0f;
 		if (hit) {
 			const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 
@@ -130,7 +144,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 
 			refractedRay.from = refractedIntersectionPoint + refractedHitNormal * 0.001f;
 			refractedRay.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
-			f = glm::max<float>(0.0f, glm::dot(refractedRay.direction, refractedHitNormal));
+			// f = glm::max<float>(0.0f, glm::dot(refractedRay.direction, refractedHitNormal));
 		}
 		else {
 			// "Flat surface". Just keep on tracing.
@@ -140,14 +154,11 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	}
 
 	// -------------------------------
-	// Reflective lighting.
+	// Reflective and specular lighting.
 	// -------------------------------
 	if (hitMaterial->IsReflective()) {
 		// Shoot a reflective ray if the material is reflective.
 		Ray reflectedRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
-		float f = glm::max<float>(0.0f, glm::dot(reflectedRay.direction, hitNormal));
-		f *= glm::max<float>(0.0f, glm::dot(-ray.direction, hitNormal));
-		assert(f < 1.0f + FLT_EPSILON && f > -FLT_EPSILON);
 		colorAccumulator += hitMaterial->reflectivity * TraceRay(reflectedRay, DEPTH + 1);
 	}
 
