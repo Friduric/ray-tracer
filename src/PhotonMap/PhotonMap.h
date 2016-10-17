@@ -1,6 +1,8 @@
 #pragma once
 #include "Octree.h"
 
+#include "../Utility/KDTree/kdtree.hpp"
+
 class PhotonMap
 {
 public:
@@ -22,57 +24,52 @@ public:
 	~PhotonMap();
 
 	/// <summary> 
-	/// Returns photons located within a given radius around a given world position.
+	/// Node used in kdTree containing a photon
+	/// and additional functionality to work with
+	/// the implementation of the KDTree.
+	/// </summary>
+	struct KDTreeNode {
+		typedef float value_type;
+		Photon photon;
+		value_type operator[](unsigned int n) const{
+			return photon.position[n];
+		}
+		float distance(const KDTreeNode &node){
+			return glm::length(node.photon.position - photon.position);
+		}
+	};
+
+	/// <summary> 
+	/// Returns direct photons located within a given radius around a given world position.
 	/// The photons are added to the vector photonsInRadius.
 	/// </summary>
-	/// <param name='photons'> The photons in the node. </param>
 	/// <param name='pos'> The position to search around. </param>
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
-	void PhotonMap::GetPhotonsAtPositionWithinRadius(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
-													 const float radius, std::vector<Photon const*> & photonsInRadius) const;
+	void GetDirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const;
 
 	/// <summary> 
-	/// Finds N closest photons located around a given world position.
-	/// The photons are added to the vector closestPhotons.
-	/// </summary>
-	/// <param name='photons'> The photons in the node. </param>
-	/// <param name='pos'> The position to search around. </param>
-	/// <param name='N'> The amount of photons to retrieve. </param>
-	/// <param name='closestPhotons'> Found photons are added to this vector. </param>
-	void PhotonMap::GetNClosestPhotonsOfPosition(const std::vector<Photon const*> & photons, const glm::vec3 & pos,
-												 const int N, std::vector<Photon const*> & closestPhotons) const;
-
-	/// <summary> 
-	/// Finds all photons in adjacent nodes within a radius r from intersectionpoint.
-	/// The photons are added to the vector adjacentPhotons.
-	/// </summary>
-	/// <param name='adjacentPhotons'> Found photons are added to this vector. </param>
-	/// <param name='node'> The node to search around. </param>
-	/// <param name='intersectionPoint'> The position in the node. </param>
-	/// <param name='radius'> The radius. </param>
-	void PhotonMap::AddPhotonsFromAdjacentNodes(std::vector<Photon const*> & adjacentPhotons, Octree::OctreeNode* node,
-												const glm::vec3 & intersectionPoint, const float radius) const;
-
-	/// <summary> 
-	/// Returns the octree node which contains a given world position.
+	/// Returns indirect photons located within a given radius around a given world position.
+	/// The photons are added to the vector photonsInRadius.
 	/// </summary>
 	/// <param name='pos'> The position to search around. </param>
-	Octree::OctreeNode * PhotonMap::GetOctreeNodeOfPosition(const glm::vec3 & pos) const;
+	/// <param name='radius'> The radius to search with. </param>
+	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
+	void GetIndirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const;
+
+	/// <summary> 
+	/// Returns shadow photons located within a given radius around a given world position.
+	/// The photons are added to the vector photonsInRadius.
+	/// </summary>
+	/// <param name='pos'> The position to search around. </param>
+	/// <param name='radius'> The radius to search with. </param>
+	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
+	void GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const;
 
 private:
-
-	/// <summary> Container for all the direct photons. </summary>
-	std::vector<Photon> directPhotons;
-
-	/// <summary> Container for all the indirect photons. </summary>
-	std::vector<Photon> indirectPhotons;
-
-	/// <summary> Container for all the shadow photons. </summary>
-	std::vector<Photon> shadowPhotons;
-
-	/// <summary> An octree used for quick fetching of photons. </summary>
-	Octree * octree;
+	KDTree::KDTree<3, KDTreeNode> directPhotonsKDTree;
+	KDTree::KDTree<3, KDTreeNode> indirectPhotonsKDTree;
+	KDTree::KDTree<3, KDTreeNode> shadowPhotonsKDTree;
 };
 
 
