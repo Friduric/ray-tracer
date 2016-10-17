@@ -4,8 +4,6 @@
 class PhotonMap
 {
 public:
-	unsigned int minPhotonsPerNode; // TODO: Add summary.
-	unsigned int maxPhotonsPerNode; // TODO: Add summary.
 
 	/// <summary> 
 	/// Constructs a photon map by shooting photons into the scene.
