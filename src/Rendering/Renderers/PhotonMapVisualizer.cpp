@@ -28,11 +28,11 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		// Add direct illumination photons.	
 		std::vector<PhotonMap::KDTreeNode> directNodes;
 		photonMap->GetDirectPhotonsAtPositionWithinRadius(intersectionPoint, radius, directNodes);
-		/*for (PhotonMap::KDTreeNode node : directNodes) {
+		for (PhotonMap::KDTreeNode node : directNodes) {
 			float distance = glm::distance(intersectionPoint, node.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance / radius);
 			colorAccumulator += weight*node.photon.color;
-		}*/
+		}
 		
 
 		// Indirect photons.
