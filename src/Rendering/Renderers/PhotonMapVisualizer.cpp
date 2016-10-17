@@ -39,18 +39,21 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 			float weight = std::max(0.0f, 1.0f - distance / radius);
 			colorAccumulator += weight*node.photon.color;
 		}
-		colorAccumulator /= radius;
+		
 
 		// Indirect photons.
-		/*const auto & allIndirPhotons = node->indirectPhotons;
-		std::vector<Photon const*> closestIndirPhotons;
-		photonMap->GetNClosestPhotonsInOctreeNodeOfPosition(allIndirPhotons, intersectionPoint, 10, closestIndirPhotons);
-		if (closestIndirPhotons.size() > 0) {
-			for (const Photon * ip : closestIndirPhotons) {
-				colorAccumulator += ip->color;
-			}
-			colorAccumulator /= closestIndirPhotons.size();
-		}*/
+		std::vector<PhotonMap::KDTreeNode> indirectNodes;
+		photonMap->GetIndirectPhotonsAtPositionWithinRadius(intersectionPoint, radius, indirectNodes);
+		// No photons found return
+		if (indirectNodes.size() == 0) {
+			return colorAccumulator;
+		}
+		for (PhotonMap::KDTreeNode node : indirectNodes) {
+			float distance = glm::distance(intersectionPoint, node.photon.position);
+			float weight = std::max(0.0f, 1.0f - distance / radius);
+			colorAccumulator += weight*node.photon.color;
+		}
+		colorAccumulator /= radius;
 	}
 
 	return colorAccumulator;

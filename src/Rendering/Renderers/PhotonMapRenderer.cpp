@@ -86,16 +86,6 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 
 glm::vec3 PhotonMapRenderer::CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection, const Primitive & prim, const Material & material) const {
 	glm::vec3 colorAccumulator = { 0,0,0 };
-
-	//Octree::OctreeNode* node = photonMap->GetOctreeNodeOfPosition(pos);
-	//std::vector<Photon const*>* directPhotons = &node->directPhotons;
-	//std::vector<Photon const*>* shadowPhotons = &node->shadowPhotons;
-	// If there are no shadow photons and several directPhotons then we approximate light with photons
-	//std::vector<Photon const*> photonsWithinRadius;
-	//photonMap->GetNClosestPhotonsOfPosition(*directPhotons, pos, 1, photonsWithinRadius);
-	//glm::vec3 corner = node->axisAlignedBoundingBox.maximum;
-	//float radius = glm::distance(node->axisAlignedBoundingBox.GetCenter(), corner)*0.2f;
-	//photonMap->GetPhotonsInOctreeNodeOfPositionWithinRadius(*directPhotons, pos, radius, photonsWithinRadius);
 	float radius = 0.5f;
 	std::vector<PhotonMap::KDTreeNode> directNodes;
 	photonMap->GetDirectPhotonsAtPositionWithinRadius(pos, radius, directNodes);
@@ -125,7 +115,7 @@ glm::vec3 PhotonMapRenderer::CalculateDirectIlluminationAtPos(const glm::vec3 & 
 		glm::vec3 lightSurfPos = lightSource->GetRandomPositionOnSurface();
 		ray.direction = glm::normalize(lightSurfPos - ray.from);
 		// Cast ray towards light source
-		if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance, false)) {
+		if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
 			// Only add color if we did hit the light source we casted towards
 			const auto & renderGroup = scene.renderGroups[intersectionRenderGroupIdx];
 			if (&renderGroup == lightSource) {

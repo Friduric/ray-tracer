@@ -79,7 +79,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 
 			// Cast a shadow ray towards the light source.
 			unsigned int shadowRayGroupIndex, shadowRayPrimitiveIndex;
-			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance, false)) {
+			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance)) {
 				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];
 				if (&renderGroup == lightSource) {
 					// We hit the light. Add it's contribution to the color accumulator.
