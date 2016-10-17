@@ -20,7 +20,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	}
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
-	assert(glm::length(ray.direction) > 1.0f - FLT_EPSILON && glm::length(ray.direction) < 1.0f + FLT_EPSILON);
+	assert(glm::length(ray.direction) > 1.0f - FLT_EPSILON*2.0f && glm::length(ray.direction) < 1.0f + FLT_EPSILON*2.0f);
 
 	// See if our current ray hits anything in the scene.
 	float intersectionDistance;
@@ -69,7 +69,6 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
 		for (RenderGroup * lightSource : scene.emissiveRenderGroups) {
-
 			// Create a shadow ray.
 			const glm::vec3 randomLightSurfacePosition = lightSource->GetRandomPositionOnSurface();
 			const glm::vec3 shadowRayDirection = glm::normalize(randomLightSurfacePosition - intersectionPoint);
@@ -81,9 +80,8 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 			// Cast the shadow ray towards the light source.
 			unsigned int shadowRayGroupIndex, shadowRayPrimitiveIndex;
 			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance)) {
-				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];
+				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];			
 				if (&renderGroup == lightSource) {
-
 					// We hit the light. Add it's contribution to the color accumulator.
 					const Primitive * lightPrimitive = renderGroup.primitives[shadowRayPrimitiveIndex];
 					const glm::vec3 lightNormal = lightPrimitive->GetNormal(shadowRay.from + intersectionDistance * shadowRay.direction);
