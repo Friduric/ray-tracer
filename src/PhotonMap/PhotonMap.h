@@ -38,39 +38,42 @@ public:
 	/// Returns direct photons located within a given radius around a given world position.
 	/// The photons are added to the vector photonsInRadius.
 	/// </summary>
-	/// <param name='pos'> The position to search around. </param>
+	/// <param name='node'> The node to search around. </param>
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
-	void GetDirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const;
+	void GetDirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius);
 
 	/// <summary> 
 	/// Returns indirect photons located within a given radius around a given world position.
 	/// The photons are added to the vector photonsInRadius.
 	/// </summary>
-	/// <param name='pos'> The position to search around. </param>
+	/// <param name='node'> The node to search around. </param>
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
-	void GetIndirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const;
+	void GetIndirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius);
 
 	/// <summary> 
 	/// Returns shadow photons located within a given radius around a given world position.
 	/// The photons are added to the vector photonsInRadius.
 	/// </summary>
-	/// <param name='pos'> The position to search around. </param>
+	/// <param name='node'> The node to search around. </param>
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
-	void GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const;
+	void GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius);
 
 	/// <summary> 
 	/// Finds the closest direct photon located within a given radius around a given world position
 	/// and sets photon to the found photon. If no photon is found then false is returned, else true.
 	/// </summary>
-	/// <param name='pos'> The position to search around. </param>
+	/// <param name='node'> The node to search around. </param>
 	/// <param name='radius'> The radius to search with. </param>
 	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
-	bool PhotonMap::GetClosestDirectPhotonAtPositionWithinRadius(const glm::vec3 & pos, const float radius, Photon & photon) const;
+	bool PhotonMap::GetClosestDirectPhotonAtPositionWithinRadius(const glm::vec3 & pos, const float radius, Photon & photon);
 
 private:
+	/// <summary> Node used as reference to keep searching at in the kd tree. </summary>
+	PhotonMap::KDTreeNode refNode;
+
 	KDTree::KDTree<3, KDTreeNode> directPhotonsKDTree;
 	KDTree::KDTree<3, KDTreeNode> indirectPhotonsKDTree;
 	KDTree::KDTree<3, KDTreeNode> shadowPhotonsKDTree;

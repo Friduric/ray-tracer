@@ -97,23 +97,22 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 // KDTree functions.
 // -------------------------------
 
-PhotonMap::KDTreeNode refNode;
-void PhotonMap::GetDirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const {
+void PhotonMap::GetDirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) {
 	refNode.photon.position = pos;
 	directPhotonsKDTree.find_within_range(refNode, radius, std::back_insert_iterator<std::vector<KDTreeNode>>(photonsInRadius));
 }
 
-void PhotonMap::GetIndirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const {
+void PhotonMap::GetIndirectPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) {
 	refNode.photon.position = pos;
 	indirectPhotonsKDTree.find_within_range(refNode, radius, std::back_insert_iterator<std::vector<KDTreeNode>>(photonsInRadius));
 }
 
-void PhotonMap::GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) const {
+void PhotonMap::GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius) {
 	refNode.photon.position = pos;
 	shadowPhotonsKDTree.find_within_range(refNode, radius, std::back_insert_iterator<std::vector<KDTreeNode>>(photonsInRadius));
 }
 
-bool PhotonMap::GetClosestDirectPhotonAtPositionWithinRadius(const glm::vec3 & pos, const float radius, Photon & photon) const {
+bool PhotonMap::GetClosestDirectPhotonAtPositionWithinRadius(const glm::vec3 & pos, const float radius, Photon & photon) {
 	refNode.photon.position = pos;
 	std::pair<KDTree::KDTree<3, KDTreeNode>::const_iterator, float> result = directPhotonsKDTree.find_nearest(refNode, radius);
 	KDTreeNode foundNode = (KDTreeNode)*result.first;

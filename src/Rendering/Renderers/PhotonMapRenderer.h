@@ -11,10 +11,10 @@ public:
 private:
 	const unsigned int MAX_DEPTH, BOUNCES_PER_HIT;
 	const float PHOTON_SEARCH_RADIUS = 0.2f;
+	const float SQRT2 = glm::root_two<float>();
+
 	PhotonMap* photonMap;
 
 	/// <summary> Traces a ray through the scene. </summary>
 	glm::vec3 TraceRay(const Ray & ray, const unsigned int DEPTH = 0);
-	glm::vec3 CalculateDirectIlluminationAtPos(const glm::vec3 & pos, const glm::vec3 & incomingDirection,
-											   const Primitive & prim, const Material & material) const;
 };
