@@ -6,7 +6,7 @@
 
 class Material {
 public:
-	float refractiveIndex, reflectivity, transparency, emissivity, specularity;
+	float refractiveIndex, reflectivity, transparency, emissivity, specularity, specularExponent = 75.0f;
 
 	bool IsEmissive() const { return emissivity > FLT_EPSILON; };
 	bool IsTransparent() const { return transparency > FLT_EPSILON; }
@@ -27,6 +27,13 @@ public:
 	/// <returns> The ratio of reflected radiance exiting along the outgoing ray direction. </returns>
 	virtual glm::vec3 CalculateDiffuseLighting(const glm::vec3 & inDirection, const glm::vec3 & outDirection,
 											   const glm::vec3 & normal, const glm::vec3 & incomingRadiance) const = 0;
+	virtual glm::vec3 CalculateSpecularLighting(const glm::vec3 & inDirection, const glm::vec3 & outDirection,
+												const glm::vec3 & normal, const glm::vec3 & incomingRadiance) const {
+		const glm::vec3 lightReflection = glm::reflect(inDirection, normal);
+		float sqr = glm::pow<float>(glm::dot(lightReflection, outDirection), 255.f); // Phong model.
+		return sqr *glm::vec3(1, 1, 1); //  glm::max(0.0f, sqr) * incomingRadiance * GetSurfaceColor();
+	}
+
 protected:
 	Material(float _emissivity = 0.0f, float _reflectivity = 0.98f,
 			 float _transparency = 0.0f, float _refractiveIndex = 1.0f,

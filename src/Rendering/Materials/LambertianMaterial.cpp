@@ -1,8 +1,8 @@
 #include "LambertianMaterial.h"
 
 LambertianMaterial::LambertianMaterial(glm::vec3 color, float _emissivity, float _reflectivity,
-									   float _transparency, float _refractiveIndex) :
-	surfaceColor(color), Material(_emissivity, _reflectivity, _transparency, _refractiveIndex, 0.0f) {}
+									   float _transparency, float _refractiveIndex, float _specularity) :
+	surfaceColor(color), Material(_emissivity, _reflectivity, _transparency, _refractiveIndex, _specularity) {}
 
 glm::vec3 LambertianMaterial::GetSurfaceColor() const { return surfaceColor; }
 

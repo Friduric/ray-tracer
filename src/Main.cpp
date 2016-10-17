@@ -45,7 +45,7 @@ int main() {
 	// --------------------------------------
 	cui PIXELS_W = 400;
 	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 80;
+	cui RAYS_PER_PIXEL = 1024;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
@@ -79,15 +79,15 @@ int main() {
 	SceneObjectFactory::AddTransparentSphere(scene, 5, 3, -2, 1.25f, glm::vec3(1.0f, 1.0f, 1.0f), 1.52f, 0, 1.f); // Mirror.
 	SceneObjectFactory::AddTransparentSphere(scene, 2, 2.80f, 1.75f, 1.5f, glm::vec3(0.5f, 1.0f, 1.0f), 1.135f, 0.00f, 0.97f); // "Mirror".
 	SceneObjectFactory::AddTransparentSphere(scene, 4, -1, 0, 1.15f, glm::vec3(0.5f, 1.0f, 1.0f), 1.53f, 0.85f, 0.0f); // "Weird glass".
-	SceneObjectFactory::AddTransparentSphere(scene, 2, -2.80f, 1.75f, 1.5f, glm::vec3(0.5f, 1.0f, 1.0f), 1.97f, 0.85f, 0.00f); // "Glass".
-	SceneObjectFactory::AddTransparentSphere(scene, 10, 0, -3.45f, 1.1f, glm::vec3(1.0f, 1.0f, 1.0f), 1.22f, 0.98f, 0.00f); // "Glass" close to ground.
+	SceneObjectFactory::AddTransparentSphere(scene, 2, -2.80f, 1.75f, 1.5f, glm::vec3(0.5f, 1.0f, 1.0f), 1.97f, 0.85f, 0.35f); // "Glass".
+	SceneObjectFactory::AddTransparentSphere(scene, 10, 0, -3.45f, 1.1f, glm::vec3(1.0f, 1.0f, 1.0f), 1.72f, 0.98f, 0.0f); // "Glass" close to ground.
 	// SceneObjectFactory::AddTetrahedron(scene, 0, 1, -1, glm::vec3(0.0f, 1.0f, 1.0f), 0.0f, 1.52f, 0.99f, 0.0f);
 
 	// Lights.
 	SceneObjectFactory::Add2DQuad(scene, glm::vec2(5.0f, -1), glm::vec2(7.0f, 1), 4.99999f,
 								  glm::vec3(0, 0, -1), glm::vec3(1, 1.0f, 1.0f), 1.0f);
-	// SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.5f, glm::vec3(0.01f, 0.01f, 1.0f), 0.75f);
-	// SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.5f, glm::vec3(0.01f, 1.01f, 0.01f), 0.75f);
+	// SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.25f, glm::vec3(0.61f, 0.01f, 0.3f), 0.75f);
+	// SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.15f, glm::vec3(1.01f, 0.01f, 0.01f), 0.75f);
 
 	// --------------------------------------
 	// Initialize camera and time keeping.

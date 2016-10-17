@@ -38,7 +38,7 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 	const float beta = std::min(alphaInclination, betaInclination);
 
 	const float C = glm::max<float>(0.0f, glm::dot(-inDirection, outDirection));
-	const float D = (C > FLT_EPSILON) ? B * C * sin(alpha) * tan(beta) : 0.0f;
+	const float D = (C > 0.0f) ? B * C * sin(alpha) * tan(beta) : 0.0f;
 
-	return glm::min<float>((A + D) * glm::max(0.0f, indot), 1.0f) * (incomingRadiance * surfaceColor);
+	return glm::max(0.0f, indot) * glm::min<float>((A + D), 1.0f) * (incomingRadiance * surfaceColor);
 }
