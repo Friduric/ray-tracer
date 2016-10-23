@@ -48,10 +48,7 @@ public:
 	/// <param name='intersectionPoint'> 
 	/// OUT: The intersection point distance if there was an intersection.
 	/// </param>
-	bool RayCast(const Ray & ray,
-				 unsigned int & intersectionRenderGroupIndex,
-				 unsigned int & intersectionPrimitiveIndex,
-				 float & intersectionDistance) const;
+	bool RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex, unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const;
 
 	/// <summary> 
 	/// Casts a ray through a given render group. Returns true if there was an intersection.
@@ -67,10 +64,5 @@ public:
 	/// <param name='intersectionPoint'> 
 	/// OUT: The intersection point distance if there was an intersection.
 	/// </param>
-	bool RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex,
-							unsigned int & intersectionPrimitiveIndex,
-							float & intersectionDistance) const;
-
-
-
+	bool RenderGroupRayCast(const Ray & ray, unsigned int renderGroupIndex, unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const;
 };

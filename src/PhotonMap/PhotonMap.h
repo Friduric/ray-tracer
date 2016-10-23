@@ -1,7 +1,8 @@
 #pragma once
-#include "Octree.h"
 
-#include "../Utility/KDTree/kdtree.hpp"
+#include "Photon.h"
+
+#include <kdtree.hpp>
 
 class PhotonMap
 {
@@ -9,12 +10,10 @@ public:
 
 	/// <summary> 
 	/// Constructs a photon map by shooting photons into the scene.
-	/// The photons are then stored in an octree data structure.
+	/// The photons are then stored in a kd-tree.
 	/// </summary>
 	/// <param name='scene'> The scene which we inject photons into. </param>
 	/// <param name='PHOTONS_PER_LIGHT_SOURCE'> The amount of photons used per light source. </param>
-	/// <param name='MAX_PHOTONS_PER_NODE'> The maximum amount of photons per octree node. </param>
-	/// <param name='MINIMUM_NODE_BOX_DIMENSION'> The minimum width, height and depth of a nodes box size. </param>
 	/// <param name='MAX_DEPTH'> The number of bounces each photon will make (at most). </param>
 	PhotonMap(const class Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MAX_DEPTH);
 
@@ -26,10 +25,10 @@ public:
 	struct KDTreeNode {
 		typedef float value_type;
 		Photon photon;
-		value_type operator[](unsigned int n) const{
+		value_type operator[](unsigned int n) const {
 			return photon.position[n];
 		}
-		float distance(const KDTreeNode &node){
+		float distance(const KDTreeNode &node) {
 			return glm::length(node.photon.position - photon.position);
 		}
 	};

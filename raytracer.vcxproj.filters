@@ -51,9 +51,6 @@
     <ClCompile Include="src\Scene\SceneObjectFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PhotonMap\Octree.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\PhotonMap\PhotonMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -122,9 +119,6 @@
     <ClInclude Include="src\PhotonMap\PhotonMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PhotonMap\Octree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\PhotonMap\Photon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -149,22 +143,22 @@
     <ClInclude Include="src\Utility\Other.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\KDTree\allocator.hpp">
+    <ClInclude Include="includes\kdtree++\allocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\KDTree\function.hpp">
+    <ClInclude Include="includes\kdtree++\function.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\KDTree\iterator.hpp">
+    <ClInclude Include="includes\kdtree++\iterator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\KDTree\kdtree.hpp">
+    <ClInclude Include="includes\kdtree++\kdtree.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\KDTree\node.hpp">
+    <ClInclude Include="includes\kdtree++\node.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utility\KDTree\region.hpp">
+    <ClInclude Include="includes\kdtree++\region.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

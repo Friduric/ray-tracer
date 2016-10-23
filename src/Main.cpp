@@ -18,20 +18,19 @@
 // Other.
 #include "Utility\Math.h"
 #include "Scene\SceneObjectFactory.h"
-#include "PhotonMap\PhotonMap.h" // TODO: Remove this.
 
-using namespace std; // TODO: Remove this.
-
-// Returns a tring that has information about current date and time.
-std::string CurrentDateTime() {
-	auto now = time(0);
-	struct tm tstruct;
-	localtime_s(&tstruct, &now);
-	string date = std::to_string(tstruct.tm_year) + "-" +
-		std::to_string(tstruct.tm_mon) + "-" + std::to_string(tstruct.tm_mday);
-	string time = std::to_string(tstruct.tm_hour) + "-" +
-		std::to_string(tstruct.tm_min) + "-" + std::to_string(tstruct.tm_sec);
-	return date + "___" + time;
+namespace {
+	// Returns a tring that has information about current date and time.
+	std::string CurrentDateTime() {
+		auto now = time(0);
+		struct tm tstruct;
+		localtime_s(&tstruct, &now);
+		std::string date = std::to_string(tstruct.tm_year) + "-" +
+			std::to_string(tstruct.tm_mon) + "-" + std::to_string(tstruct.tm_mday);
+		std::string time = std::to_string(tstruct.tm_hour) + "-" +
+			std::to_string(tstruct.tm_min) + "-" + std::to_string(tstruct.tm_sec);
+		return date + "___" + time;
+	}
 }
 
 int main() {
@@ -45,7 +44,7 @@ int main() {
 	// --------------------------------------
 	cui PIXELS_W = 400;
 	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 1024;
+	cui RAYS_PER_PIXEL = 64;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
@@ -119,43 +118,43 @@ int main() {
 	// --------------------------------------
 	// Finalize.
 	// --------------------------------------
-	auto timeElapsed = chrono::high_resolution_clock::now() - startTime;
-	double took = chrono::duration_cast<std::chrono::milliseconds>(timeElapsed).count() / 1000.0;
+	auto timeElapsed = std::chrono::high_resolution_clock::now() - startTime;
+	double took = std::chrono::duration_cast<std::chrono::milliseconds>(timeElapsed).count() / 1000.0;
 
 	// --------------------------------------
 	// Write render to file.
 	// --------------------------------------
 	auto currentDate = CurrentDateTime();
-	const string imageFileName = "output/" + currentDate + ".tga";
+	const std::string imageFileName = "output/" + currentDate + ".tga";
 	camera.WriteImageToTGA(imageFileName);
 
 	// --------------------------------------
 	// Write text data to file.
 	// --------------------------------------
-	const string textFileName = "output/" + currentDate + ".txt";
-	ofstream out(textFileName);
+	const std::string textFileName = "output/" + currentDate + ".txt";
+	std::ofstream out(textFileName);
 
 	const unsigned int COL_WIDTH = 30;
 
-	out << "-- RENDERING SETTINGS --" << endl;
-	out << setw(COL_WIDTH) << left << "Rendering mode:" << renderer->RENDERER_NAME << endl;
-	out << setw(COL_WIDTH) << left << "Dimensions:" << PIXELS_W << "x" << PIXELS_H << " pixels. " << endl;
-	out << setw(COL_WIDTH) << left << "Rays per pixel:" << RAYS_PER_PIXEL << endl;
-	out << setw(COL_WIDTH) << left << "Max ray depth:" << MAX_RAY_DEPTH << endl;
-	out << setw(COL_WIDTH) << left << "Bounces per hit:" << BOUNCES_PER_HIT << endl;
-	out << endl << "-- PHOTON MAP SETTINGS --" << endl;
-	out << setw(COL_WIDTH) << left << "Photons per light source:" << PHOTONS_PER_LIGHT_SOURCE << endl;
-	out << setw(COL_WIDTH) << left << "Photon map depth:" << PHOTON_MAP_DEPTH << endl;
-	out << endl << "-- RENDERING STATISTICS --" << endl;
-	out << setw(COL_WIDTH) << left << "Total time:" << took << " seconds." << endl;
-	out << setw(COL_WIDTH) << left << "Time per pixel ray:" << took / (double)(RAYS_PER_PIXEL * PIXELS_W * PIXELS_H) << " seconds." << endl;
+	out << "-- RENDERING SETTINGS --" << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Rendering mode:" << renderer->RENDERER_NAME << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Dimensions:" << PIXELS_W << "x" << PIXELS_H << " pixels. " << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Rays per pixel:" << RAYS_PER_PIXEL << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Max ray depth:" << MAX_RAY_DEPTH << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Bounces per hit:" << BOUNCES_PER_HIT << std::endl;
+	out << std::endl << "-- PHOTON MAP SETTINGS --" << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Photons per light source:" << PHOTONS_PER_LIGHT_SOURCE << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Photon map depth:" << PHOTON_MAP_DEPTH << std::endl;
+	out << std::endl << "-- RENDERING STATISTICS --" << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Total time:" << took << " seconds." << std::endl;
+	out << std::setw(COL_WIDTH) << std::left << "Time per pixel ray:" << took / (double)(RAYS_PER_PIXEL * PIXELS_W * PIXELS_H) << " seconds." << std::endl;
 	out.close();
 
 	// --------------------------------------
 	// Finished!
 	// --------------------------------------
-	std::cout << "Render saved to: " << imageFileName << "." << endl;
-	std::cout << "Info saved to: " << imageFileName << "." << endl;
+	std::cout << "Render saved to: " << imageFileName << "." << std::endl;
+	std::cout << "Info saved to: " << imageFileName << "." << std::endl;
 	// std::cout << "Rendering finished... press any key to exit." << std::endl;
 	// std::cout << "\b" << std::flush;
 	// std::cin.get();

@@ -71,14 +71,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>includes\glm;$(IncludePath)</IncludePath>
+    <IncludePath>includes\glm;includes\kdtree++;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>includes\glm;$(IncludePath)</IncludePath>
+    <IncludePath>includes\glm;includes\kdtree++;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -158,7 +158,6 @@
     <ClCompile Include="src\Geometry\AABB.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Geometry\Ray.cpp" />
-    <ClCompile Include="src\PhotonMap\Octree.cpp" />
     <ClCompile Include="src\PhotonMap\Photon.cpp" />
     <ClCompile Include="src\PhotonMap\PhotonMap.cpp" />
     <ClCompile Include="src\Rendering\Materials\OrenNayarMaterial.cpp" />
@@ -181,7 +180,6 @@
     <ClInclude Include="src\Geometry\AABB.h" />
     <ClInclude Include="src\Geometry\Primitive.h" />
     <ClInclude Include="src\Geometry\Ray.h" />
-    <ClInclude Include="src\PhotonMap\Octree.h" />
     <ClInclude Include="src\PhotonMap\PhotonMap.h" />
     <ClInclude Include="src\Rendering\Materials\OrenNayarMaterial.h" />
     <ClInclude Include="src\PhotonMap\Photon.h" />
@@ -198,12 +196,12 @@
     <ClInclude Include="src\Rendering\Materials\LambertianMaterial.h" />
     <ClInclude Include="src\Rendering\Materials\Material.h" />
     <ClInclude Include="src\Scene\SceneObjectFactory.h" />
-    <ClInclude Include="src\Utility\KDTree\allocator.hpp" />
-    <ClInclude Include="src\Utility\KDTree\function.hpp" />
-    <ClInclude Include="src\Utility\KDTree\iterator.hpp" />
-    <ClInclude Include="src\Utility\KDTree\kdtree.hpp" />
-    <ClInclude Include="src\Utility\KDTree\node.hpp" />
-    <ClInclude Include="src\Utility\KDTree\region.hpp" />
+    <ClInclude Include="includes\kdtree++\allocator.hpp" />
+    <ClInclude Include="includes\kdtree++\function.hpp" />
+    <ClInclude Include="includes\kdtree++\iterator.hpp" />
+    <ClInclude Include="includes\kdtree++\kdtree.hpp" />
+    <ClInclude Include="includes\kdtree++\node.hpp" />
+    <ClInclude Include="includes\kdtree++\region.hpp" />
     <ClInclude Include="src\Utility\Math.h" />
     <ClInclude Include="src\Utility\Other.h" />
     <ClInclude Include="src\Utility\Rendering.h" />

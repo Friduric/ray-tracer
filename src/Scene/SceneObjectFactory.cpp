@@ -254,7 +254,7 @@ void SceneObjectFactory::AddTransparentSphere(Scene & scene, float x, float y, f
 	auto & renderGroups = scene.renderGroups;
 
 	// Material.
-	const auto transparentMaterial = new LambertianMaterial(surfaceColor, 0.0f, reflectivity, transparency, refractiveIndex, 15.0f);
+	const auto transparentMaterial = new LambertianMaterial(surfaceColor, 0.0f, reflectivity, transparency, refractiveIndex, 0.0f);
 	materials.push_back(transparentMaterial);
 
 	// Render group + primitive.

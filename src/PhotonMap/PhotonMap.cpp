@@ -16,52 +16,53 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 
 	// Initialize.
 	std::cout << "Creating the photon map ..." << std::endl;
-	Ray ray;
 
-	// For each light source.
-	for (unsigned int i = 0; i < scene.emissiveRenderGroups.size(); ++i) {
-		// Fetch data about current light source. 
-		const auto * lightSource = scene.emissiveRenderGroups[i];
-
+	// Shoot photons from all light sources.
+	for (const auto * lightSource : scene.emissiveRenderGroups) {
 		for (unsigned int j = 0; j < PHOTONS_PER_LIGHT_SOURCE; ++j) {
-			const auto * prim = lightSource->primitives[rand() % lightSource->primitives.size()];
-			// Shoot photon in a random direction. 
-			ray.from = prim->GetRandomPositionOnSurface();
-			glm::vec3 normal = prim->GetNormal(ray.from);
-			ray.direction = Utility::Math::CosineWeightedHemisphereSampleDirection(normal);
+			const auto * primitive = lightSource->primitives[rand() % lightSource->primitives.size()];
+
+			glm::vec3 randomSurfacePosition = primitive->GetRandomPositionOnSurface();
+			glm::vec3 surfaceNormal = primitive->GetNormal(randomSurfacePosition);
+			glm::vec3 randomHemisphereDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(surfaceNormal);
+
+			// Shoot a photon in a random direction. 
+			Ray ray(randomSurfacePosition, randomHemisphereDirection);
 			glm::vec3 photonRadiance = lightSource->material->GetEmissionColor();
 
-			unsigned int intersectionRenderGroupIdx, intersectionPrimitiveIdx;
-			float intersectionDistance;
+			// Iterative deepening.
 			for (unsigned int k = 0; k < MAX_DEPTH; ++k) {
+				unsigned int intersectionRenderGroupIdx, intersectionPrimitiveIdx;
+				float intersectionDistance;
 				if (scene.RayCast(ray, intersectionRenderGroupIdx, intersectionPrimitiveIdx, intersectionDistance)) {
+					
 					// Store photon.
-					const float intersectionRadianceFactor = glm::dot(ray.direction, normal);
+					const float intersectionRadianceFactor = glm::dot(ray.direction, surfaceNormal);
 					glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.direction;
-					Primitive * prim = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
+					Primitive * primitive = scene.renderGroups[intersectionRenderGroupIdx].primitives[intersectionPrimitiveIdx];
 					Material * material = scene.renderGroups[intersectionRenderGroupIdx].material;
-					normal = prim->GetNormal(intersectionPosition);
-					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(normal);
-					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, normal, photonRadiance * intersectionRadianceFactor);
+					glm::vec3 intersectionNormal = primitive->GetNormal(intersectionPosition);
+					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
+					photonRadiance = material->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance * intersectionRadianceFactor);
 					// Indirect photon if not on first cast
 					if (k > 0) {
 						KDTreeNode indirectPhotonNode;
-						indirectPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, prim);
+						indirectPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, primitive);
 						indirectPhotonsKDTree.insert(indirectPhotonNode);
 					}
 					else {
 						// else direct photon
 						KDTreeNode directPhotonNode;
-						directPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, prim);
+						directPhotonNode.photon = Photon(intersectionPosition, ray.direction, photonRadiance, primitive);
 						directPhotonsKDTree.insert(directPhotonNode);
 						// Add shadow photons
 						Ray shadowRay;
-						glm::vec3 shadowIntersectionPosition = intersectionPosition - 0.01f * prim->GetNormal(intersectionPosition);// Add space from it to not hit itself
+						glm::vec3 shadowIntersectionPosition = intersectionPosition - 0.01f * primitive->GetNormal(intersectionPosition);// Add space from it to not hit itself
 						shadowRay.from = shadowIntersectionPosition;
 						shadowRay.direction = ray.direction;
 						unsigned int shadowIntersectionRenderGroupIdx, shadowIntersectionPrimitiveIdx;
 						float shadowIntersectionDistance;
-						Primitive * shadowPrim = prim;
+						Primitive * shadowPrim = primitive;
 						// While we hit a surface keep casting and add shadow photons
 						while (true) {
 							// disable the previously hit surface so we dont hit it again
@@ -91,6 +92,10 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			}
 		}
 	}
+
+	directPhotonsKDTree.optimize();
+	indirectPhotonsKDTree.optimize();
+	shadowPhotonsKDTree.optimize();
 }
 
 // -------------------------------

@@ -32,7 +32,7 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		for (PhotonMap::KDTreeNode node : directNodes) {
 			float distance = glm::distance(intersectionPoint, node.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance /(k * radius));
-			float normalDistance = glm::distance(node.photon.prim->GetNormal(intersectionPoint), surfaceNormal);
+			float normalDistance = glm::distance(node.photon.primitive->GetNormal(intersectionPoint), surfaceNormal);
 			float normalWeight = std::max(0.0f, 1.0f - normalDistance / SQRT2);
 			colorAccumulator += normalWeight*weight*node.photon.color;
 		}
@@ -44,7 +44,7 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		for (PhotonMap::KDTreeNode node : indirectNodes) {
 			float distance = glm::distance(intersectionPoint, node.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance / (k * radius));
-			float normalDistance = glm::distance(node.photon.prim->GetNormal(intersectionPoint), surfaceNormal);
+			float normalDistance = glm::distance(node.photon.primitive->GetNormal(intersectionPoint), surfaceNormal);
 			float normalWeight = std::max(0.0f, 1.0f - normalDistance / SQRT2);
 			colorAccumulator += normalWeight*weight*node.photon.color;
 		}

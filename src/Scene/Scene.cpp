@@ -15,8 +15,8 @@ Scene::Scene() {}
 
 Scene::~Scene() {
 	for (auto& rg : renderGroups) {
-		for (auto& prim : rg.primitives) {
-			delete prim;
+		for (auto& primitive : rg.primitives) {
+			delete primitive;
 		}
 	}
 	for (auto m : materials) {
@@ -60,8 +60,7 @@ void Scene::Initialize() {
 	RecalculateAABB();
 }
 
-bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex,
-					unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
+bool Scene::RayCast(const Ray & ray, unsigned int & intersectionRenderGroupIndex, unsigned int & intersectionPrimitiveIndex, float & intersectionDistance) const {
 
 	float closestInterectionDistance = FLT_MAX;
 

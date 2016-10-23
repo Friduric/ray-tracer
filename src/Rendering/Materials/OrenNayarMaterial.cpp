@@ -17,8 +17,8 @@ glm::vec3 OrenNayarMaterial::CalculateDiffuseLighting(const glm::vec3 & inDirect
 													  const glm::vec3 & outDirection,
 													  const glm::vec3 & normal,
 													  const glm::vec3 & incomingRadiance) const {
-	assert(glm::length(inDirection) < 1.0f + FLT_EPSILON && glm::length(inDirection) > 1.0f - FLT_EPSILON);
-	assert(glm::length(outDirection) < 1.0f + FLT_EPSILON && glm::length(outDirection) > 1.0f - FLT_EPSILON);
+	assert(glm::length(inDirection) < 1.0f + 10.0f * FLT_EPSILON && glm::length(inDirection) > 1.0f - 10.0f * FLT_EPSILON);
+	assert(glm::length(outDirection) < 1.0f + 10.0f * FLT_EPSILON && glm::length(outDirection) > 1.0f - 10.0f * FLT_EPSILON);
 	// See https://en.wikipedia.org/wiki/Oren-Nayar_reflectance_model for more information.
 
 	const float indot = glm::dot(-inDirection, normal);

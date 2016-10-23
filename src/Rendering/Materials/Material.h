@@ -3,6 +3,7 @@
 #include "../../../includes/glm/gtc/constants.hpp"
 #include <glm.hpp>
 #include "../../Geometry/Ray.h"
+#include <iostream> // TODO: Remove this.
 
 class Material {
 public:
@@ -39,5 +40,7 @@ protected:
 			 float _transparency = 0.0f, float _refractiveIndex = 1.0f,
 			 float _specularity = 0.0f) :
 		refractiveIndex(_refractiveIndex), transparency(_transparency),
-		emissivity(_emissivity), reflectivity(_reflectivity), specularity(_specularity) {}
+		emissivity(_emissivity), reflectivity(_reflectivity), specularity(_specularity) {
+		
+	}
 };

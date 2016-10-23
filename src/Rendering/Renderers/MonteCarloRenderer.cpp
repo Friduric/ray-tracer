@@ -20,7 +20,12 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	}
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
-	assert(glm::length(ray.direction) > 1.0f - FLT_EPSILON*2.0f && glm::length(ray.direction) < 1.0f + FLT_EPSILON*2.0f);
+	float rayLength = glm::length(ray.direction);
+	if (rayLength < 1.0f - 10.0f * FLT_EPSILON || rayLength > 1.0f + 10.0f * FLT_EPSILON) {
+		std::cout << rayLength << std::endl;
+		return glm::vec3(0, 0, 0);
+	}
+	assert(glm::length(ray.direction) > 1.0f - 10.0f * FLT_EPSILON && glm::length(ray.direction) < 1.0f + 10.0f * FLT_EPSILON);
 
 	// See if our current ray hits anything in the scene.
 	float intersectionDistance;
@@ -80,7 +85,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 			// Cast the shadow ray towards the light source.
 			unsigned int shadowRayGroupIndex, shadowRayPrimitiveIndex;
 			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance)) {
-				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];			
+				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];
 				if (&renderGroup == lightSource) {
 					// We hit the light. Add it's contribution to the color accumulator.
 					const Primitive * lightPrimitive = renderGroup.primitives[shadowRayPrimitiveIndex];
@@ -97,6 +102,9 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 #if __USE_SPECULAR_LIGHTING
 					// Specular lighting.
 					if (hitMaterial->IsSpecular()) {
+						if (hitMaterial->specularity < 0.001) {
+							std::cout << "yo" << std::endl;
+						}
 						colorAccumulator += rf * tf * hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 					}
 #endif
