@@ -6,6 +6,7 @@ Currently supports:
 - Photon mapping to increase performance and approximate indirect lighting.
 - Transparent and reflective materials.
 - Shadow, indirect and direct photons.
+- Parallelized/multi-threaded rendering using OMP.
 
 TODO: 
 - Caustic photons.
