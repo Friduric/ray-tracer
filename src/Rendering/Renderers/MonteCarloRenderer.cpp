@@ -102,9 +102,6 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 #if __USE_SPECULAR_LIGHTING
 					// Specular lighting.
 					if (hitMaterial->IsSpecular()) {
-						if (hitMaterial->specularity < 0.001) {
-							std::cout << "yo" << std::endl;
-						}
 						colorAccumulator += rf * tf * hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 					}
 #endif
@@ -169,5 +166,5 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 	}
 
 	// Return result.
-	return colorAccumulator * 0.95f;
+	return 0.95f * colorAccumulator;
 }

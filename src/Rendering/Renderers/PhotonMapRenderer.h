@@ -10,8 +10,9 @@ public:
 	glm::vec3 GetPixelColor(const Ray & ray) override;
 private:
 	const unsigned int MAX_DEPTH, BOUNCES_PER_HIT;
-	const float PHOTON_SEARCH_RADIUS = 0.2f;
-	const float SQRT2 = glm::root_two<float>();
+	const float PHOTON_SEARCH_RADIUS = 0.06f;
+	const float WEIGHT_MODIFIER = 1.0f;
+	const float WEIGHT_FACTOR = 1.0f / (WEIGHT_MODIFIER * PHOTON_SEARCH_RADIUS);
 
 	PhotonMap* photonMap;
 

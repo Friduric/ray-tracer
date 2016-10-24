@@ -18,19 +18,16 @@ public:
 	PhotonMap(const class Scene & scene, const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MAX_DEPTH);
 
 	/// <summary> 
-	/// Node used in kdTree containing a photon
-	/// and additional functionality to work with
-	/// the implementation of the KDTree.
+	/// A photon (node) wrapper for use with kdtree++.
 	/// </summary>
-	struct KDTreeNode {
-		typedef float value_type;
+	class KDTreeNode {
+	public:
+		using value_type = float;
 		Photon photon;
-		value_type operator[](unsigned int n) const {
-			return photon.position[n];
-		}
-		float distance(const KDTreeNode &node) {
-			return glm::length(node.photon.position - photon.position);
-		}
+		KDTreeNode() {}
+		KDTreeNode(Photon _photon) : photon(_photon) {}
+		value_type operator[](unsigned int n) const { return photon.position[n]; }
+		float distance(const KDTreeNode & other) { return glm::distance(other.photon.position, photon.position); }
 	};
 
 	/// <summary> 
@@ -71,11 +68,13 @@ public:
 
 private:
 	/// <summary> Node used as reference to keep searching at in the kd tree. </summary>
-	PhotonMap::KDTreeNode refNode;
+	PhotonMap::KDTreeNode directPhotonsReferenceNode;
+	PhotonMap::KDTreeNode indirectPhotonsReferenceNode;
+	PhotonMap::KDTreeNode shadowPhotonsReferenceNode;
 
-	KDTree::KDTree<3, KDTreeNode> directPhotonsKDTree;
-	KDTree::KDTree<3, KDTreeNode> indirectPhotonsKDTree;
-	KDTree::KDTree<3, KDTreeNode> shadowPhotonsKDTree;
+	KDTree::KDTree<3, KDTreeNode> directPhotons;
+	KDTree::KDTree<3, KDTreeNode> indirectPhotons;
+	KDTree::KDTree<3, KDTreeNode> shadowPhotons;
 };
 
 

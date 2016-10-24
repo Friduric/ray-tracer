@@ -20,7 +20,12 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	}
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
-	assert(glm::length(ray.direction) > 1.0f - FLT_EPSILON && glm::length(ray.direction) < 1.0f + FLT_EPSILON);
+	float rayLength = glm::length(ray.direction);
+	if (rayLength < 1.0f - 10.0f * FLT_EPSILON || rayLength > 1.0f + 10.0f * FLT_EPSILON) {
+		std::cout << rayLength << std::endl;
+		return glm::vec3(0, 0, 0);
+	}
+	assert(glm::length(ray.direction) > 1.0f - 10.0f * FLT_EPSILON && glm::length(ray.direction) < 1.0f + 10.0f * FLT_EPSILON);
 
 	// See if our current ray hits anything in the scene.
 	float intersectionDistance;
@@ -69,7 +74,6 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
 		for (RenderGroup * lightSource : scene.emissiveRenderGroups) {
-
 			// Create a shadow ray.
 			const glm::vec3 randomLightSurfacePosition = lightSource->GetRandomPositionOnSurface();
 			const glm::vec3 shadowRayDirection = glm::normalize(randomLightSurfacePosition - intersectionPoint);
@@ -83,7 +87,6 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance)) {
 				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];
 				if (&renderGroup == lightSource) {
-
 					// We hit the light. Add it's contribution to the color accumulator.
 					const Primitive * lightPrimitive = renderGroup.primitives[shadowRayPrimitiveIndex];
 					const glm::vec3 lightNormal = lightPrimitive->GetNormal(shadowRay.from + intersectionDistance * shadowRay.direction);
@@ -113,12 +116,27 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	// Indirect lighting.
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
-		// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting. 
+		std::vector<PhotonMap::KDTreeNode> volatilePhotonMapNodes;
+		photonMap->GetIndirectPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, volatilePhotonMapNodes);
+		const float SIZE_FACTOR = volatilePhotonMapNodes.size() > 0 ? 1.0f / (float)volatilePhotonMapNodes.size() : 0;
+		for (PhotonMap::KDTreeNode & node : volatilePhotonMapNodes) {
+			float distance = glm::distance(intersectionPoint, node.photon.position);
+			float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
+			auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
+			auto & radiance = node.photon.color;
+			float f = SIZE_FACTOR * glm::max(0.0f, glm::dot(photonNormal, hitNormal)) * weight;
+			colorAccumulator += hitMaterial->CalculateDiffuseLighting(node.photon.direction, -ray.direction, hitNormal, f * radiance);
+		}
+
+
+		/*
+		// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting.
 		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		const Ray diffuseRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(diffuseRay, DEPTH + 1);
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-diffuseRay.direction, -ray.direction, hitNormal, incomingRadiance);
+		*/
 	}
 
 	colorAccumulator *= rf * tf;
@@ -163,5 +181,5 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	}
 
 	// Return result.
-	return colorAccumulator * 0.95f;
+	return 0.95f * colorAccumulator;
 }

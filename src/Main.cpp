@@ -44,18 +44,18 @@ int main() {
 	// --------------------------------------
 	cui PIXELS_W = 400;
 	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 64;
+	cui RAYS_PER_PIXEL = 32;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
-	cui PHOTONS_PER_LIGHT_SOURCE = 500000;
+	cui PHOTONS_PER_LIGHT_SOURCE = 1000000;
 	cui PHOTON_MAP_DEPTH = 3;
-	RendererType RENDERER_TYPE = RendererType::MONTE_CARLO;
+	RendererType RENDERER_TYPE = RendererType::PHOTON_MAP;
 
 	// --------------------------------------
 	// Create the scene.
 	// --------------------------------------
 	Scene scene;
-	std::cout << "Creating the scene..." << std::endl;
+	std::cout << "Creating the scene ..." << std::endl;
 
 	// Coordinate system relative to camera plane.
 	// +x is INTO the image.
@@ -81,15 +81,14 @@ int main() {
 	// SceneObjectFactory::AddTetrahedron(scene, 0, 1, -1, glm::vec3(0.0f, 1.0f, 1.0f), 0.0f, 1.52f, 0.99f, 0.0f);
 
 	// Lights.
-	SceneObjectFactory::Add2DQuad(scene, glm::vec2(5.0f, -1), glm::vec2(7.0f, 1), 4.99999f,
-								  glm::vec3(0, 0, -1), glm::vec3(1, 1.0f, 1.0f), 1.0f);
+	SceneObjectFactory::Add2DQuad(scene, glm::vec2(5.0f, -1), glm::vec2(7.0f, 1), 4.99999f, glm::vec3(0, 0, -1), glm::vec3(1, 1.0f, 1.0f), 1.0f);
 	// SceneObjectFactory::AddEmissiveSphere(scene, 0, 2, 1, 0.25f, glm::vec3(0.61f, 0.01f, 0.3f), 0.75f);
 	// SceneObjectFactory::AddEmissiveSphere(scene, 7, 2, 2, 0.15f, glm::vec3(1.01f, 0.01f, 0.01f), 0.75f);
 
 	// --------------------------------------
 	// Initialize camera and time keeping.
 	// --------------------------------------
-	std::cout << "Initializing the camera and the scene..." << std::endl;
+	std::cout << "Initializing the camera and the scene ..." << std::endl;
 	scene.Initialize();
 	auto startTime = std::chrono::high_resolution_clock::now();
 	Camera camera(PIXELS_W, PIXELS_H);
@@ -155,9 +154,9 @@ int main() {
 	// --------------------------------------
 	std::cout << "Render saved to: " << imageFileName << "." << std::endl;
 	std::cout << "Info saved to: " << imageFileName << "." << std::endl;
-	// std::cout << "Rendering finished... press any key to exit." << std::endl;
-	// std::cout << "\b" << std::flush;
-	// std::cin.get();
+	std::cout << "Rendering finished... press any key to exit." << std::endl;
+	std::cout << "\b" << std::flush;
+	std::cin.get();
 
 	return 0;
 }

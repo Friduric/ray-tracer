@@ -11,6 +11,7 @@
 #include "../Utility/Math.h"
 
 #define __LOG_TIME_INTERVAL 3 // In seconds. 
+#define __USE_PARALLELIZATION true
 
 Camera::Camera(const unsigned int _width, const unsigned int _height) :
 	width(_width), height(_height) {
@@ -50,7 +51,9 @@ void Camera::Render(const Scene & scene, Renderer & renderer, const unsigned int
 		const auto before = std::chrono::high_resolution_clock::now();
 
 		// OMP doesn't allow unsigned int in for parallelized for loop.
+#if __USE_PARALLELIZATION
 #pragma omp parallel for schedule(static) // Parallelize using OMP.
+#endif
 		for (int z = 0; z < static_cast<int>(height); ++z) {
 
 			// Shoot a bunch of rays through the pixel (y, z), and accumulate colors.
