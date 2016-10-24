@@ -15,6 +15,7 @@ private:
 	const float WEIGHT_FACTOR = 1.0f / (WEIGHT_MODIFIER * PHOTON_SEARCH_RADIUS);
 
 	PhotonMap* photonMap;
+	std::vector<PhotonMap::KDTreeNode> volatilePhotonMapNodes;
 
 	/// <summary> Traces a ray through the scene. </summary>
 	glm::vec3 TraceRay(const Ray & ray, const unsigned int DEPTH = 0);

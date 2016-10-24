@@ -42,13 +42,13 @@ int main() {
 	// --------------------------------------
 	// Settings.
 	// --------------------------------------
-	cui PIXELS_W = 400;
-	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 32;
-	cui MAX_RAY_DEPTH = 5;
+	cui PIXELS_W = 300;
+	cui PIXELS_H = 300;
+	cui RAYS_PER_PIXEL = 64;
+	cui MAX_RAY_DEPTH = 4;
 	cui BOUNCES_PER_HIT = 1;
-	cui PHOTONS_PER_LIGHT_SOURCE = 1000000;
-	cui PHOTON_MAP_DEPTH = 3;
+	cui PHOTONS_PER_LIGHT_SOURCE = 100000;
+	cui PHOTON_MAP_DEPTH = 4;
 	RendererType RENDERER_TYPE = RendererType::PHOTON_MAP;
 
 	// --------------------------------------

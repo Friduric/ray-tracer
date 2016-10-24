@@ -11,7 +11,7 @@
 #include "../Utility/Math.h"
 
 #define __LOG_TIME_INTERVAL 3 // In seconds. 
-#define __USE_PARALLELIZATION true
+#define __USE_PARALLELIZATION false // Whether to use multiple threads for rendering or not.
 
 Camera::Camera(const unsigned int _width, const unsigned int _height) :
 	width(_width), height(_height) {

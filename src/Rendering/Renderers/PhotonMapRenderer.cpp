@@ -12,6 +12,7 @@ PhotonMapRenderer::PhotonMapRenderer(Scene & _scene, const unsigned int _MAX_DEP
 									 const unsigned int PHOTONS_PER_LIGHT_SOURCE, const unsigned int MAX_PHOTON_DEPTH) :
 	MAX_DEPTH(_MAX_DEPTH), BOUNCES_PER_HIT(_BOUNCES_PER_HIT), Renderer("Photon Map Renderer", _scene) {
 	photonMap = new PhotonMap(_scene, PHOTONS_PER_LIGHT_SOURCE, MAX_PHOTON_DEPTH);
+	volatilePhotonMapNodes.reserve(100000);
 }
 
 glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
@@ -103,12 +104,12 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 					// Specular lighting.
 					if (hitMaterial->IsSpecular()) {
 						colorAccumulator += rf * tf * hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
-					}
-#endif
 				}
+#endif
 			}
 		}
 	}
+}
 
 	colorAccumulator *= (1.0f / glm::max<float>(1.0f, (float)scene.emissiveRenderGroups.size()));
 
@@ -116,9 +117,9 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	// Indirect lighting.
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
-		std::vector<PhotonMap::KDTreeNode> volatilePhotonMapNodes;
 		photonMap->GetIndirectPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, volatilePhotonMapNodes);
 		const float SIZE_FACTOR = volatilePhotonMapNodes.size() > 0 ? 1.0f / (float)volatilePhotonMapNodes.size() : 0;
+		// std::cout << volatilePhotonMapNodes.size() << std::endl;
 		for (PhotonMap::KDTreeNode & node : volatilePhotonMapNodes) {
 			float distance = glm::distance(intersectionPoint, node.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
