@@ -10,6 +10,7 @@ Currently supports:
 
 TODO: 
 - Caustic photons.
+- Optimized ray casting using an octree and AABBs.
 
 ## Sample images
 <p align="center">
