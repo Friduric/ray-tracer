@@ -5,11 +5,10 @@ Currently supports:
 - Intransparent materials using Oren-Nayar and Lambertian BRDFs.
 - Photon mapping to increase performance and approximate indirect lighting.
 - Transparent and reflective materials.
+- Shadow, indirect and direct photons.
 
 TODO: 
-- Shadow photons.
-- Caustics by photon mapping.
-- kd-tree instead of octree.
+- Caustic photons.
 
 ## Sample images
 <p align="center">
