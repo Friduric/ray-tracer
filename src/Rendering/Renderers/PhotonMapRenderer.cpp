@@ -79,7 +79,10 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 		causticsColorAccumulator += hitMaterial->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), causticPhotonColor);
 	}
 	if (causticsNodes.size() > 0) {
-		colorAccumulator += causticsColorAccumulator/ PHOTON_SEARCH_AREA;
+		causticsColorAccumulator.r = std::min(1.0f, causticsColorAccumulator.r*CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		causticsColorAccumulator.g = std::min(1.0f, causticsColorAccumulator.g*CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		causticsColorAccumulator.b = std::min(1.0f, causticsColorAccumulator.b*CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		colorAccumulator += causticsColorAccumulator;
 	}
 	// -------------------------------
 	// Direct lighting.
