@@ -10,10 +10,10 @@ public:
 	glm::vec3 GetPixelColor(const Ray & ray) override;
 private:
 	const unsigned int MAX_DEPTH, BOUNCES_PER_HIT;
-	const float PHOTON_SEARCH_RADIUS = 0.06f;
+	const float PHOTON_SEARCH_RADIUS = 0.05f;
+	const float PHOTON_SEARCH_AREA = PHOTON_SEARCH_RADIUS*PHOTON_SEARCH_RADIUS*glm::pi<float>();
 	const float WEIGHT_MODIFIER = 1.0f;
 	const float WEIGHT_FACTOR = 1.0f / (WEIGHT_MODIFIER * PHOTON_SEARCH_RADIUS);
-
 	PhotonMap* photonMap;
 	std::vector<PhotonMap::KDTreeNode> volatilePhotonMapNodes;
 

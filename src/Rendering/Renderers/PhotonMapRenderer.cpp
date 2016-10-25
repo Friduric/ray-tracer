@@ -21,11 +21,6 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	}
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
-	float rayLength = glm::length(ray.direction);
-	if (rayLength < 1.0f - 10.0f * FLT_EPSILON || rayLength > 1.0f + 10.0f * FLT_EPSILON) {
-		std::cout << rayLength << std::endl;
-		return glm::vec3(0, 0, 0);
-	}
 	assert(glm::length(ray.direction) > 1.0f - 10.0f * FLT_EPSILON && glm::length(ray.direction) < 1.0f + 10.0f * FLT_EPSILON);
 
 	// See if our current ray hits anything in the scene.
@@ -58,7 +53,6 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	// Emissive lighting.
 	// -------------------------------
 	if (hitMaterial->IsEmissive()) {
-		// std::cout << hitMaterial->GetEmissionColor().b;
 		float f = 1.0f;
 		if (DEPTH >= 1) {
 			f *= glm::dot(-ray.direction, hitNormal);
@@ -70,6 +64,23 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	const float rf = 1.0f - hitMaterial->reflectivity;
 	const float tf = 1.0f - hitMaterial->transparency;
 
+	// -------------------------------
+	// Caustics photons.
+	// -------------------------------
+	std::vector<PhotonMap::KDTreeNode> causticsNodes;
+	glm::vec3 photonColorAccumulator(0);
+	glm::vec3 causticsColorAccumulator(0);
+	photonMap->GetCausticsPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, causticsNodes);
+	for (PhotonMap::KDTreeNode node : causticsNodes) {
+		float distance = glm::distance(intersectionPoint, node.photon.position);
+		float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
+		auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
+		glm::vec3 causticPhotonColor = glm::max(0.0f, glm::dot(photonNormal, hitNormal)) * weight * node.photon.color;
+		causticsColorAccumulator += hitMaterial->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), causticPhotonColor);
+	}
+	if (causticsNodes.size() > 0) {
+		colorAccumulator += causticsColorAccumulator/ PHOTON_SEARCH_AREA;
+	}
 	// -------------------------------
 	// Direct lighting.
 	// -------------------------------
@@ -103,13 +114,13 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 #if __USE_SPECULAR_LIGHTING
 					// Specular lighting.
 					if (hitMaterial->IsSpecular()) {
-						colorAccumulator += rf * tf * hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
-				}
+						colorAccumulator += hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
+					}
 #endif
+				}
 			}
 		}
 	}
-}
 
 	colorAccumulator *= (1.0f / glm::max<float>(1.0f, (float)scene.emissiveRenderGroups.size()));
 
@@ -117,27 +128,12 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	// Indirect lighting.
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
-		photonMap->GetIndirectPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, volatilePhotonMapNodes);
-		const float SIZE_FACTOR = volatilePhotonMapNodes.size() > 0 ? 1.0f / (float)volatilePhotonMapNodes.size() : 0;
-		// std::cout << volatilePhotonMapNodes.size() << std::endl;
-		for (PhotonMap::KDTreeNode & node : volatilePhotonMapNodes) {
-			float distance = glm::distance(intersectionPoint, node.photon.position);
-			float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
-			auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
-			auto & radiance = node.photon.color;
-			float f = SIZE_FACTOR * glm::max(0.0f, glm::dot(photonNormal, hitNormal)) * weight;
-			colorAccumulator += hitMaterial->CalculateDiffuseLighting(node.photon.direction, -ray.direction, hitNormal, f * radiance);
-		}
-
-
-		/*
-		// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting.
+		// Shoot rays and integrate diffuse lighting based on BRDF to compute indirect lighting. 
 		const glm::vec3 reflectionDirection = Utility::Math::CosineWeightedHemisphereSampleDirection(hitNormal);
 		assert(dot(reflectionDirection, hitNormal) > -FLT_EPSILON);
 		const Ray diffuseRay(intersectionPoint, reflectionDirection);
 		const auto incomingRadiance = TraceRay(diffuseRay, DEPTH + 1);
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-diffuseRay.direction, -ray.direction, hitNormal, incomingRadiance);
-		*/
 	}
 
 	colorAccumulator *= rf * tf;
@@ -152,31 +148,23 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 		glm::vec3 offset = hitNormal * 0.001f;
 		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
 
-		// Find out if the ray "exits" the render group anywhere.
-		bool hit = scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
-		// float f = 1.0f;
-		if (hit) {
+		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 			const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 
 			const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
-			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(intersectionPoint);
+			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
 
 			refractedRay.from = refractedIntersectionPoint + refractedHitNormal * 0.001f;
 			refractedRay.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
-			// f = glm::max<float>(0.0f, glm::dot(refractedRay.direction, refractedHitNormal));
-		}
-		else {
-			// "Flat surface". Just keep on tracing.
 		}
 
 		colorAccumulator += hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
 	}
 
 	// -------------------------------
-	// Reflective and specular lighting.
+	// Reflective.
 	// -------------------------------
 	if (hitMaterial->IsReflective()) {
-		// Shoot a reflective ray if the material is reflective.
 		Ray reflectedRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
 		colorAccumulator += hitMaterial->reflectivity * TraceRay(reflectedRay, DEPTH + 1);
 	}

@@ -58,6 +58,15 @@ public:
 	void GetShadowPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius);
 
 	/// <summary> 
+	/// Returns caustics photons located within a given radius around a given world position.
+	/// The photons are added to the vector photonsInRadius.
+	/// </summary>
+	/// <param name='node'> The node to search around. </param>
+	/// <param name='radius'> The radius to search with. </param>
+	/// <param name='photonsInRadius'> Found photons are added to this vector. </param>
+	void GetCausticsPhotonsAtPositionWithinRadius(const glm::vec3 & pos, const float radius, std::vector<KDTreeNode> & photonsInRadius);
+
+	/// <summary> 
 	/// Finds the closest direct photon located within a given radius around a given world position
 	/// and sets photon to the found photon. If no photon is found then false is returned, else true.
 	/// </summary>
@@ -71,10 +80,13 @@ private:
 	PhotonMap::KDTreeNode directPhotonsReferenceNode;
 	PhotonMap::KDTreeNode indirectPhotonsReferenceNode;
 	PhotonMap::KDTreeNode shadowPhotonsReferenceNode;
+	PhotonMap::KDTreeNode causticsPhotonsReferenceNode;
 
-	KDTree::KDTree<3, KDTreeNode> directPhotons;
-	KDTree::KDTree<3, KDTreeNode> indirectPhotons;
-	KDTree::KDTree<3, KDTreeNode> shadowPhotons;
+	KDTree::KDTree<3, KDTreeNode> directPhotonsKDTree;
+	KDTree::KDTree<3, KDTreeNode> indirectPhotonsKDTree;
+	KDTree::KDTree<3, KDTreeNode> shadowPhotonsKDTree;
+	KDTree::KDTree<3, KDTreeNode> causticsPhotonsKDTree;
+
 };
 
 
