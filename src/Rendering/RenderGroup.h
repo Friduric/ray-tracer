@@ -19,5 +19,5 @@ public:
 
 	RenderGroup(Material*);
 	void RecalculateAABB();
-	glm::vec3 GetRandomPositionOnSurface();
+	glm::vec3 GetRandomPositionOnSurface() const;
 };

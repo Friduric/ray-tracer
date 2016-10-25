@@ -1,7 +1,7 @@
 #include "RenderGroup.h"
 
-glm::vec3 RenderGroup::GetRandomPositionOnSurface() {
-	const auto & primitive = primitives[rand() % primitives.size()];
+glm::vec3 RenderGroup::GetRandomPositionOnSurface() const {
+	const auto primitive = primitives[rand() % primitives.size()];
 	return primitive->GetRandomPositionOnSurface();
 }
 
