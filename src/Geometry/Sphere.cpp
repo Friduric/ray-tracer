@@ -35,17 +35,17 @@ bool Sphere::RayIntersection(const Ray & ray, float & intersectionDistance) cons
 	}
 #endif // __BACK_FACE_CULLING
 	const vec3 m = ray.from - center;
-	float b = glm::dot(m, ray.direction);
-	float c = glm::dot(m, m) - radius * radius;
-	if (c > FLT_EPSILON && b > FLT_EPSILON) {
-		return false;
-	}
-
-	float d = b * b - c;
+	float u = 2 * glm::dot(m, ray.direction);
+	float v = glm::dot(m, m) - radius * radius;
+	float d = 0.25f * u * u - v;
 	if (d < FLT_EPSILON) {
 		return false;
 	}
-
-	intersectionDistance = -b - sqrt(d);
+	d = sqrt(d);
+	float t1 = -0.5f * u + d;
+	float t2 = -0.5f * u - d;
+	if (t1 < FLT_EPSILON) { t1 = t2; }
+	if (t2 < FLT_EPSILON) { t2 = t1; }
+	intersectionDistance = glm::min<float>(t1, t2);
 	return intersectionDistance > FLT_EPSILON;
 }
