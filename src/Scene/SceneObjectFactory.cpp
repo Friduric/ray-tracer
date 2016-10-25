@@ -218,11 +218,11 @@ void SceneObjectFactory::Add2DQuad(Scene & scene, glm::vec2 corner1, glm::vec2 c
 	glm::vec3 c4 = glm::vec3(corner2.x, corner1.y, height);
 
 	// Material.
-	const auto sphereMaterial = new LambertianMaterial(surfaceColor, emissivity);
-	materials.push_back(sphereMaterial);
+	const auto lightMaterial = new LambertianMaterial(surfaceColor, emissivity);
+	materials.push_back(lightMaterial);
 
 	// Render group + primitive.
-	RenderGroup triangleGroup(sphereMaterial);
+	RenderGroup triangleGroup(lightMaterial);
 
 	triangleGroup.primitives.push_back(new Triangle(c1, c2, c3, normal));
 	triangleGroup.primitives.push_back(new Triangle(c3, c4, c1, normal));
