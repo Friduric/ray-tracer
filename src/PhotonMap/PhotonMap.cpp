@@ -112,71 +112,73 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			transparentObjects.push_back(&rg);
 		}
 	}
-	for (const auto * lightSource : scene.emissiveRenderGroups) {
-		for (unsigned int j = 0; j < PHOTONS_PER_LIGHT_SOURCE; ++j) {
-			auto * lightPrimitive = lightSource->primitives[rand() % lightSource->primitives.size()];
+	if (transparentObjects.size() > 0) {
+		for (const auto * lightSource : scene.emissiveRenderGroups) {
+			for (unsigned int j = 0; j < PHOTONS_PER_LIGHT_SOURCE; ++j) {
+				auto * lightPrimitive = lightSource->primitives[rand() % lightSource->primitives.size()];
 
-			// Create a random photon direction from a random light surface position.
-			glm::vec3 randomSurfacePosition = lightPrimitive->GetRandomPositionOnSurface();
-			glm::vec3 surfaceNormal = lightPrimitive->GetNormal(randomSurfacePosition);
-			glm::vec3 randomHemisphereDirection;
-			glm::vec3 posOnSurface = transparentObjects[rand() % transparentObjects.size()]->GetRandomPositionOnSurface();
-			randomHemisphereDirection = glm::normalize(posOnSurface - randomSurfacePosition);
-			Ray ray(randomSurfacePosition + 0.01f*surfaceNormal, randomHemisphereDirection);
-			glm::vec3 photonRadiance = glm::dot(ray.direction, surfaceNormal) * lightSource->material->GetEmissionColor();
+				// Create a random photon direction from a random light surface position.
+				glm::vec3 randomSurfacePosition = lightPrimitive->GetRandomPositionOnSurface();
+				glm::vec3 surfaceNormal = lightPrimitive->GetNormal(randomSurfacePosition);
+				glm::vec3 randomHemisphereDirection;
+				glm::vec3 posOnSurface = transparentObjects[rand() % transparentObjects.size()]->GetRandomPositionOnSurface();
+				randomHemisphereDirection = glm::normalize(posOnSurface - randomSurfacePosition);
+				Ray ray(randomSurfacePosition + 0.01f*surfaceNormal, randomHemisphereDirection);
+				glm::vec3 photonRadiance = glm::dot(ray.direction, surfaceNormal) * lightSource->material->GetEmissionColor();
 
-			// Iterative deepening.
-			for (unsigned int k = 0; k < MAX_DEPTH; ++k) {
-				float intersectionDistance;
-				unsigned int intersectionRenderGroupIndex, intersectionPrimitiveIndex;
+				// Iterative deepening.
+				for (unsigned int k = 0; k < MAX_DEPTH; ++k) {
+					float intersectionDistance;
+					unsigned int intersectionRenderGroupIndex, intersectionPrimitiveIndex;
 
-				// Shoot photon.
-				if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
+					// Shoot photon.
+					if (scene.RayCast(ray, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 
-					// The photon hit something.
-					glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.direction;
-					const RenderGroup & intersectionRenderGroup = scene.renderGroups[intersectionRenderGroupIndex];
-					Primitive * intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
-					Material * intersectionMaterial = scene.renderGroups[intersectionRenderGroupIndex].material;
-					glm::vec3 intersectionNormal = intersectionPrimitive->GetNormal(intersectionPosition);
-					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
+						// The photon hit something.
+						glm::vec3 intersectionPosition = ray.from + intersectionDistance * ray.direction;
+						const RenderGroup & intersectionRenderGroup = scene.renderGroups[intersectionRenderGroupIndex];
+						Primitive * intersectionPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
+						Material * intersectionMaterial = scene.renderGroups[intersectionRenderGroupIndex].material;
+						glm::vec3 intersectionNormal = intersectionPrimitive->GetNormal(intersectionPosition);
+						glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
 
-					if (intersectionMaterial->IsTransparent()) {
+						if (intersectionMaterial->IsTransparent()) {
 
-						const float n1 = 1.0f;
-						const float n2 = intersectionMaterial->refractiveIndex;
-						glm::vec3 offset = intersectionNormal * 0.1f;
-						Ray refractedRay(intersectionPosition - offset, glm::refract(ray.direction, intersectionNormal, n1 / n2));
-						// Find out if the ray "exits" the render group anywhere.
-						bool hit = scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
-						// float f = 1.0f;
-						if (hit) {
-							const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
-							const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
-							const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
+							const float n1 = 1.0f;
+							const float n2 = intersectionMaterial->refractiveIndex;
+							glm::vec3 offset = intersectionNormal * 0.1f;
+							Ray refractedRay(intersectionPosition - offset, glm::refract(ray.direction, intersectionNormal, n1 / n2));
+							// Find out if the ray "exits" the render group anywhere.
+							bool hit = scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
+							// float f = 1.0f;
+							if (hit) {
+								const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
+								const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
+								const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
 
-							photonRadiance = intersectionMaterial->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
-							ray.from = refractedIntersectionPoint + refractedRay.direction * 0.001f;
-							ray.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
+								photonRadiance = intersectionMaterial->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
+								ray.from = refractedIntersectionPoint + refractedRay.direction * 0.001f;
+								ray.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
 
+							}
+							else {
+								// "Flat reflective surface". Stop tracing
+								break;
+							}
 						}
-						else {
-							// "Flat reflective surface". Stop tracing
+						// We hit a none refractive surface, store caustics photon if its not on depth 0.
+						else if (k > 0) {
+							Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
+							causticsPhotons.push_back(photon);
 							break;
 						}
-					}
-					// We hit a none refractive surface, store caustics photon if its not on depth 0.
-					else if (k > 0) {
-						Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
-						causticsPhotons.push_back(photon);
-						break;
+						else {
+							break;
+						}
 					}
 					else {
 						break;
 					}
-				}
-				else {
-					break;
 				}
 			}
 		}
@@ -184,11 +186,11 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 
 	// Fix strength of photons based on total photons
 	for (Photon & photon : directPhotons) {
-		photon.color /= (float)directPhotons.size();
+		photon.color /= (float)directPhotons.size() + (float)indirectPhotons.size();
 		directPhotonsKDTree.insert(KDTreeNode(photon)); // This copy of the photons is inefective but the kd tree crashes when using photon pointers atm
 	}
 	for (Photon & photon : indirectPhotons) {
-		photon.color /= (float)indirectPhotons.size();
+		photon.color /= (float)directPhotons.size() + (float)indirectPhotons.size();
 		indirectPhotonsKDTree.insert(KDTreeNode(photon));
 	}
 	for (Photon & photon : shadowPhotons) {
