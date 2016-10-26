@@ -3,11 +3,12 @@
 #include "../../../includes/glm/gtc/constants.hpp"
 #include <glm.hpp>
 #include "../../Geometry/Ray.h"
+
 #include <iostream> // TODO: Remove this.
 
 class Material {
 public:
-	float refractiveIndex, reflectivity, transparency, emissivity, specularity, specularExponent = 75.0f;
+	float refractiveIndex, reflectivity, transparency, emissivity, specularity, specularExponent;
 
 	bool IsEmissive() const { return emissivity > FLT_EPSILON; };
 	bool IsTransparent() const { return transparency > FLT_EPSILON; }
@@ -31,16 +32,16 @@ public:
 	virtual glm::vec3 CalculateSpecularLighting(const glm::vec3 & inDirection, const glm::vec3 & outDirection,
 												const glm::vec3 & normal, const glm::vec3 & incomingRadiance) const {
 		const glm::vec3 lightReflection = glm::reflect(inDirection, normal);
-		float sqr = glm::pow<float>(glm::dot(lightReflection, outDirection), 255.f); // Phong model.
-		return sqr *glm::vec3(1, 1, 1); //  glm::max(0.0f, sqr) * incomingRadiance * GetSurfaceColor();
+		float sqr = glm::pow<float>(glm::dot(lightReflection, outDirection), specularExponent); // Phong model.
+		return  glm::max(0.0f, sqr) * incomingRadiance; //  glm::max(0.0f, sqr) * incomingRadiance * GetSurfaceColor();
 	}
 
 protected:
 	Material(float _emissivity = 0.0f, float _reflectivity = 0.98f,
 			 float _transparency = 0.0f, float _refractiveIndex = 1.0f,
-			 float _specularity = 0.0f) :
+			 float _specularity = 0.0f, float _specularityExponent = 75.0f) :
 		refractiveIndex(_refractiveIndex), transparency(_transparency),
-		emissivity(_emissivity), reflectivity(_reflectivity), specularity(_specularity) {
-		
+		emissivity(_emissivity), reflectivity(_reflectivity), specularity(_specularity), specularExponent(_specularityExponent) {
+
 	}
 };
