@@ -25,7 +25,7 @@ public:
 		using value_type = float;
 		Photon photon;
 		KDTreeNode() {}
-		KDTreeNode(Photon _photon) : photon(_photon) {}
+		KDTreeNode(const Photon & _photon) : photon(_photon) {}
 		value_type operator[](unsigned int n) const { return photon.position[n]; }
 		float distance(const KDTreeNode & other) { return glm::distance(other.photon.position, photon.position); }
 	};

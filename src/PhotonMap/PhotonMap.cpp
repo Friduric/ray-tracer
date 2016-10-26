@@ -32,8 +32,6 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 	}
 	const float INV_MAX_EMISSIVITY = 1.0f / maxEmissivity;
 
-	float amountOfDirectPhotons = PHOTONS_PER_LIGHT_SOURCE;
-	float amountOfIndirectPhotons = PHOTONS_PER_LIGHT_SOURCE*MAX_DEPTH;
 	// Shoot photons from all light sources.
 	for (const auto * lightSource : scene.emissiveRenderGroups) {
 		for (unsigned int j = 0; j < PHOTONS_PER_LIGHT_SOURCE; ++j) {
@@ -66,19 +64,17 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					if (k > 0) {
 						Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
 						indirectPhotons.push_back(photon);
-						amountOfIndirectPhotons++;
 						// Calculate probability for reflection/absorption and use Russian roulette to decide whether to reflect or not.
 						float p = INV_MAX_EMISSIVITY * (photonRadiance.r + photonRadiance.b + photonRadiance.g);
 						float rand = std::rand() / (float)RAND_MAX;
 						if (rand > p) {
-							//	break;
+							break;
 						}
 					}
 					// Otherwise direct and shadow photons.
 					else {
 						Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
 						directPhotons.push_back(photon);
-						amountOfDirectPhotons++;
 						// Create a shadow ray.
 						Ray shadowRay(intersectionPosition + 0.01f * ray.direction, ray.direction);
 						Primitive * shadowPrimitive = intersectionPrimitive;
@@ -96,7 +92,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 						}
 					}
 					photonRadiance = intersectionMaterial->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
-					ray.from = intersectionPosition;
+					ray.from = intersectionPosition + 0.001f*intersectionNormal;
 					ray.direction = rayReflection;
 				}
 				else {
@@ -109,7 +105,6 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 	// -------------------------------
 	// Caustics photons.
 	// -------------------------------
-	float amountOfCausticsPhotons = PHOTONS_PER_LIGHT_SOURCE;
 	std::vector<const RenderGroup*> transparentObjects;
 	for (const RenderGroup & rg : scene.renderGroups) {
 		Material* mat = rg.material;
@@ -174,7 +169,6 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					else if (k > 0) {
 						Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
 						causticsPhotons.push_back(photon);
-						amountOfCausticsPhotons++;
 						break;
 					}
 					else {
@@ -187,21 +181,21 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 			}
 		}
 	}
-	
+
 	// Fix strength of photons based on total photons
-	for (Photon photon : directPhotons) {
-		photon.color /= amountOfDirectPhotons; 
+	for (Photon & photon : directPhotons) {
+		photon.color /= (float)directPhotons.size();
 		directPhotonsKDTree.insert(KDTreeNode(photon)); // This copy of the photons is inefective but the kd tree crashes when using photon pointers atm
 	}
-	for (Photon photon : indirectPhotons) {
-		photon.color /= amountOfIndirectPhotons;
+	for (Photon & photon : indirectPhotons) {
+		photon.color /= (float)indirectPhotons.size();
 		indirectPhotonsKDTree.insert(KDTreeNode(photon));
 	}
-	for (Photon photon : shadowPhotons) {
+	for (Photon & photon : shadowPhotons) {
 		shadowPhotonsKDTree.insert(KDTreeNode(photon));
 	}
-	float amountOfCausticsPhotonsPerTransparentObject = amountOfCausticsPhotons / (float)transparentObjects.size();
-	for (Photon photon : causticsPhotons) {
+	float amountOfCausticsPhotonsPerTransparentObject = causticsPhotons.size() / (float)transparentObjects.size();
+	for (Photon & photon : causticsPhotons) {
 		photon.color /= amountOfCausticsPhotonsPerTransparentObject;
 		causticsPhotonsKDTree.insert(KDTreeNode(photon));
 	}
