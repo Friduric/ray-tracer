@@ -76,7 +76,10 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	glm::vec3 photonColorAccumulator(0);
 	glm::vec3 causticsColorAccumulator(0);
 	photonMap->GetCausticsPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, causticsNodes);
-	for (PhotonMap::KDTreeNode node : causticsNodes) {
+	int currentAmountOfNodes = (int)causticsNodes.size();// std::min(maxNodes, (int)causticsNodes.size());
+	//for (PhotonMap::KDTreeNode node : causticsNodes) {
+	for (int i = 0; i < currentAmountOfNodes; i++) {
+		PhotonMap::KDTreeNode node = causticsNodes[i];
 		float distance = glm::distance(intersectionPoint, node.photon.position);
 		float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
 		auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
@@ -84,9 +87,9 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 		causticsColorAccumulator += hitMaterial->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), causticPhotonColor);
 	}
 	if (causticsNodes.size() > 0) {
-		causticsColorAccumulator.r = std::min(1.0f, causticsColorAccumulator.r*CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
-		causticsColorAccumulator.g = std::min(1.0f, causticsColorAccumulator.g*CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
-		causticsColorAccumulator.b = std::min(1.0f, causticsColorAccumulator.b*CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		causticsColorAccumulator.r = std::min(1.0f, causticsColorAccumulator.r *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		causticsColorAccumulator.g = std::min(1.0f, causticsColorAccumulator.g *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		causticsColorAccumulator.b = std::min(1.0f, causticsColorAccumulator.b *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
 		colorAccumulator += causticsColorAccumulator;
 	}
 
@@ -125,7 +128,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 #if __USE_SPECULAR_LIGHTING
 					// Specular lighting.
 					if (hitMaterial->IsSpecular()) {
-						
+
 						glm::vec3 v = hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 						/*if (v.r > 0.9f || v.g > 0.9f || v.b > 0.9f) {
 							std::cout << " ------------" << std::endl;
@@ -160,31 +163,35 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	// Refracted lighting.
 	// -------------------------------
 	if (hitMaterial->IsTransparent()) {
-	
 
 		const float n1 = 1.0f;
 		const float n2 = hitMaterial->refractiveIndex;
 		const float schlickConstantOutside = Utility::Rendering::CalculateSchlicksApproximation(ray.direction, hitNormal, n1, n2);
-		float schlickConstantInside = schlickConstantOutside; // Same as outside schlickconstant unless the refracted ray hits an inside
-
+		float schlickConstantInside = schlickConstantOutside; // Same as outside schlickconstant unless the refracted ray hits an inside
 		glm::vec3 offset = hitNormal * 0.001f;
 		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
-		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {		
+		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 			const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 			const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
 			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
-
 			schlickConstantInside = Utility::Rendering::CalculateSchlicksApproximation(refractedRay.direction, -refractedHitNormal, n2, n1);
-
-			refractedRay.from = refractedIntersectionPoint + refractedHitNormal * 0.001f;
-			refractedRay.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
-		}
+			Ray refractedRayOut(refractedIntersectionPoint + refractedHitNormal * 0.01f, glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1));
 		
+			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency)*
+				hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal,
+													  (1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
+
+			//refractedRay.from = refractedIntersectionPoint + refractedHitNormal * 0.001f;
+			//refractedRay.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
+		}
+		else {
+			colorAccumulator += (1.0f - schlickConstantOutside)  *(hitMaterial->transparency)* TraceRay(refractedRay, DEPTH + 1);
+		}
+		//colorAccumulator += (1.0f - schlickConstantOutside)*(1.0f - schlickConstantInside) * hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
 
 		Ray specularRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
-		colorAccumulator += schlickConstantOutside*hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
-		//(1.0f - schlickConstantOutside) *
-		colorAccumulator += (1.0f - schlickConstantOutside)*(1.0f - schlickConstantInside) * hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
+		//colorAccumulator += schlickConstantOutside * hitMaterial->specularity *
+		//	hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
 	}
 
 	// -------------------------------
