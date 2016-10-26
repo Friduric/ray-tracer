@@ -249,12 +249,12 @@ void SceneObjectFactory::AddSphere(Scene & scene, float x, float y, float z,
 void SceneObjectFactory::AddTransparentSphere(Scene & scene, float x, float y, float z,
 											  float radius, glm::vec3 surfaceColor,
 											  float refractiveIndex, float transparency,
-											  float reflectivity) {
+											  float reflectivity, float specularity) {
 	auto & materials = scene.materials;
 	auto & renderGroups = scene.renderGroups;
 
 	// Material.
-	const auto transparentMaterial = new LambertianMaterial(surfaceColor, 0.0f, reflectivity, transparency, refractiveIndex, 0.0f);
+	const auto transparentMaterial = new LambertianMaterial(surfaceColor, 0.0f, reflectivity, transparency, refractiveIndex, specularity);
 	materials.push_back(transparentMaterial);
 
 	// Render group + primitive.
