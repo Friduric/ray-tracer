@@ -2,7 +2,10 @@
 
 #include <algorithm>
 
+#include "../../Utility/Rendering.h"
 #include "../../Utility/Math.h"
+
+#define __USE_SPECULAR_LIGHTING false
 
 glm::vec3 PhotonMapRenderer::GetPixelColor(const Ray & ray) {
 	return TraceRay(ray);
@@ -15,10 +18,12 @@ PhotonMapRenderer::PhotonMapRenderer(Scene & _scene, const unsigned int _MAX_DEP
 	volatilePhotonMapNodes.reserve(100000);
 }
 
-glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
+glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH) {
 	if (DEPTH == MAX_DEPTH) {
 		return glm::vec3(0);
 	}
+
+	Ray ray(_ray.from + 0.001f * _ray.direction, _ray.direction);
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
 	assert(glm::length(ray.direction) > 1.0f - 10.0f * FLT_EPSILON && glm::length(ray.direction) < 1.0f + 10.0f * FLT_EPSILON);
@@ -84,6 +89,9 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 		causticsColorAccumulator.b = std::min(1.0f, causticsColorAccumulator.b*CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
 		colorAccumulator += causticsColorAccumulator;
 	}
+
+
+
 	// -------------------------------
 	// Direct lighting.
 	// -------------------------------
@@ -117,6 +125,13 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 #if __USE_SPECULAR_LIGHTING
 					// Specular lighting.
 					if (hitMaterial->IsSpecular()) {
+						
+						glm::vec3 v = hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
+						/*if (v.r > 0.9f || v.g > 0.9f || v.b > 0.9f) {
+							std::cout << " ------------" << std::endl;
+							std::cout << v.r << " " << v.g << " " << v.b << std::endl;
+							std::cout << colorAccumulator.r << " " << colorAccumulator.g << " " << colorAccumulator.b << std::endl;
+						}*/
 						colorAccumulator += hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 					}
 #endif
@@ -145,23 +160,31 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH)
 	// Refracted lighting.
 	// -------------------------------
 	if (hitMaterial->IsTransparent()) {
+	
+
 		const float n1 = 1.0f;
 		const float n2 = hitMaterial->refractiveIndex;
+		const float schlickConstantOutside = Utility::Rendering::CalculateSchlicksApproximation(ray.direction, hitNormal, n1, n2);
+		float schlickConstantInside = schlickConstantOutside; // Same as outside schlickconstant unless the refracted ray hits an inside
 
 		glm::vec3 offset = hitNormal * 0.001f;
 		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
-
-		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
+		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {		
 			const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
-
 			const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
 			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
+
+			schlickConstantInside = Utility::Rendering::CalculateSchlicksApproximation(refractedRay.direction, -refractedHitNormal, n2, n1);
 
 			refractedRay.from = refractedIntersectionPoint + refractedHitNormal * 0.001f;
 			refractedRay.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
 		}
+		
 
-		colorAccumulator += hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
+		Ray specularRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
+		colorAccumulator += schlickConstantOutside*hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
+		//(1.0f - schlickConstantOutside) *
+		colorAccumulator += (1.0f - schlickConstantOutside)*(1.0f - schlickConstantInside) * hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
 	}
 
 	// -------------------------------
