@@ -28,7 +28,7 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 		Material* material = renderGroup.material;
 
 		// Add direct illumination photons.	
-		std::vector<PhotonMap::KDTreeNode> directNodes;
+		/*std::vector<PhotonMap::KDTreeNode> directNodes;
 		photonMap->GetDirectPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, directNodes);
 		glm::vec3 directColorAccumulator(0.0f);
 		for (PhotonMap::KDTreeNode node : directNodes) {
@@ -36,14 +36,14 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 			float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
 			auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
 			glm::vec3 directPhotonColor = glm::max(0.0f, glm::dot(photonNormal, surfaceNormal)) * weight * node.photon.color;
-			directColorAccumulator += material->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), directPhotonColor);
+			directColorAccumulator += directPhotonColor;// material->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), directPhotonColor);
 		}
 		if (directNodes.size() > 0) {
 			colorAccumulator += directColorAccumulator;
-		}
+		}*/
 
 		// Indirect photons.
-		std::vector<PhotonMap::KDTreeNode> indirectNodes;
+		/*std::vector<PhotonMap::KDTreeNode> indirectNodes;
 		photonMap->GetIndirectPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, indirectNodes);
 		glm::vec3 indirectColorAccumulator(0.0f);
 		for (PhotonMap::KDTreeNode node : indirectNodes) {
@@ -51,14 +51,14 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 			float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
 			auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
 			glm::vec3 indirectPhotonColor = glm::max(0.0f, glm::dot(photonNormal, surfaceNormal)) * weight * node.photon.color;
-			indirectColorAccumulator += material->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), indirectPhotonColor);
+			indirectColorAccumulator += indirectPhotonColor;// material->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), indirectPhotonColor);
 		}
 		if (indirectNodes.size() > 0) {
 			colorAccumulator += indirectColorAccumulator;
-		}
+		}*/
 
 		// Caustics photons.
-		/*std::vector<PhotonMap::KDTreeNode> causticsNodes;
+		std::vector<PhotonMap::KDTreeNode> causticsNodes;
 		photonMap->GetCausticsPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, causticsNodes);
 		glm::vec3 causticsColorAccumulator(0.0f);
 		for (PhotonMap::KDTreeNode node : causticsNodes) {
@@ -66,11 +66,12 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 			float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
 			auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
 			glm::vec3 causticPhotonColor = glm::max(0.0f, glm::dot(photonNormal, surfaceNormal)) * weight * node.photon.color;
-			causticsColorAccumulator += material->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), causticPhotonColor);
+
+			causticsColorAccumulator += causticPhotonColor;// material->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), causticPhotonColor);
 		}
 		if (causticsNodes.size() > 0) {
 			colorAccumulator += causticsColorAccumulator;
-		}*/
+		}
 
 		// Shadow photons.
 		/*std::vector<PhotonMap::KDTreeNode> shadowNodes;
@@ -79,7 +80,7 @@ glm::vec3 PhotonMapVisualizer::TraceRay(const Ray & ray, const unsigned int DEPT
 			float distance = glm::distance(intersectionPoint, node.photon.position);
 			float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
 			auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
-			colorAccumulator += glm::max(0.0f, glm::dot(photonNormal, surfaceNormal)) * weight * node.photon.color;
+			colorAccumulator += glm::max(0.0f, glm::dot(photonNormal, surfaceNormal)) * weight * glm::vec3(1.0f,1.0f,0.1f);
 		}*/
 
 		colorAccumulator /= PHOTON_SEARCH_RADIUS;
