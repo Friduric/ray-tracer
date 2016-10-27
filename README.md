@@ -5,7 +5,7 @@ A Monte Carlo ray tracer implementation using photon mapping.
 An image rendered using this renderer:
 </p>
 <p align="center">
-<img src="https://github.com/Friduric/raytracer/blob/master/final.png" width="400" height="400">
+<img src="https://github.com/Friduric/raytracer/blob/master/final.png" width="600" height="600">
 </p>
 
 Currently supports:
