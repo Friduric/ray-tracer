@@ -76,8 +76,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	glm::vec3 photonColorAccumulator(0);
 	glm::vec3 causticsColorAccumulator(0);
 	photonMap->GetCausticsPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, causticsNodes);
-	int currentAmountOfNodes = (int)causticsNodes.size();// std::min(maxNodes, (int)causticsNodes.size());
-	//for (PhotonMap::KDTreeNode node : causticsNodes) {
+	int currentAmountOfNodes = (int)causticsNodes.size();
 	for (int i = 0; i < currentAmountOfNodes; i++) {
 		PhotonMap::KDTreeNode node = causticsNodes[i];
 		float distance = glm::distance(intersectionPoint, node.photon.position);
@@ -176,22 +175,17 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
 			schlickConstantInside = Utility::Rendering::CalculateSchlicksApproximation(refractedRay.direction, -refractedHitNormal, n2, n1);
 			Ray refractedRayOut(refractedIntersectionPoint + refractedHitNormal * 0.01f, glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1));
-		
+
 			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency)*
 				hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal,
 													  (1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
-
-			//refractedRay.from = refractedIntersectionPoint + refractedHitNormal * 0.001f;
-			//refractedRay.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
 		}
 		else {
 			colorAccumulator += (1.0f - schlickConstantOutside)  *(hitMaterial->transparency)* TraceRay(refractedRay, DEPTH + 1);
 		}
-		//colorAccumulator += (1.0f - schlickConstantOutside)*(1.0f - schlickConstantInside) * hitMaterial->transparency * TraceRay(refractedRay, DEPTH + 1);
-
 		Ray specularRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
-		//colorAccumulator += schlickConstantOutside * hitMaterial->specularity *
-		//	hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
+		colorAccumulator += schlickConstantOutside * hitMaterial->specularity *
+			hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
 	}
 
 	// -------------------------------
