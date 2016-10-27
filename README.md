@@ -14,7 +14,13 @@ TODO:
 
 ## Sample images
 <p align="center">
-An image that was rendered using (only) this renderer:
+The latest rendered image using this renderer:
+</p>
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/finalres.png" width="400" height="400">
+</p>
+<p align="center">
+An image that was rendered using this renderer:
 </p>
 <p align="center">
 <img src="https://github.com/Friduric/raytracer/blob/master/first_refraction_test.png" width="400" height="400">
