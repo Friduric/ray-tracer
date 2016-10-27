@@ -132,10 +132,10 @@ void Camera::CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD) {
 	// Squash image.
 	for (size_t i = 0; i < width; ++i) {
 		for (size_t j = 0; j < height; ++j) {
-			pixels[i][j].color = sqrt(pixels[i][j].color);
+			// pixels[i][j].color = sqrt(pixels[i][j].color);
 		}
 	}
-	maxIntensity = sqrt(maxIntensity);
+	// maxIntensity = sqrt(maxIntensity);
 
 	// Discretize pixels using the max intensity. Every discretized value must be between 0 and 255.
 	glm::u8 discretizedMaxIntensity{};
