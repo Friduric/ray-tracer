@@ -19,6 +19,18 @@ An image that was rendered using (only) this renderer:
 <p align="center">
 <img src="https://github.com/Friduric/raytracer/blob/master/first_refraction_test.png" width="400" height="400">
 </p>
+<p align="center">
+Caustics photon map test:
+</p>
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/100kcp53sec.png" width="400" height="400">
+</p>
+<p align="center">
+Bunch of different spheres and materials (and a tetrahedron):
+</p>
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/1000ray763s.png" width="400" height="400">
+</p>
 
 ## A few troubleshooting tips
 - IMPORTANT: Use the 32-bit binaries (build using x86!). Otherwise GLM might bug out.
