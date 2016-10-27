@@ -54,44 +54,10 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	// Retrieve the intersected surface's material.
 	const Material * const hitMaterial = intersectionRenderGroup.material;
 
-	// -------------------------------
-	// Emissive lighting.
-	// -------------------------------
-	if (hitMaterial->IsEmissive()) {
-		float f = 1.0f;
-		if (DEPTH >= 1) {
-			f *= glm::dot(-ray.direction, hitNormal);
-		}
-		return f * hitMaterial->GetEmissionColor();
-	}
 
 	glm::vec3 colorAccumulator = glm::vec3(0);
 	const float rf = 1.0f - hitMaterial->reflectivity;
 	const float tf = 1.0f - hitMaterial->transparency;
-
-	// -------------------------------
-	// Caustics photons.
-	// -------------------------------
-	std::vector<PhotonMap::KDTreeNode> causticsNodes;
-	glm::vec3 photonColorAccumulator(0);
-	glm::vec3 causticsColorAccumulator(0);
-	photonMap->GetCausticsPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, causticsNodes);
-	int currentAmountOfNodes = (int)causticsNodes.size();
-	for (int i = 0; i < currentAmountOfNodes; i++) {
-		PhotonMap::KDTreeNode node = causticsNodes[i];
-		float distance = glm::distance(intersectionPoint, node.photon.position);
-		float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
-		auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
-		glm::vec3 causticPhotonColor = glm::max(0.0f, glm::dot(photonNormal, hitNormal)) * weight * node.photon.color;
-		causticsColorAccumulator += hitMaterial->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), causticPhotonColor);
-	}
-	if (causticsNodes.size() > 0) {
-		causticsColorAccumulator.r = std::min(1.0f, causticsColorAccumulator.r *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
-		causticsColorAccumulator.g = std::min(1.0f, causticsColorAccumulator.g *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
-		causticsColorAccumulator.b = std::min(1.0f, causticsColorAccumulator.b *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
-		colorAccumulator += causticsColorAccumulator;
-	}
-
 
 
 	// -------------------------------
@@ -130,9 +96,9 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 
 						glm::vec3 v = hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 						/*if (v.r > 0.9f || v.g > 0.9f || v.b > 0.9f) {
-							std::cout << " ------------" << std::endl;
-							std::cout << v.r << " " << v.g << " " << v.b << std::endl;
-							std::cout << colorAccumulator.r << " " << colorAccumulator.g << " " << colorAccumulator.b << std::endl;
+						std::cout << " ------------" << std::endl;
+						std::cout << v.r << " " << v.g << " " << v.b << std::endl;
+						std::cout << colorAccumulator.r << " " << colorAccumulator.g << " " << colorAccumulator.b << std::endl;
 						}*/
 						colorAccumulator += hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 					}
@@ -145,6 +111,42 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	colorAccumulator *= (1.0f / glm::max<float>(1.0f, (float)scene.emissiveRenderGroups.size()));
 
 	// -------------------------------
+	// Emissive lighting.
+	// -------------------------------
+	if (hitMaterial->IsEmissive()) {
+		float f = 1.0f;
+		if (DEPTH >= 1) {
+			f *= glm::dot(-ray.direction, hitNormal);
+		}
+		// The emission color of the light source + the contribution of the light hit on itself
+		return f * hitMaterial->GetEmissionColor() + hitMaterial->CalculateDiffuseLighting(-hitNormal, -ray.direction, hitNormal, hitMaterial->GetEmissionColor());
+	}
+
+	// -------------------------------
+	// Caustics photons.
+	// -------------------------------
+	std::vector<PhotonMap::KDTreeNode> causticsNodes;
+	glm::vec3 photonColorAccumulator(0);
+	glm::vec3 causticsColorAccumulator(0);
+	photonMap->GetCausticsPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, causticsNodes);
+	int currentAmountOfNodes = (int)causticsNodes.size();
+	for (int i = 0; i < currentAmountOfNodes; i++) {
+		PhotonMap::KDTreeNode node = causticsNodes[i];
+		float distance = glm::distance(intersectionPoint, node.photon.position);
+		float weight = std::max(0.0f, 1.0f - distance * WEIGHT_FACTOR);
+		auto photonNormal = node.photon.primitive->GetNormal(intersectionPoint);
+		glm::vec3 causticPhotonColor = glm::max(0.0f, glm::dot(photonNormal, hitNormal)) * weight * node.photon.color;
+		causticsColorAccumulator += hitMaterial->CalculateDiffuseLighting(node.photon.direction, ray.direction, node.photon.primitive->GetNormal(node.photon.position), causticPhotonColor);
+	}
+	if (causticsNodes.size() > 0) {
+		causticsColorAccumulator.r = std::min(1.0f, causticsColorAccumulator.r *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		causticsColorAccumulator.g = std::min(1.0f, causticsColorAccumulator.g *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		causticsColorAccumulator.b = std::min(1.0f, causticsColorAccumulator.b *CAUSTICS_STRENGTH_MULTIPLIER / PHOTON_SEARCH_AREA);
+		colorAccumulator += causticsColorAccumulator;
+	}
+
+
+	// -------------------------------
 	// Indirect lighting.
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
@@ -155,7 +157,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 		const auto incomingRadiance = TraceRay(diffuseRay, DEPTH + 1);
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-diffuseRay.direction, -ray.direction, hitNormal, incomingRadiance);
 	}
-
+	
 	colorAccumulator *= rf * tf;
 
 	// -------------------------------
