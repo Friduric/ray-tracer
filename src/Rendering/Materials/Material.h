@@ -33,7 +33,7 @@ public:
 												const glm::vec3 & normal, const glm::vec3 & incomingRadiance) const {
 		const glm::vec3 lightReflection = glm::reflect(inDirection, normal);
 		float sqr = glm::pow<float>(glm::dot(lightReflection, outDirection), specularExponent); // Phong model.
-		return  glm::max(0.0f, sqr) * incomingRadiance; //  glm::max(0.0f, sqr) * incomingRadiance * GetSurfaceColor();
+		return  glm::max(0.0f, sqr) * incomingRadiance;
 	}
 
 protected:
@@ -41,7 +41,5 @@ protected:
 			 float _transparency = 0.0f, float _refractiveIndex = 1.0f,
 			 float _specularity = 0.0f, float _specularityExponent = 75.0f) :
 		refractiveIndex(_refractiveIndex), transparency(_transparency),
-		emissivity(_emissivity), reflectivity(_reflectivity), specularity(_specularity), specularExponent(_specularityExponent) {
-
-	}
+		emissivity(_emissivity), reflectivity(_reflectivity), specularity(_specularity), specularExponent(_specularityExponent) {}
 };
