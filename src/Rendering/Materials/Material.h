@@ -4,8 +4,6 @@
 #include <glm.hpp>
 #include "../../Geometry/Ray.h"
 
-#include <iostream> // TODO: Remove this.
-
 class Material {
 public:
 	float refractiveIndex, reflectivity, transparency, emissivity, specularity, specularExponent;

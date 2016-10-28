@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Photon.h"
-
 #include <kdtree.hpp>
+
+#include "Photon.h"
 
 class PhotonMap
 {

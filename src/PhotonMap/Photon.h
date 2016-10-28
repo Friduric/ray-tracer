@@ -1,4 +1,5 @@
 #pragma once
+
 #include <glm.hpp>
 
 #include "../Geometry/Primitive.h"
