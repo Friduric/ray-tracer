@@ -1,42 +1,23 @@
 ## Description
 A Monte Carlo ray tracer implementation using photon mapping. 
 
+<p align="center">
+An image rendered using this renderer:
+</p>
+<p align="center">
+<img src="https://github.com/Friduric/raytracer/blob/master/final.png" width="600" height="600">
+</p>
+
 Currently supports:
 - Intransparent materials using Oren-Nayar and Lambertian BRDFs.
 - Photon mapping to increase performance and approximate indirect lighting.
 - Transparent and reflective materials.
 - Shadow, indirect and direct photons.
 - Parallelized/multi-threaded rendering using OMP.
+- Caustic photons.
 
 TODO: 
-- Caustic photons.
 - Optimized ray casting using an octree and AABBs.
-
-## Sample images
-<p align="center">
-The latest rendered image using this renderer:
-</p>
-<p align="center">
-<img src="https://github.com/Friduric/raytracer/blob/master/finalres.png" width="400" height="400">
-</p>
-<p align="center">
-An image that was rendered using this renderer:
-</p>
-<p align="center">
-<img src="https://github.com/Friduric/raytracer/blob/master/first_refraction_test.png" width="400" height="400">
-</p>
-<p align="center">
-Caustics photon map test:
-</p>
-<p align="center">
-<img src="https://github.com/Friduric/raytracer/blob/master/100kcp53sec.png" width="400" height="400">
-</p>
-<p align="center">
-Bunch of different spheres and materials (and a tetrahedron):
-</p>
-<p align="center">
-<img src="https://github.com/Friduric/raytracer/blob/master/1000ray763s.png" width="400" height="400">
-</p>
 
 ## A few troubleshooting tips
 - IMPORTANT: Use the 32-bit binaries (build using x86!). Otherwise GLM might bug out.
