@@ -1,6 +1,10 @@
 #include "PhotonMap.h"
 
+#define __PRINT_RESULT true
+
+#if __PRINT_RESULT
 #include <iostream>
+#endif
 #include <random>
 #include <numeric>
 #include <algorithm>
@@ -60,10 +64,12 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					Material * intersectionMaterial = scene.renderGroups[intersectionRenderGroupIndex].material;
 					glm::vec3 intersectionNormal = intersectionPrimitive->GetNormal(intersectionPosition);
 					glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
+
 					// Indirect photon if deeper than 0.
 					if (k > 0) {
 						Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
 						indirectPhotons.push_back(photon);
+
 						// Calculate probability for reflection/absorption and use Russian roulette to decide whether to reflect or not.
 						float p = INV_MAX_EMISSIVITY * (photonRadiance.r + photonRadiance.b + photonRadiance.g);
 						float rand = std::rand() / (float)RAND_MAX;
@@ -75,6 +81,7 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 					else {
 						Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
 						directPhotons.push_back(photon);
+
 						// Create a shadow ray.
 						Ray shadowRay(intersectionPosition + 0.01f * ray.direction, ray.direction);
 						Primitive * shadowPrimitive = intersectionPrimitive;
@@ -143,15 +150,13 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 						glm::vec3 rayReflection = Utility::Math::CosineWeightedHemisphereSampleDirection(intersectionNormal);
 
 						if (intersectionMaterial->IsTransparent()) {
-
 							const float n1 = 1.0f;
 							const float n2 = intersectionMaterial->refractiveIndex;
 							glm::vec3 offset = intersectionNormal * 0.1f;
 							Ray refractedRay(intersectionPosition - offset, glm::refract(ray.direction, intersectionNormal, n1 / n2));
+
 							// Find out if the ray "exits" the render group anywhere.
-							bool hit = scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance);
-							// float f = 1.0f;
-							if (hit) {
+							if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
 								const auto & refractedRayHitPrimitive = intersectionRenderGroup.primitives[intersectionPrimitiveIndex];
 								const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
 								const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
@@ -159,14 +164,9 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 								photonRadiance = intersectionMaterial->CalculateDiffuseLighting(ray.direction, rayReflection, intersectionNormal, photonRadiance);
 								ray.from = refractedIntersectionPoint + refractedRay.direction * 0.001f;
 								ray.direction = glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1);
-
-							}
-							else {
-								// "Flat reflective surface". Stop tracing
-								break;
 							}
 						}
-						// We hit a none refractive surface, store caustics photon if its not on depth 0.
+						// We hit a none refractive surface, store caustics photon if we are not on depth 0.
 						else if (k > 0) {
 							Photon photon = Photon(intersectionPosition, ray.direction, photonRadiance, intersectionPrimitive);
 							causticsPhotons.push_back(photon);
@@ -202,16 +202,19 @@ PhotonMap::PhotonMap(const Scene & scene, const unsigned int PHOTONS_PER_LIGHT_S
 		causticsPhotonsKDTree.insert(KDTreeNode(photon));
 	}
 
-	// Finalize by balancing and optimizing the kd-trees.
+	// Finalize by balancing and optimizing the k-d trees.
 	directPhotonsKDTree.optimize();
 	indirectPhotonsKDTree.optimize();
 	shadowPhotonsKDTree.optimize();
-	// Print.
+
+#if __PRINT_RESULT
+	// Print results.
 	std::cout << "Photon map was built successfully." << std::endl;
 	std::cout << "Total direct photons: " << directPhotonsKDTree.size() << std::endl;
 	std::cout << "Total indirect photons: " << indirectPhotonsKDTree.size() << std::endl;
 	std::cout << "Total shadow photons: " << shadowPhotonsKDTree.size() << std::endl;
 	std::cout << "Total caustics photons: " << causticsPhotonsKDTree.size() << std::endl;
+#endif
 }
 
 

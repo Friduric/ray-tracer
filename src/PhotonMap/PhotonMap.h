@@ -86,7 +86,6 @@ private:
 	KDTree::KDTree<3, KDTreeNode> indirectPhotonsKDTree;
 	KDTree::KDTree<3, KDTreeNode> shadowPhotonsKDTree;
 	KDTree::KDTree<3, KDTreeNode> causticsPhotonsKDTree;
-
 };
 
 
