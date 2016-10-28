@@ -42,12 +42,12 @@ int main() {
 	// --------------------------------------
 	// Settings.
 	// --------------------------------------
-	cui PIXELS_W = 400;
-	cui PIXELS_H = 400;
-	cui RAYS_PER_PIXEL = 1;
-	cui MAX_RAY_DEPTH = 4;
+	cui PIXELS_W = 500;
+	cui PIXELS_H = 500;
+	cui RAYS_PER_PIXEL = 800;
+	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
-	cui PHOTONS_PER_LIGHT_SOURCE = 100000;
+	cui PHOTONS_PER_LIGHT_SOURCE = 240000;
 	cui PHOTON_MAP_DEPTH = 4;
 	RendererType RENDERER_TYPE = RendererType::PHOTON_MAP;
 
@@ -60,21 +60,24 @@ int main() {
 	// Coordinate system relative to camera plane.
 	// +x is INTO the image.
 	// +y is LEFT in image.
-	// +z is UP in image.
+	// +z is UP in image. 
 
-	// A nice scene setting with all different kind of objects
 	SceneObjectFactory::AddRoom(scene, false);
 
 	SceneObjectFactory::AddOrenNayarSphere(scene, 5, -0.5f, -4.0f, 0.75f, glm::vec3(1.0f, 0.0f, 0.0f), 0.00f); //red oren
 	SceneObjectFactory::AddSphere(scene, 10, 0, -0.5f, 1.25f, glm::vec3(1.0f, 0.2f, 1.0f)); //green diffuse
 	SceneObjectFactory::AddSphere(scene, 6, 4, 2, 1.15f, glm::vec3(1.0f, 1.0f, 0.2f)); // yellow
-	SceneObjectFactory::AddTransparentSphere(scene, 6.0f, -3.5f, -3.5f, 1.15f, glm::vec3(0.5f, 0.5f, 1.0f), 1.0f, 1.0f, 0.6f, 0.0f, 255.0f); // "thin glass" right.
-	SceneObjectFactory::AddTransparentSphere(scene, 8.0f, 3.0f, -3.0f, 1.15f, glm::vec3(1.0f, 1.0f, 0.2f), 1.0f, 0.0f, 1.0f, 0.0f, 255.0f);//mirror
-	SceneObjectFactory::AddTransparentSphere(scene, 6, -4.0f, 1.75f, 1.5f, glm::vec3(1.0f, 1.0f, 1.0f), 1.97f, 1.0f, 0.0f, 1.0f, 255.0f); // "Glass".
+	SceneObjectFactory::AddTransparentSphere(scene, 6.0f, -3.5f, -3.5f, 1.15f, glm::vec3(0.5f, 0.5f, 1.0f), 1.15f, 1.0f, 0.6f, 0.0f, 255.0f); // "thin glass" right.
+	SceneObjectFactory::AddTransparentSphere(scene, 8.0f, 3.0f, -3.0f, 1.15f, glm::vec3(1.0f, 1.0f, 0.2f), 1.15f, 0.0f, 1.0f, 0.0f, 255.0f);//mirror
+	SceneObjectFactory::AddTransparentSphere(scene, 6, -4.0f, 1.75f, 1.5f, glm::vec3(1.0f, 1.0f, 0.0f), 1.47f, 1.0f, 0.0f, 1.0f, 255.0f); // "Glass".
+	// SceneObjectFactory::AddTransparentSphere(scene, 6, -2.0f, 0.65f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), 1.97f, 1.0f, 0.0f, 1.0f, 255.0f);
+	SceneObjectFactory::AddTransparentSphere(scene, 7, 0.0f, 2.75f, 0.5f, glm::vec3(0.8f, 0.2f, 1.0f), 1.37f, 1.0f, 0.0f, 1.0f, 255.0f);
+	SceneObjectFactory::AddTransparentSphere(scene, 6.5f, -2.0f, 0.95f, 1.0f, glm::vec3(0.7f, 1.0f, 0.0f), 1.47f, 1.0f, 0.0f, 1.0f, 255.0f);
 	SceneObjectFactory::AddTetrahedron(scene, 7, 4, -1, glm::vec3(0.0f, 1.0f, 1.0f), 0.0f, 1.0f, 0.0f, 0.0f);
 
 	// Lights.
 	SceneObjectFactory::Add2DQuad(scene, glm::vec2(5.0f, -1), glm::vec2(7.0f, 1), 4.99999f, glm::vec3(0, 0, -1), glm::vec3(1, 1.0f, 1.0f), 1.0f);
+	SceneObjectFactory::Add2DQuad(scene, glm::vec2(4.0f, 2), glm::vec2(5.0f, 3), 4.99999f, glm::vec3(0, 0, -1), glm::vec3(1.0f, 1.0f, 0.65f), 1.0f);
 
 	// --------------------------------------
 	// Initialize camera and time keeping.
