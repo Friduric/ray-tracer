@@ -3,7 +3,6 @@
 #include "../../Utility/Math.h"
 #include "../../includes/glm/gtx/norm.hpp"
 #include "../../Utility/Rendering.h"
-#include <iostream>
 
 #define __USE_SPECULAR_LIGHTING true
 

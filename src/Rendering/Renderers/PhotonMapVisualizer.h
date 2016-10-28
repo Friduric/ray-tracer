@@ -12,5 +12,5 @@ private:
 	const float WEIGHT_MODIFIER = 1.3f;
 	const float WEIGHT_FACTOR = 1.0f / (WEIGHT_MODIFIER * PHOTON_SEARCH_RADIUS);
 	glm::vec3 TraceRay(const Ray & ray, const unsigned int DEPTH = 0);
-	PhotonMap* photonMap;
+	PhotonMap * photonMap;
 };

@@ -1,8 +1,6 @@
 #include "PhotonMapVisualizer.h"
 
-#include <iostream>
 #include <algorithm>
-#include <iostream>
 
 #define __VISUALIZE_CAUSTICS true // Whether to visualize the caustics photon map or not.
 #define __VISUALIZE_DIRECT true // Whether to visualize the direct photons or not.
