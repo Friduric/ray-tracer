@@ -14,13 +14,17 @@ glm::vec3 MonteCarloRenderer::GetPixelColor(const Ray & ray) {
 MonteCarloRenderer::MonteCarloRenderer(Scene & _scene, const unsigned int _MAX_DEPTH) :
 	MAX_DEPTH(_MAX_DEPTH), Renderer("Monte Carlo Renderer", _scene) { }
 
-glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH) {
+glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH) {
 	if (DEPTH == MAX_DEPTH) {
 		return glm::vec3(0);
 	}
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
 	assert(glm::length(ray.direction) > 1.0f - 10.0f * FLT_EPSILON && glm::length(ray.direction) < 1.0f + 10.0f * FLT_EPSILON);
+
+	// Nudge the ray a little bit. 
+	// This is not really required, but it removes some unnecessary "misses" (due to floating point errors).
+	Ray ray(_ray.from + 0.001f * _ray.direction, _ray.direction);
 
 	// See if our current ray hits anything in the scene.
 	float intersectionDistance;
@@ -127,7 +131,8 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 		const float n1 = 1.0f;
 		const float n2 = hitMaterial->refractiveIndex;
 		const float schlickConstantOutside = Utility::Rendering::CalculateSchlicksApproximation(ray.direction, hitNormal, n1, n2);
-		float schlickConstantInside = schlickConstantOutside; // Same as outside schlickconstant unless the refracted ray hits an inside
+		float schlickConstantInside = schlickConstantOutside; // Same as outside schlickconstant unless the refracted ray hits an inside
+
 		glm::vec3 offset = hitNormal * 0.001f;
 		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
 		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
@@ -139,7 +144,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & ray, const unsigned int DEPTH
 
 			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency)*
 				hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal,
-													  (1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
+				(1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
 		}
 		else {
 			colorAccumulator += (1.0f - schlickConstantOutside)  *(hitMaterial->transparency)* TraceRay(refractedRay, DEPTH + 1);

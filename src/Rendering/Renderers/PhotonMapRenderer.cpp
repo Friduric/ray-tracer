@@ -23,6 +23,8 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 		return glm::vec3(0);
 	}
 
+	// Nudge the ray a little bit. 
+	// This is not really required, but it removes some unnecessary "misses" (due to floating point errors).
 	Ray ray(_ray.from + 0.001f * _ray.direction, _ray.direction);
 
 	assert(DEPTH >= 0 && DEPTH < MAX_DEPTH);
@@ -54,11 +56,10 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	// Retrieve the intersected surface's material.
 	const Material * const hitMaterial = intersectionRenderGroup.material;
 
-
+	// Initialize color accumulator.
 	glm::vec3 colorAccumulator = glm::vec3(0);
 	const float rf = 1.0f - hitMaterial->reflectivity;
 	const float tf = 1.0f - hitMaterial->transparency;
-
 
 	// -------------------------------
 	// Direct lighting.
@@ -101,12 +102,12 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 						std::cout << colorAccumulator.r << " " << colorAccumulator.g << " " << colorAccumulator.b << std::endl;
 						}*/
 						colorAccumulator += hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
-					}
-#endif
 				}
+#endif
 			}
 		}
 	}
+}
 
 	colorAccumulator *= (1.0f / glm::max<float>(1.0f, (float)scene.emissiveRenderGroups.size()));
 
@@ -157,7 +158,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 		const auto incomingRadiance = TraceRay(diffuseRay, DEPTH + 1);
 		colorAccumulator += hitMaterial->CalculateDiffuseLighting(-diffuseRay.direction, -ray.direction, hitNormal, incomingRadiance);
 	}
-	
+
 	colorAccumulator *= rf * tf;
 
 	// -------------------------------
@@ -180,7 +181,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 
 			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency)*
 				hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal,
-													  (1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
+				(1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
 		}
 		else {
 			colorAccumulator += (1.0f - schlickConstantOutside)  *(hitMaterial->transparency)* TraceRay(refractedRay, DEPTH + 1);
