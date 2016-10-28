@@ -20,7 +20,7 @@
 #include "Scene\SceneObjectFactory.h"
 
 namespace {
-	// Returns a tring that has information about current date and time.
+	// Returns a string that represents the current date and time.
 	std::string CurrentDateTime() {
 		auto now = time(0);
 		struct tm tstruct;
@@ -62,15 +62,16 @@ int main() {
 	// +y is LEFT in image.
 	// +z is UP in image. 
 
+	// Add the room.
 	SceneObjectFactory::AddRoom(scene, false);
 
+	// Add the scene objects.
 	SceneObjectFactory::AddOrenNayarSphere(scene, 5, -0.5f, -4.0f, 0.75f, glm::vec3(1.0f, 0.0f, 0.0f), 0.00f); //red oren
 	SceneObjectFactory::AddSphere(scene, 10, 0, -0.5f, 1.25f, glm::vec3(1.0f, 0.2f, 1.0f)); //green diffuse
 	SceneObjectFactory::AddSphere(scene, 6, 4, 2, 1.15f, glm::vec3(1.0f, 1.0f, 0.2f)); // yellow
 	SceneObjectFactory::AddTransparentSphere(scene, 6.0f, -3.5f, -3.5f, 1.15f, glm::vec3(0.5f, 0.5f, 1.0f), 1.15f, 1.0f, 0.6f, 0.0f, 255.0f); // "thin glass" right.
 	SceneObjectFactory::AddTransparentSphere(scene, 8.0f, 3.0f, -3.0f, 1.15f, glm::vec3(1.0f, 1.0f, 0.2f), 1.15f, 0.0f, 1.0f, 0.0f, 255.0f);//mirror
 	SceneObjectFactory::AddTransparentSphere(scene, 6, -4.0f, 1.75f, 1.5f, glm::vec3(1.0f, 1.0f, 0.0f), 1.47f, 1.0f, 0.0f, 1.0f, 255.0f); // "Glass".
-	// SceneObjectFactory::AddTransparentSphere(scene, 6, -2.0f, 0.65f, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), 1.97f, 1.0f, 0.0f, 1.0f, 255.0f);
 	SceneObjectFactory::AddTransparentSphere(scene, 7, 0.0f, 2.75f, 0.5f, glm::vec3(0.8f, 0.2f, 1.0f), 1.37f, 1.0f, 0.0f, 1.0f, 255.0f);
 	SceneObjectFactory::AddTransparentSphere(scene, 6.5f, -2.0f, 0.95f, 1.0f, glm::vec3(0.7f, 1.0f, 0.0f), 1.47f, 1.0f, 0.0f, 1.0f, 255.0f);
 	SceneObjectFactory::AddTetrahedron(scene, 7, 4, -1, glm::vec3(0.0f, 1.0f, 1.0f), 0.0f, 1.0f, 0.0f, 0.0f);
