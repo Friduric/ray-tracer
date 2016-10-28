@@ -55,7 +55,12 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	// Emissive lighting.
 	// -------------------------------
 	if (hitMaterial->IsEmissive()) {
-		return hitMaterial->GetEmissionColor();
+		float f = 1.0f;
+		if (DEPTH >= 1) {
+			f *= glm::dot(-ray.direction, hitNormal);
+		}
+		auto self = hitMaterial->CalculateDiffuseLighting(-hitNormal, -ray.direction, hitNormal, hitMaterial->GetEmissionColor());
+		return f * hitMaterial->GetEmissionColor() + self;
 	}
 
 	// Initialize color accumulator.
