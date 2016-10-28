@@ -9,9 +9,7 @@
 
 using namespace std;
 
-float Utility::Math::BilinearInterpolation(const float dy, const float dz,
-										   const float x1, const float x2,
-										   const float x3, const float x4) {
+float Utility::Math::BilinearInterpolation(const float dy, const float dz, const float x1, const float x2, const float x3, const float x4) {
 	assert(dy >= -FLT_EPSILON && dy <= 1 + FLT_EPSILON);
 	assert(dz >= -FLT_EPSILON && dz <= 1 + FLT_EPSILON);
 	const float idy = 1 - dy;

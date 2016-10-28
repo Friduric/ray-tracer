@@ -1,8 +1,11 @@
 #pragma once
 
 #include <random>
+
 #include <glm.hpp>
+
 #include "../../includes/glm/gtc/constants.hpp"
+
 namespace Utility {
 	namespace Math {
 		/// <summary> Returns an bilinearly interpolated value between 4 corner values. </summary>
@@ -18,9 +21,7 @@ namespace Utility {
 		/// <param name='x2'> The value of the "lower left" point. </param>
 		/// <param name='x3'> The value of the "upper left" point. </param>
 		/// <param name='x4'> The value of the "upper right" point. </param>
-		float BilinearInterpolation(const float dy, const float dz,
-									const float x1, const float x2,
-									const float x3, const float x4);
+		float BilinearInterpolation(const float dy, const float dz, const float x1, const float x2, const float x3, const float x4);
 
 		/// <summary> 
 		/// A normal distribution generator that generates numbers between two given numbers.
