@@ -49,7 +49,7 @@ int main() {
 	cui BOUNCES_PER_HIT = 1;
 	cui PHOTONS_PER_LIGHT_SOURCE = 100000;
 	cui PHOTON_MAP_DEPTH = 4;
-	const RendererType RENDERER_TYPE = RendererType::MONTE_CARLO;
+	const RendererType RENDERER_TYPE = RendererType::PHOTON_MAP;
 
 	// --------------------------------------
 	// Create the scene.
