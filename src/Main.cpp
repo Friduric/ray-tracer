@@ -42,14 +42,14 @@ int main() {
 	// --------------------------------------
 	// Settings.
 	// --------------------------------------
-	cui PIXELS_W = 500;
-	cui PIXELS_H = 500;
-	cui RAYS_PER_PIXEL = 800;
+	cui PIXELS_W = 400;
+	cui PIXELS_H = 400;
+	cui RAYS_PER_PIXEL = 8;
 	cui MAX_RAY_DEPTH = 5;
 	cui BOUNCES_PER_HIT = 1;
-	cui PHOTONS_PER_LIGHT_SOURCE = 240000;
+	cui PHOTONS_PER_LIGHT_SOURCE = 100000;
 	cui PHOTON_MAP_DEPTH = 4;
-	RendererType RENDERER_TYPE = RendererType::PHOTON_MAP;
+	const RendererType RENDERER_TYPE = RendererType::MONTE_CARLO;
 
 	// --------------------------------------
 	// Create the scene.
