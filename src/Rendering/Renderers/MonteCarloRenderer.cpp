@@ -56,13 +56,10 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	// Emissive lighting.
 	// -------------------------------
 	if (hitMaterial->IsEmissive()) {
-		float f = 1.0f;
-		if (DEPTH >= 1) {
-			f *= glm::dot(-ray.direction, hitNormal);
-		}
-		return f * hitMaterial->GetEmissionColor();
+		return hitMaterial->GetEmissionColor();
 	}
 
+	// Initialize color accumulator.
 	glm::vec3 colorAccumulator = glm::vec3(0);
 	const float rf = 1.0f - hitMaterial->reflectivity;
 	const float tf = 1.0f - hitMaterial->transparency;
@@ -128,11 +125,13 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	// Refracted lighting.
 	// -------------------------------
 	if (hitMaterial->IsTransparent()) {
+		// Fetch refractive data.
 		const float n1 = 1.0f;
 		const float n2 = hitMaterial->refractiveIndex;
 		const float schlickConstantOutside = Utility::Rendering::CalculateSchlicksApproximation(ray.direction, hitNormal, n1, n2);
-		float schlickConstantInside = schlickConstantOutside; // Same as outside schlickconstant unless the refracted ray hits an inside
+		float schlickConstantInside = schlickConstantOutside;
 
+		// Refract ray.
 		glm::vec3 offset = hitNormal * 0.001f;
 		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
 		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
@@ -140,18 +139,18 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 			const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
 			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
 			schlickConstantInside = Utility::Rendering::CalculateSchlicksApproximation(refractedRay.direction, -refractedHitNormal, n2, n1);
-			Ray refractedRayOut(refractedIntersectionPoint + refractedHitNormal * 0.01f, glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1));
-
-			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency)*
-				hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal,
-				(1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
+			Ray refractedRayOut(refractedIntersectionPoint + 0.01f * refractedHitNormal, glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1));
+			const float f1 = (1.0f - schlickConstantOutside) * (hitMaterial->transparency);
+			const float f2 = (1.0f - schlickConstantInside);
+			const auto incomingRadiance = f2 * TraceRay(refractedRayOut, DEPTH + 1);
+			colorAccumulator += f1 * hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal, incomingRadiance);
 		}
 		else {
-			colorAccumulator += (1.0f - schlickConstantOutside)  *(hitMaterial->transparency)* TraceRay(refractedRay, DEPTH + 1);
+			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency) * TraceRay(refractedRay, DEPTH + 1);
 		}
 		Ray specularRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
-		colorAccumulator += schlickConstantOutside * hitMaterial->specularity *
-			hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
+		const float sf = schlickConstantOutside * hitMaterial->specularity;
+		colorAccumulator += sf * hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
 	}
 
 	// -------------------------------
@@ -163,5 +162,5 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	}
 
 	// Return result.
-	return 0.95f * colorAccumulator;
+	return colorAccumulator;
 }
