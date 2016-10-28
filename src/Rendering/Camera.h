@@ -53,5 +53,5 @@ private:
 	std::vector<std::vector<glm::u8vec3>> discretizedPixels;
 
 	/// <summary> Discretizes the color of each pixel. </summary>
-	void CreateImage(const float BRIGHTNESS_DISCRETIZATION_THRESHOLD = 1.25f);
+	void CreateImage();
 };
