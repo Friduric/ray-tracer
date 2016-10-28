@@ -7,6 +7,7 @@
 
 #define __USE_SPECULAR_LIGHTING false
 #define __USE_CAUSTICS_PHOTON_MAP true
+#define __USE_GLOBAL_PHOTON_MAP true
 
 glm::vec3 PhotonMapRenderer::GetPixelColor(const Ray & ray) {
 	return TraceRay(ray);
@@ -77,6 +78,8 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	// Direct lighting.
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
+		bool shootShadowRay = true;
+#if __USE_GLOBAL_PHOTON_MAP
 		// If there are no direct light photons then approximate direct light to 0.
 		std::vector<PhotonMap::KDTreeNode> directNodesWithinRadius;
 		photonMap->GetDirectPhotonsAtPositionWithinRadius(intersectionPoint, PHOTON_SEARCH_RADIUS, directNodesWithinRadius);
@@ -93,7 +96,6 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 		const float upperLimit = 1200.0f;
 		const float lowerLimit = 0.0008f;
 
-		bool shootShadowRay = false;
 		if (dn != 0 && sn != 0) {
 			float factor = sn / (float)dn;
 			if (factor < upperLimit && factor > lowerLimit) {
@@ -140,7 +142,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 				}
 			}
 		}
-
+#endif
 		if (shootShadowRay) {
 			for (RenderGroup * lightSource : scene.emissiveRenderGroups) {
 
@@ -173,13 +175,7 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 #if __USE_SPECULAR_LIGHTING
 						// Specular lighting.
 						if (hitMaterial->IsSpecular()) {
-
 							glm::vec3 v = hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
-							/*if (v.r > 0.9f || v.g > 0.9f || v.b > 0.9f) {
-							std::cout << " ------------" << std::endl;
-							std::cout << v.r << " " << v.g << " " << v.b << std::endl;
-							std::cout << colorAccumulator.r << " " << colorAccumulator.g << " " << colorAccumulator.b << std::endl;
-							}*/
 							colorAccumulator += hitMaterial->CalculateSpecularLighting(-shadowRay.direction, -ray.direction, hitNormal, radiance);
 						}
 #endif
@@ -190,20 +186,6 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	}
 
 	colorAccumulator *= (1.0f / glm::max<float>(1.0f, (float)scene.emissiveRenderGroups.size()));
-
-	/*
-	// -------------------------------
-	// Emissive lighting.
-	// -------------------------------
-	if (hitMaterial->IsEmissive()) {
-		float f = 1.0f;
-		if (DEPTH >= 1) {
-			f *= glm::dot(-ray.direction, hitNormal);
-		}
-		auto self = hitMaterial->CalculateDiffuseLighting(-hitNormal, -ray.direction, hitNormal, hitMaterial->GetEmissionColor());
-		return f * hitMaterial->GetEmissionColor() + self;
-	}
-	*/
 
 #if	__USE_CAUSTICS_PHOTON_MAP
 	// -------------------------------
@@ -248,12 +230,13 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	// Refracted lighting.
 	// -------------------------------
 	if (hitMaterial->IsTransparent()) {
-
+		// Fetch refractive data.
 		const float n1 = 1.0f;
 		const float n2 = hitMaterial->refractiveIndex;
 		const float schlickConstantOutside = Utility::Rendering::CalculateSchlicksApproximation(ray.direction, hitNormal, n1, n2);
-		float schlickConstantInside = schlickConstantOutside; // Same as outside schlickconstant unless the refracted ray hits an inside
+		float schlickConstantInside = schlickConstantOutside;
 
+		// Refract ray.
 		glm::vec3 offset = hitNormal * 0.001f;
 		Ray refractedRay(intersectionPoint - offset, glm::refract(ray.direction, hitNormal, n1 / n2));
 		if (scene.RenderGroupRayCast(refractedRay, intersectionRenderGroupIndex, intersectionPrimitiveIndex, intersectionDistance)) {
@@ -261,18 +244,18 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 			const glm::vec3 refractedIntersectionPoint = refractedRay.from + refractedRay.direction * intersectionDistance;
 			const glm::vec3 refractedHitNormal = refractedRayHitPrimitive->GetNormal(refractedIntersectionPoint);
 			schlickConstantInside = Utility::Rendering::CalculateSchlicksApproximation(refractedRay.direction, -refractedHitNormal, n2, n1);
-			Ray refractedRayOut(refractedIntersectionPoint + refractedHitNormal * 0.01f, glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1));
-
-			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency)*
-				hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal,
-				(1.0f - schlickConstantInside) *TraceRay(refractedRayOut, DEPTH + 1));
+			Ray refractedRayOut(refractedIntersectionPoint + 0.01f * refractedHitNormal, glm::refract(refractedRay.direction, -refractedHitNormal, n2 / n1));
+			const float f1 = (1.0f - schlickConstantOutside) * (hitMaterial->transparency);
+			const float f2 = (1.0f - schlickConstantInside);
+			const auto incomingRadiance = f2 * TraceRay(refractedRayOut, DEPTH + 1);
+			colorAccumulator += f1 * hitMaterial->CalculateDiffuseLighting(refractedRay.direction, -ray.direction, hitNormal, incomingRadiance);
 		}
 		else {
-			colorAccumulator += (1.0f - schlickConstantOutside)  *(hitMaterial->transparency)* TraceRay(refractedRay, DEPTH + 1);
+			colorAccumulator += (1.0f - schlickConstantOutside) * (hitMaterial->transparency) * TraceRay(refractedRay, DEPTH + 1);
 		}
 		Ray specularRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
-		colorAccumulator += schlickConstantOutside * hitMaterial->specularity *
-			hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
+		const float sf = schlickConstantOutside * hitMaterial->specularity;
+		colorAccumulator += sf * hitMaterial->CalculateSpecularLighting(-specularRay.direction, -ray.direction, hitNormal, TraceRay(specularRay, DEPTH + 1));
 	}
 
 	// -------------------------------
@@ -284,5 +267,5 @@ glm::vec3 PhotonMapRenderer::TraceRay(const Ray & _ray, const unsigned int DEPTH
 	}
 
 	// Return result.
-	return 0.95f * colorAccumulator;
+	return colorAccumulator;
 }

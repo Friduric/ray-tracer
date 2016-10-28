@@ -73,6 +73,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	// -------------------------------
 	if (rf > FLT_EPSILON && tf > FLT_EPSILON) {
 		for (RenderGroup * lightSource : scene.emissiveRenderGroups) {
+
 			// Create a shadow ray.
 			const glm::vec3 randomLightSurfacePosition = lightSource->GetRandomPositionOnSurface();
 			const glm::vec3 shadowRayDirection = glm::normalize(randomLightSurfacePosition - intersectionPoint);
@@ -86,6 +87,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 			if (scene.RayCast(shadowRay, shadowRayGroupIndex, shadowRayPrimitiveIndex, intersectionDistance)) {
 				const auto & renderGroup = scene.renderGroups[shadowRayGroupIndex];
 				if (&renderGroup == lightSource) {
+
 					// We hit the light. Add it's contribution to the color accumulator.
 					const Primitive * lightPrimitive = renderGroup.primitives[shadowRayPrimitiveIndex];
 					const glm::vec3 lightNormal = lightPrimitive->GetNormal(shadowRay.from + intersectionDistance * shadowRay.direction);
@@ -158,7 +160,7 @@ glm::vec3 MonteCarloRenderer::TraceRay(const Ray & _ray, const unsigned int DEPT
 	}
 
 	// -------------------------------
-	// Reflective.
+	// Perfectly reflective lighting.
 	// -------------------------------
 	if (hitMaterial->IsReflective()) {
 		Ray reflectedRay(intersectionPoint, glm::reflect(ray.direction, hitNormal));
