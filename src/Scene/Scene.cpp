@@ -15,7 +15,7 @@ Scene::Scene() {}
 
 Scene::~Scene() {
 	for (auto& rg : renderGroups) {
-		for (auto& primitive : rg.primitives) {
+		for (auto primitive : rg.primitives) {
 			delete primitive;
 		}
 	}
@@ -56,7 +56,6 @@ void Scene::Initialize() {
 			emissiveRenderGroups.push_back(&renderGroups[i]);
 		}
 	}
-
 	RecalculateAABB();
 }
 
