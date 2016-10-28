@@ -14,7 +14,7 @@ private:
 	const float PHOTON_SEARCH_AREA = PHOTON_SEARCH_RADIUS*PHOTON_SEARCH_RADIUS*glm::pi<float>();
 	const float WEIGHT_MODIFIER = 1.0f;
 	const float WEIGHT_FACTOR = 1.0f / (WEIGHT_MODIFIER * PHOTON_SEARCH_RADIUS);
-	const float CAUSTICS_STRENGTH_MULTIPLIER = 5.0f;
+	const float CAUSTICS_STRENGTH_MULTIPLIER = 10.0;
 	PhotonMap* photonMap;
 	std::vector<PhotonMap::KDTreeNode> volatilePhotonMapNodes;
 
