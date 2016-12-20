@@ -1,13 +1,6 @@
 ## Description
 A Monte Carlo ray tracer implementation using photon mapping. 
 
-<p align="center">
-An image rendered using this renderer:
-</p>
-<p align="center">
-<img src="https://github.com/Friduric/raytracer/blob/master/final.png" width="600" height="600">
-</p>
-
 Currently supports:
 - Intransparent materials using Oren-Nayar and Lambertian BRDFs.
 - Transparent and reflective materials.
